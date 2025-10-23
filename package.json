@@ -1,0 +1,23 @@
+{
+  "name": "smart-boxes",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SHIJYang/Smartboxes.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SHIJYang/Smartboxes/issues"
+  },
+  "homepage": "https://github.com/SHIJYang/Smartboxes#readme",
+  "dependencies": {
+    "vue": "^3.5.22"
+  }
+}
