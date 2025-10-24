@@ -1,20 +1,16 @@
-import App from './App'
+// main.js
+import App from './App.vue'
 
-// #ifndef VUE3
-import Vue from 'vue'
-import './uni.promisify.adaptor'
-Vue.config.productionTip = false
-App.mpType = 'app'
-const app = new Vue({
-  ...App
-})
-app.$mount()
-// #endif
+// 引入 uView Plus
+import uViewPlus from 'uview-plus'
 
 // #ifdef VUE3
 import { createSSRApp } from 'vue'
+
 export function createApp() {
   const app = createSSRApp(App)
+  // 挂载 uView Plus
+  app.use(uViewPlus)
   return {
     app
   }

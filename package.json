@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/SHIJYang/Smartboxes#readme",
   "dependencies": {
+    "uview-plus": "^3.6.4",
     "vue": "^3.5.22"
   }
 }
