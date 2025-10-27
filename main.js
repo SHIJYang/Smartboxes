@@ -1,5 +1,6 @@
 // main.js
 import App from './App.vue'
+import '@/mock' // 开发环境使用 mock 数据
 
 // 引入 uView Plus
 import uViewPlus from 'uview-plus'

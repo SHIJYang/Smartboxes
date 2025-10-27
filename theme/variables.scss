@@ -1,0 +1,30 @@
+// 主题变量
+:root {
+  --primary-color: v-bind('theme.primary');
+  --secondary-color: v-bind('theme.secondary');
+  --background-color: v-bind('theme.background');
+  --card-bg-color: v-bind('theme.cardBg');
+  --text-primary-color: v-bind('theme.textPrimary');
+  --text-secondary-color: v-bind('theme.textSecondary');
+  --border-color: v-bind('theme.border');
+  --success-color: v-bind('theme.success');
+  --warning-color: v-bind('theme.warning');
+  --error-color: v-bind('theme.error');
+}
+
+// 主题混入
+@mixin themed-component {
+  background-color: var(--card-bg-color);
+  color: var(--text-primary-color);
+  border-color: var(--border-color);
+  transition: all 0.3s ease;
+}
+
+@mixin themed-text {
+  color: var(--text-primary-color);
+}
+
+@mixin themed-card {
+  @include themed-component;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}

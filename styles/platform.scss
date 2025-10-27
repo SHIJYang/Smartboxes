@@ -1,0 +1,29 @@
+/* 平台特定样式 */
+.platform-container {
+  /* #ifdef H5 */
+  height: calc(100vh - 44px);
+  /* #endif */
+  
+  /* #ifdef MP-WEIXIN */
+  height: 100vh;
+  padding-bottom: env(safe-area-inset-bottom);
+  /* #endif */
+  
+  /* #ifdef APP-PLUS */
+  height: 100vh;
+  /* #endif */
+}
+
+.safe-area-bottom {
+  /* #ifdef MP-WEIXIN */
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+  /* #endif */
+}
+
+/* 修复小程序点击高亮 */
+.mp-hover {
+  /* #ifdef MP-WEIXIN */
+  background-color: transparent !important;
+  /* #endif */
+}

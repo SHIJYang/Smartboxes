@@ -44,50 +44,54 @@
       />
     </scroll-view>
 
-    <u-fab icon="plus" position="bottomRight" :offset="[40, 80]" @click="addSpace" />
+    <u-fab
+      icon="plus"
+      position="bottomRight"
+      :offset="[40, 80]"
+      @click="addSpace"
+    />
   </view>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { fetchSpaces } from '../../api/mock/spaces.js'
-import boxcard from '@/components/boxcard.vue'
+import { ref, onMounted } from "vue";
+import { fetchSpaces } from "../../api/mock/spaces.js";
+import boxcard from "@/components/boxcard.vue";
 
-const spaceList = ref([])
-const loading = ref(false)
-const listHeight = ref(0)
+const spaceList = ref([]);
+const loading = ref(false);
+const listHeight = ref(0);
 
 onMounted(() => {
-  const sysInfo = uni.getSystemInfoSync()
+  const sysInfo = uni.getSystemInfoSync();
   // 更准确的高度计算
-  const navHeight = (sysInfo.statusBarHeight || 0) + (sysInfo.platform === 'ios' ? 44 : 48)
-  listHeight.value = sysInfo.windowHeight - navHeight - 60 // 60px 预留底部
-  console.log('列表高度:', listHeight.value) // 调试用
-})
+  const navHeight =
+    (sysInfo.statusBarHeight || 0) + (sysInfo.platform === "ios" ? 44 : 48);
+  listHeight.value = sysInfo.windowHeight - navHeight - 60; // 60px 预留底部
+  console.log("列表高度:", listHeight.value); // 调试用
+
+  loadData();
+});
 
 const loadData = async () => {
-  loading.value = true
+  loading.value = true;
   try {
-    const data = await fetchSpaces()
-    spaceList.value = data
+    const data = await fetchSpaces();
+    spaceList.value = data;
   } catch (err) {
-    uni.showToast({ title: '加载失败', icon: 'none' })
+    uni.showToast({ title: "加载失败", icon: "none" });
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
-
-onMounted(() => {
-  loadData()
-})
+};
 
 const gotoSpace = (id) => {
-  uni.navigateTo({ url: `/pages/space/space?id=${id}` })
-}
+  uni.navigateTo({ url: `/pages/space/space?id=${id}` });
+};
 
 const addSpace = () => {
-  uni.showToast({ title: '功能开发中', icon: 'none' })
-}
+  uni.showToast({ title: "功能开发中", icon: "none" });
+};
 </script>
 
 <style scoped>
