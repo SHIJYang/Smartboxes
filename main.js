@@ -9,16 +9,14 @@ if (process.env.NODE_ENV === 'development') {
 
 // 引入 uView Plus
 import uViewPlus from 'uview-plus'
+import 'uview-plus/index.scss'
 
 // #ifdef VUE3
 import { createSSRApp } from 'vue'
 
 export function createApp() {
   const app = createSSRApp(App)
-  // 挂载 uView Plus
   app.use(uViewPlus)
-  return {
-    app
-  }
+  return { app }
 }
 // #endif

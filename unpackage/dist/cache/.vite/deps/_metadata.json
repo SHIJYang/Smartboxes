@@ -1,25 +1,15 @@
 {
-  "hash": "12e4c73f",
-  "configHash": "7084ef31",
-  "lockfileHash": "e1693485",
-  "browserHash": "227d73a9",
+  "hash": "b08fb071",
+  "configHash": "15125ef0",
+  "lockfileHash": "5ef66fe0",
+  "browserHash": "56af0480",
   "optimized": {
     "uview-plus": {
       "src": "../../../../../node_modules/uview-plus/index.js",
       "file": "uview-plus.js",
-      "fileHash": "be69d34d",
-      "needsInterop": false
-    },
-    "uview-ui": {
-      "src": "../../../../../node_modules/uview-ui/index.js",
-      "file": "uview-ui.js",
-      "fileHash": "33ace5ff",
+      "fileHash": "7aecacdd",
       "needsInterop": false
     }
   },
-  "chunks": {
-    "chunk-LQ2VYIYD": {
-      "file": "chunk-LQ2VYIYD.js"
-    }
-  }
+  "chunks": {}
 }

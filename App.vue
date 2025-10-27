@@ -1,46 +1,66 @@
 <template>
-  <!-- 使用 uview-plus 全局组件做一个最小示例 -->
   <u-navbar title="模拟分类收纳" />
   <view class="app-shell">
-    <view class="welcome">
+    <view class="welcome" ref="welcomeRef">
       <text>欢迎使用 模拟分类收纳 管理系统</text>
     </view>
     <view class="actions">
       <u-button type="primary" @click="openDemo">打开示例</u-button>
+      <u-button type="default" @click="toggleTheme">切换主题</u-button>
     </view>
   </view>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted, watch } from "vue";
 import { useTheme } from "@/utils/theme";
-import i18n from "@/utils/i18n";
+import gsap from "gsap";
 
-export default {
-  onLaunch() {
-    const { getThemeConfig } = useTheme();
-    // 初始化主题
-    const theme = getThemeConfig();
-    this.updateThemeVariables(theme);
-  },
-  methods: {
-    updateThemeVariables(theme) {
-      // 增加 document 存在性检查，避免在非 H5 环境报错
-      if (typeof document === "undefined" || !theme) return;
-      // 更新CSS变量
-      Object.entries(theme).forEach(([key, value]) => {
-        document.documentElement.style.setProperty(`--${key}-color`, value);
-      });
-    },
-    openDemo() {
-      // 示例交互，使用 uview-plus 组件触发
-      uni.showToast({ title: "示例已打开", icon: "none" });
-    },
-  },
+const welcomeRef = ref(null);
+const { currentTheme, setTheme, getThemeConfig } = useTheme();
+
+const updateThemeVariables = (theme) => {
+  if (typeof document === "undefined" || !theme) return;
+  Object.entries(theme).forEach(([key, value]) => {
+    document.documentElement.style.setProperty(`--${key}-color`, value);
+  });
+};
+
+onMounted(() => {
+  updateThemeVariables(getThemeConfig());
+  if (welcomeRef.value) {
+    gsap.fromTo(
+      welcomeRef.value,
+      { opacity: 0, y: 30 },
+      { opacity: 1, y: 0, duration: 1 }
+    );
+  }
+});
+
+watch(currentTheme, () => {
+  updateThemeVariables(getThemeConfig());
+});
+
+const openDemo = () => {
+  uni.showToast({ title: "示例已打开", icon: "none" });
+};
+
+const toggleTheme = () => {
+  const next =
+    currentTheme.value === "default"
+      ? "dark"
+      : currentTheme.value === "dark"
+      ? "elegant"
+      : "default";
+  setTheme(next);
+  uni.showToast({ title: `已切换主题：${next}`, icon: "none" });
 };
 </script>
 
 <style lang="scss">
+@import "uview-plus/libs/css/common.scss";
 @import "@/theme/variables.scss";
+@import "uview-plus/index.scss";
 
 // 全局样式
 .app-shell {
@@ -51,9 +71,12 @@ export default {
 }
 .welcome {
   margin: 18px 0;
-  font-size: 16px;
+  font-size: 18px;
+  text-align: center;
 }
 .actions {
-  margin-top: 12px;
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
 }
 </style>

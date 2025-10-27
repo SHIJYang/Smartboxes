@@ -1,5 +1,3 @@
-import "./chunk-LQ2VYIYD.js";
-
 // ../../../sjy/Smart-boxes/node_modules/uview-plus/libs/vue.js
 var defineMixin = (options) => {
   return options;
