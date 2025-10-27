@@ -1,17 +1,21 @@
-import request from '@/utils/request'
+import { getItems as mockGetItems, getBoxes as mockGetBoxes, getUserInfo as mockGetUserInfo, postChat as mockPostChat } from '@/mock/api'
 
-export const getItems = (params) => {
-    return request.get('/api/items', { params })
+export const getItems = async (params) => {
+    const res = await mockGetItems(params)
+    return res.data || res
 }
 
-export const getBoxes = () => {
-    return request.get('/api/boxes')
+export const getBoxes = async () => {
+    const res = await mockGetBoxes()
+    return res.data || res
 }
 
-export const getUserInfo = () => {
-    return request.get('/api/user/info')
+export const getUserInfo = async () => {
+    const res = await mockGetUserInfo()
+    return res.data || res
 }
 
-export const sendChatMessage = (data) => {
-    return request.post('/api/chat', data)
+export const sendChatMessage = async (data) => {
+    const res = await mockPostChat(data)
+    return res.data || res
 }

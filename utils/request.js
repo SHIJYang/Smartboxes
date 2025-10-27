@@ -1,69 +1,37 @@
-import { useUserStore } from '@/stores/user'
+// 使用本地 mock 数据替代真实请求
 
-const request = {
-    baseURL: '/api',
-    timeout: 10000,
-    header: {
-        'Content-Type': 'application/json'
-    }
-}
+import { getItems, getUserInfo, getBoxes, postChat } from '../mock/api'
 
-// 请求拦截器
-request.beforeRequest = (config) => {
-    const userStore = useUserStore()
-    if (userStore.token) {
-        config.header['Authorization'] = `Bearer ${userStore.token}`
-    }
-    return config
-}
-
-// 响应拦截器
-request.afterResponse = (response) => {
-    const { code, message, data } = response.data
-
-    if (code === 200) {
-        return data
-    }
-
-    if (code === 401) {
-        const userStore = useUserStore()
-        userStore.logout()
-        uni.redirectTo({ url: '/pages/login/login' })
-    }
-
-    uni.showToast({
-        title: message || '请求失败',
-        icon: 'error'
-    })
-    return Promise.reject(new Error(message))
-}
-
-// 统一请求方法
 const http = {
-    get(url, params = {}) {
-        return new Promise((resolve, reject) => {
-            uni.request({
-                ...request,
-                url: request.baseURL + url,
-                data: params,
-                method: 'GET',
-                success: (res) => resolve(request.afterResponse(res)),
-                fail: reject
-            })
-        })
+    async get(url, params = {}) {
+        try {
+            if (url === '/items' || url.startsWith('/items')) {
+                const res = await getItems(params)
+                return res.data || res
+            }
+            if (url === '/user/info' || url.endsWith('/user/info')) {
+                const res = await getUserInfo()
+                return res.data || res
+            }
+            if (url === '/boxes' || url.startsWith('/boxes')) {
+                const res = await getBoxes()
+                return res.data || res
+            }
+            return null
+        } catch (e) {
+            return Promise.reject(e)
+        }
     },
-
-    post(url, data = {}) {
-        return new Promise((resolve, reject) => {
-            uni.request({
-                ...request,
-                url: request.baseURL + url,
-                data,
-                method: 'POST',
-                success: (res) => resolve(request.afterResponse(res)),
-                fail: reject
-            })
-        })
+    async post(url, data = {}) {
+        try {
+            if (url === '/chat' || url.endsWith('/chat')) {
+                const res = await postChat(data)
+                return res.data || res
+            }
+            return null
+        } catch (e) {
+            return Promise.reject(e)
+        }
     }
 }
 

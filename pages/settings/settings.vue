@@ -97,31 +97,6 @@
         </view>
       </view>
     </u-popup>
-
-    <!-- 语言设置 -->
-    <u-cell-group title="语言设置" margin-top="20">
-      <u-cell
-        :title="$t('settings.language')"
-        :value="languages[currentLocale]"
-        @click="showLanguageSelect = true"
-      />
-    </u-cell-group>
-
-    <!-- 语言选择弹窗 -->
-    <u-popup v-model="showLanguageSelect" mode="bottom">
-      <view class="language-select">
-        <view
-          v-for="(name, code) in languages"
-          :key="code"
-          class="language-item"
-          :class="{ active: currentLocale === code }"
-          @click="changeLanguage(code)"
-        >
-          <text>{{ name }}</text>
-          <u-icon v-if="currentLocale === code" name="checkmark" />
-        </view>
-      </view>
-    </u-popup>
   </view>
 </template>
 
@@ -129,7 +104,7 @@
 import { ref } from "vue";
 import { useTheme } from "@/utils/theme";
 import { themes } from "@/theme/config";
-import { useI18n } from "@/utils/i18n";
+import { platform } from "@/utils/platform";
 
 const settings = ref({
   notification: true,
@@ -204,22 +179,6 @@ const changeTheme = (themeName) => {
   showThemeSelect.value = false;
 };
 
-const { getLocale, setLocale } = useI18n();
-const currentLocale = ref(getLocale());
-const showLanguageSelect = ref(false);
-
-const languages = {
-  "zh-CN": "简体中文",
-  "en-US": "English",
-  "ja-JP": "日本語",
-};
-
-const changeLanguage = (locale) => {
-  setLocale(locale);
-  currentLocale.value = locale;
-  showLanguageSelect.value = false;
-};
-
 // APP专属方法
 const checkPermission = async () => {
   if (!platform.isApp) return;
@@ -263,23 +222,5 @@ const checkPermission = async () => {
   width: 60rpx;
   height: 60rpx;
   border-radius: 30rpx;
-}
-
-.language-select {
-  padding: 30rpx;
-}
-
-.language-item {
-  @include themed-component;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20rpx;
-  margin-bottom: 20rpx;
-  border-radius: 12rpx;
-
-  &.active {
-    color: var(--primary-color);
-  }
 }
 </style>

@@ -4,7 +4,11 @@ import { messages, defaultLocale } from '@/locale'
 const i18n = createI18n({
     locale: uni.getStorageSync('language') || defaultLocale,
     fallbackLocale: defaultLocale,
-    messages
+    messages,
+    legacy: false, // 使用组合式API
+    globalInjection: true, // 全局注入 $t 等方法
+    missingWarn: false, // 关闭警告
+    fallbackWarn: false
 })
 
 export const useI18n = () => {

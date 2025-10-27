@@ -15,8 +15,8 @@ export const platform = {
 
 // 平台特定样式
 export const platformStyle = {
-    // 安全区域
+    // 安全区域：使用 platform 对象而非 this
     getSafeAreaBottom() {
-        return this.isWeapp ? 'padding-bottom: env(safe-area-inset-bottom);' : ''
+        return platform.isWeapp ? 'padding-bottom: env(safe-area-inset-bottom);' : ''
     }
 }

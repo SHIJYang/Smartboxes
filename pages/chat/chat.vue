@@ -82,18 +82,32 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+// import http from "@/utils/request";
+import { postChat } from "../../mock/api";
 import { platform } from "@/utils/platform";
 
 const messages = ref([
   {
+    id: 1,
     text: "你好！我是收纳助手，可以帮你查找物品。",
     isSelf: false,
     avatar: "/static/avatar/ai.png",
   },
-  { text: "我想找我的钢笔", isSelf: true, avatar: "/static/avatar/user.png" },
+  {
+    id: 2,
+    text: "我想找我的钢笔",
+    isSelf: true,
+    avatar: "/static/avatar/user.png",
+  },
 ]);
 
 const inputText = ref("");
+const inputFocus = ref(false);
+
+// 补充避免未定义
+const showVoice = ref(false);
+const latestId = ref("");
+const scrollTop = ref(0);
 
 const onVoiceStart = () => {
   console.log("开始录音");
@@ -106,27 +120,33 @@ const onVoiceStop = () => {
 };
 
 const sendMessage = async () => {
-  if (!inputText.value.trim()) return;
+  const content = inputText.value.trim();
+  if (!content) return;
 
   const msgId = Date.now();
   messages.value.push({
     id: msgId,
-    text: inputText.value,
+    text: content,
     isSelf: true,
     avatar: "/static/avatar/user.png",
   });
 
+  latestId.value = "msg-" + msgId;
   inputText.value = "";
 
   try {
-    const data = await http.post("/chat", { message: inputText.value });
-    messages.value.push({
-      id: Date.now(),
-      text: data.reply,
-      items: data.items,
-      isSelf: false,
-      avatar: "/static/avatar/ai.png",
-    });
+    const res = await postChat(content);
+    if (res && res.code === 200) {
+      messages.value.push({
+        id: Date.now(),
+        text: res.data.reply,
+        items: res.data.items,
+        isSelf: false,
+        avatar: "/static/avatar/ai.png",
+      });
+    } else {
+      uni.showToast({ title: "发送失败", icon: "error" });
+    }
   } catch (e) {
     uni.showToast({ title: "发送失败", icon: "error" });
   }
