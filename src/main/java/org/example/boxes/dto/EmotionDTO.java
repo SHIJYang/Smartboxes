@@ -1,6 +1,7 @@
 package org.example.boxes.dto;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
@@ -24,6 +25,7 @@ public class EmotionDTO {
 
     /**
      * 情感标签（必填）
+     * 1-快乐 2-悲伤 3-愤怒 4-焦虑 5-平静
      */
     @NotNull(message = "情感标签不能为空")
     private Integer emotionTag;
@@ -31,5 +33,6 @@ public class EmotionDTO {
     /**
      * 情感备注
      */
+    @Size(max = 500, message = "情感备注长度不能超过500个字符")
     private String emotionRemark;
 }
