@@ -1,15 +1,37 @@
 {
-  "hash": "b08fb071",
-  "configHash": "15125ef0",
+  "hash": "ed7dedad",
+  "configHash": "a40b5f47",
   "lockfileHash": "5ef66fe0",
-  "browserHash": "56af0480",
+  "browserHash": "873f8696",
   "optimized": {
+    "gsap": {
+      "src": "../../../../../node_modules/gsap/index.js",
+      "file": "gsap.js",
+      "fileHash": "b9f9ee12",
+      "needsInterop": false
+    },
     "uview-plus": {
       "src": "../../../../../node_modules/uview-plus/index.js",
       "file": "uview-plus.js",
-      "fileHash": "7aecacdd",
+      "fileHash": "5cfadfb2",
+      "needsInterop": false
+    },
+    "gsap/CSSPlugin": {
+      "src": "../../../../../node_modules/gsap/CSSPlugin.js",
+      "file": "gsap_CSSPlugin.js",
+      "fileHash": "62ccb8c2",
+      "needsInterop": false
+    },
+    "gsap/ScrollTrigger": {
+      "src": "../../../../../node_modules/gsap/ScrollTrigger.js",
+      "file": "gsap_ScrollTrigger.js",
+      "fileHash": "73ec3c91",
       "needsInterop": false
     }
   },
-  "chunks": {}
+  "chunks": {
+    "chunk-2ZOXH2DT": {
+      "file": "chunk-2ZOXH2DT.js"
+    }
+  }
 }

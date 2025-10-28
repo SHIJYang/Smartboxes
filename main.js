@@ -9,7 +9,6 @@ if (process.env.NODE_ENV === 'development') {
 
 // 引入 uView Plus
 import uViewPlus from 'uview-plus'
-import 'uview-plus/index.scss'
 
 // #ifdef VUE3
 import { createSSRApp } from 'vue'
