@@ -66,12 +66,12 @@ public class BoxDTO {
     private Integer battery;
 
     private java.time.LocalDateTime lastHeartbeatTime;
-    
+
     /**
      * 创建时间
      */
     private java.time.LocalDateTime createTime;
-    
+
     /**
      * 更新时间
      */
