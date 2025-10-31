@@ -38,7 +38,7 @@
     </view>
 
     <u-fab
-      icon="add"
+      icon="plus"
       position="bottomRight"
       :offset="[32, 88]"
       @click="addSpace"
@@ -48,38 +48,22 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { getBoxes } from "@/mock/api.js";
+
+import http from "@/utils/request";
 import boxcard from "@/components/boxcard.vue";
 
 const spaceList = ref([]);
 const loading = ref(false);
-const listHeight = ref(0);
 
 onMounted(() => {
-  const sysInfo = uni.getSystemInfoSync();
-  const statusBar = sysInfo.statusBarHeight || 0;
-  // 导航高度在不同平台略有不同，兼容性处理
-  const navBar = sysInfo.platform === "ios" ? 44 : 48;
-  const safeBottom =
-    sysInfo.safeArea && sysInfo.safeArea.bottom
-      ? sysInfo.screenHeight - sysInfo.safeArea.bottom
-      : 0;
-  listHeight.value = sysInfo.windowHeight - statusBar - navBar - 120; // 预留顶部/底部空间
   loadData();
 });
 
 const loadData = async () => {
   loading.value = true;
   try {
-    const res = await getBoxes();
-    // getBoxes 返回 { code:200, data: [...] }，兼容各种实现
-    if (res && res.data) {
-      spaceList.value = res.data;
-    } else if (Array.isArray(res)) {
-      spaceList.value = res;
-    } else {
-      spaceList.value = [];
-    }
+    const res = await http.get('/boxes');
+    spaceList.value = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
   } catch (err) {
     uni.showToast({ title: "加载失败", icon: "none" });
     spaceList.value = [];

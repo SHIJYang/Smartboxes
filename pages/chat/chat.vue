@@ -217,7 +217,7 @@ import { ref, onMounted, nextTick, watch } from "vue";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-import { postChat } from "../../mock/api";
+import http from "@/utils/request";
 import { formatTime } from "@/utils/date"; // 假设已有时间格式化工具
 
 // 注册GSAP插件
@@ -420,21 +420,22 @@ const sendMessage = async () => {
     systemTipText.value = "正在思考...";
     await new Promise(resolve => setTimeout(resolve, 800));
     
-    const res = await postChat(content);
-    if (res && res.code === 200) {
-      // 隐藏提示
-      showSystemTip.value = false;
-      
-      // 添加AI回复
-      const aiMsgId = Date.now();
-      messages.value.push({
-        id: aiMsgId,
-        text: res.data.reply,
-        items: res.data.items,
-        isSelf: false,
-        avatar: "/static/avatar/ai.png",
-        timestamp: aiMsgId
-      });
+    const data = await http.post('/chat', { message: content });
+    // 隐藏提示
+    showSystemTip.value = false;
+    
+    // 添加AI回复（兼容后端返回 {reply, items} 或 data 层）
+    const reply = data.reply ?? data?.data?.reply ?? '已收到';
+    const items = data.items ?? data?.data?.items ?? [];
+    const aiMsgId = Date.now();
+    messages.value.push({
+      id: aiMsgId,
+      text: reply,
+      items,
+      isSelf: false,
+      avatar: "/static/avatar/ai.png",
+      timestamp: aiMsgId
+    });
 
       // AI消息动画（左侧滑入）
       await nextTick();

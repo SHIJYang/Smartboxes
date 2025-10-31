@@ -21,8 +21,10 @@ const { currentTheme, setTheme, getThemeConfig } = useTheme();
 
 const updateThemeVariables = (theme) => {
   if (typeof document === "undefined" || !theme) return;
+  const toKebab = (s) => s.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
   Object.entries(theme).forEach(([key, value]) => {
-    document.documentElement.style.setProperty(`--${key}-color`, value);
+    const kebab = toKebab(key); // e.g. textPrimary -> text-primary
+    document.documentElement.style.setProperty(`--${kebab}-color`, String(value));
   });
 };
 

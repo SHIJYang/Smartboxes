@@ -1,69 +1,17 @@
 {
-
-	"pages": [{
-			"path": "pages/index/index",
-			"style": {
-				"navigationBarTitleText": "收纳空间",
-				"navigationBarBackgroundColor": "#4A90E2",
-				"navigationBarTextStyle": "white"
-			}
-		},
-		{
-			"path": "pages/space/space",
-			"style": {
-				"navigationBarTitleText": "收纳盒详情",
-				"navigationBarBackgroundColor": "#4A99E2",
-				"navigationBarTextStyle": "white"
-			}
-		},
-		{
-			"path": "pages/item/item",
-			"style": {
-				"navigationBarTitleText": "物品详情",
-				"navigationBarBackgroundColor": "#5AA9E2",
-				"navigationBarTextStyle": "white"
-			}
-		},
-		{
-			"path": "pages/add-item/add-item",
-			"style": {
-				"navigationBarTitleText": "添加物品",
-				"navigationBarBackgroundColor": "#6AB9E2",
-				"navigationBarTextStyle": "white"
-			}
-		},
-		{
-			"path": "pages/search/search",
-			"style": {
-				"navigationBarTitleText": "查找物品",
-				"navigationBarBackgroundColor": "#7AC9E2",
-				"navigationBarTextStyle": "white"
-			}
-		},
-		{
-			"path": "pages/chat/chat",
-			"style": {
-				"navigationBarTitleText": "智能助手",
-				"navigationBarBackgroundColor": "#8AD9E2",
-				"navigationBarTextStyle": "white"
-			}
-		},
-		{
-			"path": "pages/settings/settings",
-			"style": {
-				"navigationBarTitleText": "设置",
-				"navigationBarBackgroundColor": "#9AE9E2",
-				"navigationBarTextStyle": "black"
-			}
-		},
-		{
-			"path": "pages/profile/profile",
-			"style": {
-				"navigationBarTitleText": "我的",
-				"navigationBarBackgroundColor": "#FFFFFF",
-				"navigationBarTextStyle": "black"
-			}
-		}
+	"pages": [
+		{ "path": "pages/index/index", "style": { "navigationBarTitleText": "收纳空间", "navigationBarBackgroundColor": "#4A90E2", "navigationBarTextStyle": "white" } },
+		{ "path": "pages/space/space", "style": { "navigationBarTitleText": "收纳盒详情", "navigationBarBackgroundColor": "#4A99E2", "navigationBarTextStyle": "white" } },
+		{ "path": "pages/item/item", "style": { "navigationBarTitleText": "物品详情", "navigationBarBackgroundColor": "#5AA9E2", "navigationBarTextStyle": "white" } },
+		{ "path": "pages/add-item/add-item", "style": { "navigationBarTitleText": "添加物品", "navigationBarBackgroundColor": "#6AB9E2", "navigationBarTextStyle": "white" } },
+		{ "path": "pages/search/search", "style": { "navigationBarTitleText": "查找物品", "navigationBarBackgroundColor": "#7AC9E2", "navigationBarTextStyle": "white" } },
+		{ "path": "pages/chat/chat", "style": { "navigationBarTitleText": "智能助手", "navigationBarBackgroundColor": "#8AD9E2", "navigationBarTextStyle": "white" } },
+		{ "path": "pages/settings/settings", "style": { "navigationBarTitleText": "设置", "navigationBarBackgroundColor": "#9AE9E2", "navigationBarTextStyle": "black" } },
+		{ "path": "pages/profile/profile", "style": { "navigationBarTitleText": "我的", "navigationBarBackgroundColor": "#FFFFFF", "navigationBarTextStyle": "black" } },
+		{ "path": "pages/password/change", "style": { "navigationBarTitleText": "修改密码", "navigationBarBackgroundColor": "#FFFFFF", "navigationBarTextStyle": "black" } },
+		{ "path": "pages/privacy/settings", "style": { "navigationBarTitleText": "隐私设置", "navigationBarBackgroundColor": "#FFFFFF", "navigationBarTextStyle": "black" } },
+		{ "path": "pages/about/index", "style": { "navigationBarTitleText": "关于我们", "navigationBarBackgroundColor": "#FFFFFF", "navigationBarTextStyle": "black" } },
+		{ "path": "pages/login/login", "style": { "navigationBarTitleText": "登录", "navigationBarBackgroundColor": "#FFFFFF", "navigationBarTextStyle": "black" } }
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
@@ -76,30 +24,11 @@
 		"selectedColor": "#4A90E2",
 		"borderStyle": "black",
 		"backgroundColor": "#ffffff",
-		"list": [{
-				"pagePath": "pages/index/index",
-				"text": "收纳",
-				"iconPath": "static/tabbar/home.png",
-				"selectedIconPath": "static/tabbar/home-active.png"
-			},
-			{
-				"pagePath": "pages/chat/chat",
-				"text": "助手",
-				"iconPath": "static/tabbar/chat.png",
-				"selectedIconPath": "static/tabbar/chat-active.png"
-			},
-			{
-				"pagePath": "pages/search/search",
-				"text": "查找",
-				"iconPath": "static/tabbar/search.png",
-				"selectedIconPath": "static/tabbar/search-active.png"
-			},
-			{
-				"pagePath": "pages/profile/profile",
-				"text": "我的",
-				"iconPath": "static/tabbar/profile.png",
-				"selectedIconPath": "static/tabbar/profile-active.png"
-			}
+		"list": [
+			{ "pagePath": "pages/index/index", "text": "收纳", "iconPath": "static/tabbar/home.png", "selectedIconPath": "static/tabbar/home-active.png" },
+			{ "pagePath": "pages/chat/chat", "text": "助手", "iconPath": "static/tabbar/chat.png", "selectedIconPath": "static/tabbar/chat-active.png" },
+			{ "pagePath": "pages/search/search", "text": "查找", "iconPath": "static/tabbar/search.png", "selectedIconPath": "static/tabbar/search-active.png" },
+			{ "pagePath": "pages/profile/profile", "text": "我的", "iconPath": "static/tabbar/profile.png", "selectedIconPath": "static/tabbar/profile-active.png" }
 		]
 	}
 }

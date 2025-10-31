@@ -97,6 +97,16 @@
         </view>
       </view>
     </u-popup>
+
+    <!-- 默认收纳盒选择 -->
+    <u-action-sheet 
+      :show="showBoxSheet" 
+      :actions="boxActions" 
+      title="选择默认收纳盒"
+      cancelText="取消"
+      @close="showBoxSheet = false"
+      @select="onSelectBox"
+    />
   </view>
 </template>
 
@@ -105,6 +115,7 @@ import { ref } from "vue";
 import { useTheme } from "@/utils/theme";
 import { themes } from "@/theme/config";
 import { platform } from "@/utils/platform";
+import http from "@/utils/request";
 
 const settings = ref({
   notification: true,
@@ -128,8 +139,30 @@ const toggleAutoSort = () => {
   settings.value.autoSort = !settings.value.autoSort;
 };
 
-const selectDefaultBox = () => {
-  // TODO: 选择默认收纳盒
+// 默认收纳盒选择
+const showBoxSheet = ref(false);
+const boxActions = ref([]); // [{ name, id }]
+
+const selectDefaultBox = async () => {
+  try {
+    const res = await http.get('/boxes');
+    const list = Array.isArray(res?.data) ? res.data : Array.isArray(res) ? res : [];
+    boxActions.value = list.map((b) => ({ name: b.boxName || b.name || b.id, id: b.id }));
+    if (boxActions.value.length === 0) {
+      return uni.showToast({ title: "暂无收纳盒", icon: "none" });
+    }
+    showBoxSheet.value = true;
+  } catch (e) {
+    uni.showToast({ title: "加载失败", icon: "none" });
+  }
+};
+
+const onSelectBox = (index) => {
+  const item = typeof index === 'number' ? boxActions.value[index] : index;
+  if (!item) return;
+  settings.value.defaultBox = item.name;
+  showBoxSheet.value = false;
+  uni.showToast({ title: `已选择：${item.name}`, icon: "none" });
 };
 
 const changePassword = () => {
@@ -144,9 +177,11 @@ const clearCache = () => {
   uni.showModal({
     title: "提示",
     content: "确定要清除缓存吗？",
-    success: (res) => {
+    success: async (res) => {
       if (res.confirm) {
-        // TODO: 清除缓存
+        try {
+          await uni.clearStorage();
+        } catch (e) {}
         uni.showToast({ title: "清除成功" });
         cacheSize.value = "0KB";
       }
@@ -164,7 +199,7 @@ const logout = () => {
     content: "确定要退出登录吗？",
     success: (res) => {
       if (res.confirm) {
-        // TODO: 退出登录
+        // TODO: 退出登录逻辑
         uni.reLaunch({ url: "/pages/login/login" });
       }
     },
@@ -180,10 +215,16 @@ const changeTheme = (themeName) => {
 };
 
 // APP专属方法
+const toggleBackground = () => {
+  settings.value.background = !settings.value.background;
+};
+
 const checkPermission = async () => {
   if (!platform.isApp) return;
-  const status = await uni.getSetting();
-  // TODO: 检查权限
+  try {
+    const status = await uni.getSetting();
+    // TODO: 根据 status 授权情况引导用户
+  } catch (e) {}
 };
 </script>
 
