@@ -19,19 +19,19 @@
 		<view v-if="showToolbar" class="u-signature__toolbar">
 			<view class="u-signature__toolbar-icons u-flex u-flex-x">
 				<view class="u-signature__toolbar-icon" @click="undo">
-					<up-icon name="arrow-left" size="22" :color="pathStack.length === 0 ? '#ccc' : '#999'"></up-icon>
+					<u-icon name="arrow-left" size="22" :color="pathStack.length === 0 ? '#ccc' : '#999'"></u-icon>
 				</view>
 				<view class="u-signature__toolbar-icon" @click="clear">
-					<up-icon name="trash" size="25" color="#999"></up-icon>
+					<u-icon name="trash" size="25" color="#999"></u-icon>
 				</view>
 				<view class="u-signature__toolbar-icon" @click="toggleBrushSettings">
-					<up-icon name="edit-pen" size="25" color="#999"></up-icon>
+					<u-icon name="edit-pen" size="25" color="#999"></u-icon>
 				</view>
 				<view class="u-signature__toolbar-icon" @click="toggleColorSettings">
-					<up-icon name="grid" size="24" color="#999"></up-icon>
+					<u-icon name="grid" size="24" color="#999"></u-icon>
 				</view>
 				<view class="u-signature__toolbar-icon" @click="exportSignature">
-					<up-icon name="checkmark" size="25" :color="isEmpty ? '#ccc' : '#999'"></up-icon>
+					<u-icon name="checkmark" size="25" :color="isEmpty ? '#ccc' : '#999'"></u-icon>
 				</view>
 			</view>
 			
@@ -39,14 +39,14 @@
 			<view v-if="showBrushSettings" class="u-signature__brush-settings">
 				<view class="u-signature__progress">
 					<text class="u-signature__progress-label">{{ t("up.signature.penSize") }}:</text>
-					<up-slider 
+					<u-slider 
 						v-model="lineWidth" 
 						:min="1" 
 						:max="20" 
 						:step="1"
 						@show-value="true"
 						:value-show="(lineWidth)"
-					></up-slider>
+					></u-slider>
 				</view>
 			</view>
 			

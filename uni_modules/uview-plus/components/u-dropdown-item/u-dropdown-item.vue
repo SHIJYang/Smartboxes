@@ -5,14 +5,14 @@
 				height: addUnit(height)
 			}">
 				<view class="u-dropdown-item__options">
-					<up-cell-group>
-						<up-cell @click="cellClick(item.value)" :arrow="false" :title="item.label" v-for="(item, index) in options"
+					<u-cell-group>
+						<u-cell @click="cellClick(item.value)" :arrow="false" :title="item.label" v-for="(item, index) in options"
 						 :key="index" :title-style="{
 							color: modelValue == item.value ? activeColor : inactiveColor
 						}">
-							<up-icon v-if="modelValue == item.value" name="checkbox-mark" :color="activeColor" size="32"></up-icon>
-						</up-cell>
-					</up-cell-group>
+							<u-icon v-if="modelValue == item.value" name="checkbox-mark" :color="activeColor" size="32"></u-icon>
+						</u-cell>
+					</u-cell-group>
 				</view>
 			</scroll-view>
 		</block>

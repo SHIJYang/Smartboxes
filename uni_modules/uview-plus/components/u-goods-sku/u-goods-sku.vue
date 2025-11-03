@@ -1,9 +1,9 @@
 <template>
-    <view class="up-goods-sku"> 
+    <view class="u-goods-sku"> 
         <view @click="open">
             <slot name="trigger"></slot>
         </view>
-        <up-popup
+        <u-popup
             v-model:show="show"
             mode="bottom"
             :closeable="pageInline ? false : closeable"
@@ -11,34 +11,34 @@
             :border-radius="20"
             @close="close"
         >
-            <view class="up-goods-sku-container" :style="{padding: pageInline ? '0px' : ''}">
-                <view class="up-goods-sku__header">
+            <view class="u-goods-sku-container" :style="{padding: pageInline ? '0px' : ''}">
+                <view class="u-goods-sku__header">
                     <slot name="header">
-                        <view class="up-goods-sku__header__image">
+                        <view class="u-goods-sku__header__image">
                             <image :src="goodsInfo.image || goodsInfo.picture" mode="aspectFill"></image>
                         </view>
-                        <view class="up-goods-sku__header__info">
-                            <view class="up-goods-sku__header__info__price">
-                                <text class="up-goods-sku__header__info__price__symbol">¥</text>
-                                <text class="up-goods-sku__header__info__price__value">{{ price }}</text>
+                        <view class="u-goods-sku__header__info">
+                            <view class="u-goods-sku__header__info__price">
+                                <text class="u-goods-sku__header__info__price__symbol">¥</text>
+                                <text class="u-goods-sku__header__info__price__value">{{ price }}</text>
                             </view>
-                            <view class="up-goods-sku__header__info__stock">{{ t('up.goodsSku.stock') }} {{ stock }} {{ t('up.goodsSku.amount') }}</view>
-                            <view class="up-goods-sku__header__info__selected">{{ t('up.goodsSku.choosed') }}: {{ selectedSkuText }}</view>
+                            <view class="u-goods-sku__header__info__stock">{{ t('up.goodsSku.stock') }} {{ stock }} {{ t('up.goodsSku.amount') }}</view>
+                            <view class="u-goods-sku__header__info__selected">{{ t('up.goodsSku.choosed') }}: {{ selectedSkuText }}</view>
                         </view>
                     </slot>
                 </view>
                 
-                <scroll-view class="up-goods-sku__content" scroll-y>
-                    <view v-for="(treeItem, index) in skuTree" :key="index" class="up-goods-sku__content__item">
-                        <view class="up-goods-sku__content__item__title">{{ treeItem.label }}</view>
-                        <view class="up-goods-sku__content__item__list">
+                <scroll-view class="u-goods-sku__content" scroll-y>
+                    <view v-for="(treeItem, index) in skuTree" :key="index" class="u-goods-sku__content__item">
+                        <view class="u-goods-sku__content__item__title">{{ treeItem.label }}</view>
+                        <view class="u-goods-sku__content__item__list">
                             <view 
                                 v-for="(leafItem, leafIndex) in treeItem.children" 
                                 :key="leafIndex"
-                                class="up-goods-sku__content__item__list__item"
+                                class="u-goods-sku__content__item__list__item"
                                 :class="{
-                                    'up-goods-sku__content__item__list__item--active': isSelected(treeItem.name, leafItem.id),
-                                    'up-goods-sku__content__item__list__item--disabled': isDisabled(treeItem.name, leafItem.id)
+                                    'u-goods-sku__content__item__list__item--active': isSelected(treeItem.name, leafItem.id),
+                                    'u-goods-sku__content__item__list__item--disabled': isDisabled(treeItem.name, leafItem.id)
                                 }"
                                 @click="onSkuClick(treeItem.name, leafItem)"
                             >
@@ -47,38 +47,38 @@
                         </view>
                     </view>
                     
-                    <view class="up-goods-sku__content__count">
-                        <view class="up-goods-sku__content__count__title">{{ t('"up.goodsSku.buyAmount"') }}</view>
-                        <view class="up-goods-sku__content__count__control">
-                            <up-number-box 
+                    <view class="u-goods-sku__content__count">
+                        <view class="u-goods-sku__content__count__title">{{ t('"up.goodsSku.buyAmount"') }}</view>
+                        <view class="u-goods-sku__content__count__control">
+                            <u-number-box 
                                 v-model="buyNum" 
                                 :min="1" 
                                 :max="maxBuyNum"
                                 :disabled="!canBuy"
                                 @change="onNumChange"
-                            ></up-number-box>
+                            ></u-number-box>
                         </view>
                     </view>
                 </scroll-view>
                 
-                <view class="up-goods-sku__footer">
-                    <up-button 
+                <view class="u-goods-sku__footer">
+                    <u-button 
                         type="primary" 
                         :disabled="!canBuy" 
                         @click="onConfirm"
                     >
                         {{ confirmText }}
-                    </up-button>
+                    </u-button>
                 </view>
             </view>
-        </up-popup>
+        </u-popup>
     </view>
 </template>
 
 <script>
 	import { t } from '../../libs/i18n'
 	export default {
-		name: 'up-goods-sku',
+		name: 'u-goods-sku',
 		props: {
 			// 商品信息
 			goodsInfo: {
@@ -311,11 +311,11 @@
 </script>
 
 <style lang="scss" scoped>
-	.up-goods-sku {
+	.u-goods-sku {
 		background-color: #fff;
 		overflow: hidden;
 
-        .up-goods-sku-container {
+        .u-goods-sku-container {
             padding: 4rpx 30rpx;
         }
 		

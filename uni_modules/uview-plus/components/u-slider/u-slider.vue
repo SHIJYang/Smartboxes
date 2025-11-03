@@ -121,7 +121,7 @@
 	 * @property {Boolean} disabled 是否禁用滑块(默认为false)
 	 * @event {Function} changing 正在滑动中
 	 * @event {Function} change 滑动结束
-	 * @example <up-slider v-model="value" />
+	 * @example <u-slider v-model="value" />
 	 */
 	export default {
 		name: 'u-slider',

@@ -150,7 +150,7 @@ export default {
   mounted () {
     this.$nextTick(() => {
       // 修复可能导致死循环的问题
-      for (this.root = this?.$parent; this.root && this.root?.$options.name !== 'up-parse'; this.root = this.root?.$parent);
+      for (this.root = this?.$parent; this.root && this.root?.$options.name !== 'u-parse'; this.root = this.root?.$parent);
     })
     // #ifdef H5 || APP-PLUS
     if (this.opts[0]) {

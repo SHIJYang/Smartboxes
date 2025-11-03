@@ -1,6 +1,6 @@
 <style scoped lang="scss">
-	.up-choose {
-		::v-deep .up-tag {
+	.u-choose {
+		::v-deep .u-tag {
 		    font-weight: 600;
 		}
 		&:last-child {
@@ -8,11 +8,11 @@
 		}
 	}
 	
-	.up-choose-wrap {
+	.u-choose-wrap {
 		flex-wrap: wrap;
 	}
 	
-	.up-choose-nowrap {
+	.u-choose-nowrap {
 		flex-wrap: nowrap;
 		white-space: nowrap;
 	}
@@ -21,17 +21,17 @@
 <template>
 	<scroll-view 
 		:scroll-x="wrap === false" 
-		:class="['up-choose', wrap ? 'up-choose-wrap' : 'up-choose-nowrap']">
+		:class="['u-choose', wrap ? 'u-choose-wrap' : 'u-choose-nowrap']">
         <template :key="item.id"  v-for="(item,index) in options">
             <view :style="{width: width, display: 'inline-block'}">
                 <slot :item="item" :index="index">
-                    <up-tag :type="index == currentIndex ? 'primary' : 'info'"
+                    <u-tag :type="index == currentIndex ? 'primary' : 'info'"
                         size="large" :plain="index == currentIndex ? false : true"
                         :class="currentIndex === index ? 'active': ''" :height="itemHeight"
                         :style="{width: itemWidth, padding: itemPadding}"
                         @click="change(index)">
                         {{item[labelName]}}
-                    </up-tag>
+                    </u-tag>
                 </slot>
             </view>
         </template>
@@ -40,7 +40,7 @@
 
 <script>
 	export default {
-	    name: 'up-choose',
+	    name: 'u-choose',
 	    props: {
 			options:{
 				type: Array,

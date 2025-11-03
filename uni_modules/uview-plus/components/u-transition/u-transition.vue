@@ -132,13 +132,13 @@ export default {
 .u-fade-left-leave-active,
 .u-fade-right-enter-active,
 .u-fade-right-leave-active,
-.u-fade-up-enter-active,
-.u-fade-up-leave-active {
+.u-fade-u-enter-active,
+.u-fade-u-leave-active {
 	transition-property: opacity, transform;
 }
 
-.u-fade-up-enter,
-.u-fade-up-leave-to {
+.u-fade-u-enter,
+.u-fade-u-leave-to {
 	transform: translate3d(0, 100%, 0);
 	opacity: 0
 }
@@ -167,13 +167,13 @@ export default {
 .u-slide-left-leave-active,
 .u-slide-right-enter-active,
 .u-slide-right-leave-active,
-.u-slide-up-enter-active,
-.u-slide-up-leave-active {
+.u-slide-u-enter-active,
+.u-slide-u-leave-active {
 	transition-property: transform;
 }
 
-.u-slide-up-enter,
-.u-slide-up-leave-to {
+.u-slide-u-enter,
+.u-slide-u-leave-to {
 	transform: translate3d(0, 100%, 0)
 }
 

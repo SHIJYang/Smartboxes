@@ -11,12 +11,12 @@
 		>
 			<view class="u-tabbar-item--mid-button-cover" v-if="isMidButton">
 			</view>
-			<up-icon
+			<u-icon
 			    v-if="icon"
 			    :name="icon"
 			    :color="isActive? parentData.activeColor : parentData.inactiveColor"
 			    :size="isMidButton ? 26 : 20"
-			></up-icon>
+			></u-icon>
 			<template v-else>
 				<slot
 				    v-if="isActive"
@@ -100,7 +100,7 @@
 				// 支付宝小程序不支持provide/inject，所以使用这个方法获取整个父组件，在created定义，避免循环引用
 				this.updateParentData()
 				if (!this.parent) {
-					error('up-tabbar-item必须搭配up-tabbar组件使用')
+					error('u-tabbar-item必须搭配u-tabbar组件使用')
 				}
 				// 本子组件在u-tabbar的children数组中的索引
 				const index = this.parent.children.indexOf(this)

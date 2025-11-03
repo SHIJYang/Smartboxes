@@ -39,13 +39,13 @@
             >
         </template>
         <template v-else>
-            <up-icon
+            <u-icon
                 v-if="icon"
                 :name="icon"
                 :color="iconColorCom"
                 :size="textSize * 1.35"
                 :customStyle="{ marginRight: '2px' }"
-            ></up-icon>
+            ></u-icon>
             <slot>
                 <text
                     class="u-button__text"
@@ -87,12 +87,12 @@
             >
         </template>
         <template v-else>
-            <up-icon
+            <u-icon
                 v-if="icon"
                 :name="icon"
                 :color="iconColorCom"
                 :size="textSize * 1.35"
-            ></up-icon>
+            ></u-icon>
             <text
                 class="u-button__text"
                 :style="[
@@ -206,7 +206,7 @@ export default {
         },
         iconColorCom() {
             // 如果是镂空状态，设置了color就用color值，否则使用主题颜色，
-            // up-icon的color能接受一个主题颜色的值
+            // u-icon的color能接受一个主题颜色的值
 			if (this.iconColor) return this.iconColor;
 			if (this.plain) {
                 return this.color ? this.color : this.type;

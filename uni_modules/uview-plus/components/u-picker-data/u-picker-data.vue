@@ -2,18 +2,18 @@
 	<view class="u-picker-data">
 		<view class="u-picker-data__trigger">
 			<slot name="trigger" :current="current"></slot>
-			<up-input
+			<u-input
 				v-if="!$slots['trigger']"
 				:modelValue="current"
 				disabled
 				disabledColor="#ffffff"
 				:placeholder="title"
 				border="none"
-			></up-input>
+			></u-input>
 			<view @click="show = true"
 				class="u-picker-data__trigger__cover"></view>
 		</view>
-		<up-picker
+		<u-picker
 			:show="show"
 			:columns="optionsInner"
 			:keyName="labelKey"
@@ -21,7 +21,7 @@
 			@confirm="confirm"
 			@cancel="cancel"
 			@close="close">
-		</up-picker>
+		</u-picker>
 	</view>
 </template>
 

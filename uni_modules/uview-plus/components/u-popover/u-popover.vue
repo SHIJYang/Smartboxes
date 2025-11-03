@@ -1,11 +1,11 @@
 <template>
-	<view class="up-popover">
-		<up-tooltip
+	<view class="u-popover">
+		<u-tooltip
 			ref="tooltip"
 			:text="text"
 			:color="color"
 			:bg-color="bgColor"
-			:popup-bg-color="popupBgColor"
+			:popu-bg-color="popupBgColor"
 			:placement="placement"
 			:trigger-mode="triggerMode"
 			:show="show"
@@ -20,13 +20,13 @@
 				<slot name="trigger"></slot>
 			</template>
 			<template #content>
-				<view class="up-popover__content">
+				<view class="u-popover__content">
 					<slot name="content">
 						<text>{{text}}</text>
 					</slot>
 				</view>
 			</template>
-		</up-tooltip>
+		</u-tooltip>
 	</view>
 </template>
 
@@ -51,10 +51,10 @@
 	 * @event {Function}			open			弹出框打开时触发
 	 * @event {Function}			close			弹出框关闭时触发
 	 * @event {Function}			click			点击触发器时触发
-	 * @example <up-popover text="提示内容"><template #trigger><up-button>点击</up-button></template></up-popover>
+	 * @example <u-popover text="提示内容"><template #trigger><u-button>点击</u-button></template></u-popover>
 	 */
 	export default {
-		name: 'up-popover',
+		name: 'u-popover',
 		mixins: [mpMixin, mixin, props],
 		data() {
 			return {
@@ -84,7 +84,7 @@
 </script>
 
 <style lang="scss" scoped>	
-	.up-popover {
+	.u-popover {
 		
 		&__content {
 			@include flex;

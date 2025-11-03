@@ -1,34 +1,34 @@
 <template>
-	<view class="up-color-picker">
-        <view clas="up-color-picker__trigger" @click="show = true"
+	<view class="u-color-picker">
+        <view clas="u-color-picker__trigger" @click="show = true"
             :style="{backgroundColor: value}" >
             <slot></slot>
         </view>
-		<up-popup :show="show" mode="bottom" round="10" @close="close" :closeOnClickOverlay="true">
-			<view class="up-color-picker__content">
-				<view class="up-color-picker__header">
-					<text class="up-color-picker__title">选择颜色</text>
+		<u-popup :show="show" mode="bottom" round="10" @close="close" :closeOnClickOverlay="true">
+			<view class="u-color-picker__content">
+				<view class="u-color-picker__header">
+					<text class="u-color-picker__title">选择颜色</text>
 				</view>
 				
 				<!-- 纯色/渐变色切换 -->
-				<view class="up-color-picker__switch">
-					<up-subsection
+				<view class="u-color-picker__switch">
+					<u-subsection
 						:list="[{ name: '纯色' }, { name: '渐变' }]"
 						:current="colorTypeIndex"
 						@change="changeColorType"
 						fontSize="14"
-					></up-subsection>
+					></u-subsection>
 				</view>
 				
 				<!-- 渐变色选择器 -->
-				<view v-if="colorTypeIndex == 1" class="up-color-picker__gradient">
+				<view v-if="colorTypeIndex == 1" class="u-color-picker__gradient">
 					<!-- 渐变色控制条 -->
 					<view 
-						class="up-color-picker__gradient-track"
+						class="u-color-picker__gradient-track"
                         :style="{ background: gradientStyle }"
 					>
 						<view 
-							class="up-color-picker__gradient-pointer" 
+							class="u-color-picker__gradient-pointer" 
 							v-for="(item, index) in gradientColors" 
 							:key="index"
 							:style="{ left: getGradientPointerPosition(index) + 'px' }"
@@ -37,31 +37,31 @@
 							@touchmove.stop="onPointerTouchMove"
 							@touchend.stop="onPointerTouchEnd"
 						>
-							<view class="up-color-picker__gradient-pointer-inner" :style="{ backgroundColor: item.color }"></view>
+							<view class="u-color-picker__gradient-pointer-inner" :style="{ backgroundColor: item.color }"></view>
 						</view>
 					</view>
 					
-					<view class="up-color-picker__gradient-controls">
-						<up-button 
+					<view class="u-color-picker__gradient-controls">
+						<u-button 
 							type="primary" 
 							size="mini" 
 							plain 
 							@click="addGradientColor"
-							class="up-color-picker__add-btn"
+							class="u-color-picker__add-btn"
 						>
 							添加颜色
-						</up-button>
+						</u-button>
 					</view>
 					
 					<!-- 圆形方向选择器 -->
-					<view class="up-color-picker__gradient-direction">
+					<view class="u-color-picker__gradient-direction">
 						<text>方向:</text>
-						<view class="up-color-picker__gradient__direction-circle" 
+						<view class="u-color-picker__gradient__direction-circle" 
 							@touchstart="onDirectionTouchStart"
 							@touchmove="onDirectionTouchMove"
 							@touchend="onDirectionTouchEnd">
 							<view 
-								class="up-color-picker__direction-pointer"
+								class="u-color-picker__direction-pointer"
 								:style="{ 
 									left: directionPointer.x + 'px', 
 									top: directionPointer.y + 'px' 
@@ -72,17 +72,17 @@
 				</view>
 
                 <!-- 纯色选择器 -->
-				<view class="up-color-picker__solid">
+				<view class="u-color-picker__solid">
 					<!-- 饱和度和明度选择区域 -->
 					<view 
-						class="up-color-picker__saturation" 
+						class="u-color-picker__saturation" 
 						:style="{ backgroundColor: `hsl(${hue}, 100%, 50%)` }"
 						@touchstart="onSaturationTouchStart"
 						@touchmove="onSaturationTouchMove"
 						@touchend="onSaturationTouchEnd"
 					>
 						<view 
-							class="up-color-picker__saturation-pointer" 
+							class="u-color-picker__saturation-pointer" 
 							:style="{
 								left: saturationPosition.x + 'px',
 								top: saturationPosition.y + 'px'
@@ -92,40 +92,40 @@
 					
 					<!-- 色相选择 -->
 					<view 
-						class="up-color-picker__hue"
+						class="u-color-picker__hue"
 						@touchstart="onHueTouchStart"
 						@touchmove="onHueTouchMove"
 						@touchend="onHueTouchEnd"
 					>
 						<view 
-							class="up-color-picker__hue-pointer" 
+							class="u-color-picker__hue-pointer" 
 							:style="{ left: huePosition + 'px' }"
 						></view>
 					</view>
 					
 					<!-- 透明度选择 -->
 					<view v-if="colorTypeIndex == 0" 
-						class="up-color-picker__alpha"
+						class="u-color-picker__alpha"
 						@touchstart="onAlphaTouchStart"
 						@touchmove="onAlphaTouchMove"
 						@touchend="onAlphaTouchEnd"
 					>
-						<view class="up-color-picker__alpha-bg"></view>
+						<view class="u-color-picker__alpha-bg"></view>
 						<view 
-							class="up-color-picker__alpha-pointer" 
+							class="u-color-picker__alpha-pointer" 
 							:style="{ left: alphaPosition + 'px' }"
 						></view>
 					</view>
 				</view>
 				
 				<!-- 常用颜色 -->
-				<view v-if="commonColors && commonColors.length" class="up-color-picker__common">
-					<text class="up-color-picker__common-title">常用颜色</text>
-					<view class="up-color-picker__common-list">
+				<view v-if="commonColors && commonColors.length" class="u-color-picker__common">
+					<text class="u-color-picker__common-title">常用颜色</text>
+					<view class="u-color-picker__common-list">
 						<view 
 							v-for="(color, index) in commonColors" 
 							:key="index"
-							class="up-color-picker__common-item"
+							class="u-color-picker__common-item"
 							:style="{ backgroundColor: color }"
 							@click="selectCommonColor(color)"
 						></view>
@@ -133,41 +133,41 @@
 				</view>
 				
 				<!-- 颜色预览和操作按钮 -->
-				<view class="up-color-picker__footer">
-					<view class="up-color-picker__preview">
+				<view class="u-color-picker__footer">
+					<view class="u-color-picker__preview">
 						<view 
-							class="up-color-picker__preview-color"
+							class="u-color-picker__preview-color"
 							:style="{ backgroundColor: displayColor }"
 						></view>
-						<text class="up-color-picker__preview-text">{{ displayColor }}</text>
+						<text class="u-color-picker__preview-text">{{ displayColor }}</text>
 					</view>
-					<view class="up-color-picker__actions">
-						<up-button 
+					<view class="u-color-picker__actions">
+						<u-button 
 							type="primary" 
 							size="small" 
 							@click="confirm"
-							class="up-color-picker__btn"
+							class="u-color-picker__btn"
 						>
 							确定
-						</up-button>
-						<up-button 
+						</u-button>
+						<u-button 
 							type="info" 
 							size="small" 
 							@click="close"
-							class="up-color-picker__btn"
+							class="u-color-picker__btn"
 						>
 							取消
-						</up-button>
+						</u-button>
 					</view>
 				</view>
 			</view>
-		</up-popup>
+		</u-popup>
 	</view>
 </template>
 
 <script>
 export default {
-	name: 'up-color-picker',
+	name: 'u-color-picker',
 	props: {
 		// 初始颜色值
 		modelValue: {
@@ -294,7 +294,7 @@ export default {
         // 初始化alpha位置为最右侧
         async initAlphaPosition() {
             const query = uni.createSelectorQuery().in(this);
-            query.select('.up-color-picker__alpha').boundingClientRect();
+            query.select('.u-color-picker__alpha').boundingClientRect();
             await this.$nextTick();
             query.exec(res => {
                 const rect = res[0];
@@ -444,7 +444,7 @@ export default {
 			const touch = e.touches[0] || e.changedTouches[0]
 			const target = e.currentTarget
 			const query = uni.createSelectorQuery().in(this);
-			query.select('.up-color-picker__saturation').boundingClientRect()
+			query.select('.u-color-picker__saturation').boundingClientRect()
 			
 			query.exec(res => {
 				const rect = res[0];
@@ -482,7 +482,7 @@ export default {
 			const touch = e.touches[0] || e.changedTouches[0]
 			const target = e.currentTarget
 			const query = uni.createSelectorQuery().in(this);
-			query.select('.up-color-picker__hue').boundingClientRect()
+			query.select('.u-color-picker__hue').boundingClientRect()
 			
 			query.exec(res => {
 				const rect = res[0];
@@ -516,7 +516,7 @@ export default {
 			const touch = e.touches[0] || e.changedTouches[0]
 			const target = e.currentTarget
 			const query = uni.createSelectorQuery().in(this);
-			query.select('.up-color-picker__alpha').boundingClientRect()
+			query.select('.u-color-picker__alpha').boundingClientRect()
 			
 			query.exec(res => {
 				const rect = res[0];
@@ -534,7 +534,7 @@ export default {
 		updateSolidColor() {
 			// 使用实际元素尺寸替代硬编码的150
 			const query = uni.createSelectorQuery().in(this);
-			query.select('.up-color-picker__saturation').boundingClientRect();
+			query.select('.u-color-picker__saturation').boundingClientRect();
 			
 			query.exec(res => {
 				const rect = res[0];
@@ -582,7 +582,7 @@ export default {
 		updateGradientColor(e) {
 			const touch = e.touches[0] || e.changedTouches[0];
 			const query = uni.createSelectorQuery().in(this);
-			query.select('.up-color-picker__gradient-track').boundingClientRect();
+			query.select('.u-color-picker__gradient-track').boundingClientRect();
 			
 			query.exec(res => {
 				const rect = res[0];
@@ -621,7 +621,7 @@ export default {
 			
 			const touch = e.touches[0] || e.changedTouches[0];
 			const query = uni.createSelectorQuery().in(this);
-			query.select('.up-color-picker__gradient-track').boundingClientRect();
+			query.select('.u-color-picker__gradient-track').boundingClientRect();
 			
 			query.exec(res => {
 				const rect = res[0];
@@ -672,7 +672,7 @@ export default {
 		updateDirection(e) {
 			const touch = e.touches[0] || e.changedTouches[0];
 			const query = uni.createSelectorQuery().in(this);
-			query.select('.up-color-picker__gradient__direction-circle').boundingClientRect();
+			query.select('.u-color-picker__gradient__direction-circle').boundingClientRect();
 			
 			query.exec(res => {
 				const rect = res[0];
@@ -796,7 +796,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.up-color-picker {
+.u-color-picker {
 	&__content {
 		width: 100%;
 		padding: 20px;
@@ -1087,7 +1087,7 @@ export default {
         flex-direction: row;
 		justify-content: flex-end;
 		
-		& .up-color-picker__btn {
+		& .u-color-picker__btn {
 			margin-left: 10px;
 		}
 	}

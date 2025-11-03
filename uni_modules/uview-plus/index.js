@@ -121,7 +121,7 @@ for (const key in importFn) {
 const install = (Vue, upuiParams = '') => {
     // #ifdef APP || H5
     components.forEach(function(component) {
-        const name = component.name.replace(/u-([a-zA-Z0-9-_]+)/g, 'up-$1');
+        const name = component.name.replace(/u-([a-zA-Z0-9-_]+)/g, 'u-$1');
 		if (name != component.name) {
 			Vue.component(component.name, component); 
 		}

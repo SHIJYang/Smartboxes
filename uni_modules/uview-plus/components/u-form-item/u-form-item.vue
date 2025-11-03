@@ -29,10 +29,10 @@
 							class="u-form-item__body__left__content__icon"
 							v-if="leftIcon"
 						>
-							<up-icon
+							<u-icon
 								:name="leftIcon"
 								:custom-style="leftIconStyle"
-							></up-icon>
+							></u-icon>
 						</view>
 						<text
 							class="u-form-item__body__left__content__label"

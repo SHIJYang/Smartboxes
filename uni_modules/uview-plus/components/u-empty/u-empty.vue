@@ -4,13 +4,13 @@
 	    :style="[emptyStyle]"
 	    v-if="show"
 	>
-		<up-icon
+		<u-icon
 		    v-if="!isSrc"
 		    :name="mode === 'message' ? 'chat' : `empty-${mode}`"
 		    :size="iconSize"
 		    :color="iconColor"
 		    margin-top="14"
-		></up-icon>
+		></u-icon>
 		<image
 		    v-else
 		    :style="{

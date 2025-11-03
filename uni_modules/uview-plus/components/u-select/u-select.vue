@@ -11,7 +11,7 @@
 					</text>
 				</slot>
 				<slot name="icon">
-					<up-icon name="arrow-down" :size="iconSize" :color="iconColor"></up-icon>
+					<u-icon name="arrow-down" :size="iconSize" :color="iconColor"></u-icon>
 				</slot>
 			</view>
 			<u-overlay
@@ -48,7 +48,7 @@
 <script>
 import { getWindowInfo } from '../../libs/function/index';
 export default {
-	name:"up-select",
+	name:"u-select",
 	emits: ['update:current', 'select'],
 	props: {
 		maxHeight: {

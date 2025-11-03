@@ -49,7 +49,7 @@
 <script>
 	import { addUnit, sleep } from '../../libs/function/index';
 	export default {
-		name: 'up-cate-tab',
+		name: 'u-cate-tab',
         props: {
 			mode: {
                 type: String,

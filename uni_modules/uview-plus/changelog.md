@@ -11,10 +11,10 @@ fix: 优化picker当前列判断
 fix: 修复getWindowInfo微信小程序下报警告
 
 ## 3.6.5（2025-10-11）
-🐛fix: 修复picker双向绑定 #753
+fix: 修复picker双向绑定 #753
 
 ## 3.6.4（2025-10-09）
-🐛fix: import rpx2px function and add to exports in index.js
+fix: import rpx2px function and add to exports in index.js
 
 ## 3.6.3（2025-10-09）
 fix: 修复getWindowInfo微信小程序下报警告
@@ -38,7 +38,7 @@ fix: 修复picker和datetime-picker在部分原生渲染时hasInput触发键盘�
 feat: waterfall新增after-add-one和after-add-all事件
 
 ## 3.5.54（2025-09-25）
-🐞 fix: 解决索引列表初始化时获取不到高度导致的字母列表异常
+ fix: 解决索引列表初始化时获取不到高度导致的字母列表异常
 
 ## 3.5.53（2025-09-19）
 improvment: back-top示例组合式API改造
@@ -582,7 +582,7 @@ fix: 修复picker-data快捷组件默认picker选中
 fix: 修复日历month子组件缺失emits定义
 
 ## 3.4.25（2025-04-27）
-fix: up-form编译在微信小程序里样式缺失 #640
+fix: u-form编译在微信小程序里样式缺失 #640
 
 fix: number-box输入为空时自动设为最小值
 
@@ -691,9 +691,9 @@ feat: upload组件支持服务器本机和阿里云OSS自动上传功能及上�
 
 feat: upload组件支持视频预览及oss上传时获取视频封面图
 
-feat: 新增up-action-sheet-data快捷组件
+feat: 新增u-action-sheet-data快捷组件
 
-feat: 新增up-picker-data快捷组件
+feat: 新增u-picker-data快捷组件
 
 ## 3.4.5（2025-03-24）
 feat: tag组件新增textSize/height/padding/borderRadius属性
@@ -738,7 +738,7 @@ picker允许传递禁用颜色props
 
 slider组件isRange状态下增加min max插槽分开显示内容
 
-feat: 新增经典下拉框组件up-select
+feat: 新增经典下拉框组件u-select
 
 ## 3.3.68（2025-02-12）
 fix: 修复weekText类型
@@ -919,7 +919,7 @@ fix: 修复tabs组件current参数为字符串处理逻辑
 fix: list组件滑动偏移量不一样取绝对值导致iOS下拉偏移量计算错误
 
 ## 3.3.27（2024-08-22）
-fix: 修复up-datetime-picker组件toolbarRightSlot定义缺失
+fix: 修复u-datetime-picker组件toolbarRightSlot定义缺失
 
 fix: 修复FormItem的rules更新错误的问题
 
@@ -1063,7 +1063,7 @@ fix: toast 支持自定义图标？可传入了决对路径的 icon也没有用 
 
 feat: form-item校验失败时 增加class方便自定义显示错误的展示方式 #394
 
-fix: up-cell的required配置不生效 #395
+fix: u-cell的required配置不生效 #395
 
 fix: 横向滚动组件，微信小程序编译后会有警告 #415
 
@@ -1144,7 +1144,7 @@ fix: 修复时间选择器confirm事件触发时机导致2次才会触发v-model
 ## 3.2.23（2024-05-30）
 fix: #378 H5 u-input 在表单中初始值为空也会触发一次 formValidate(this,"change")事件导致进入页面直接校验了一次
 
-fix: #373 搜索组件up-search的@clear事件无效
+fix: #373 搜索组件u-search的@clear事件无效
 
 fix: #372 ActionSheet 组件的取消按钮触发区域太小
 
@@ -1166,8 +1166,8 @@ fix: 349 popup 组件设置 zIndex 属性后，组件渲染异常#
 feat: 搜索框增加adjustPosition属性
 fix: #331增加u-action-sheet__cancel
 优化mixin兼容性
-feat: #326 up-list增加下拉刷新功能
-fix: #319 优化up-tabs参数与定义匹配
+feat: #326 u-list增加下拉刷新功能
+fix: #319 优化u-tabs参数与定义匹配
 fix: index-list组件微信小程序端使用自定义导航栏异常
 fix: #285 pickerimmediateChange 写死为true
 fix: #111 u-scroll-list组件,隐藏指示器后报错, 提示找不到ref
@@ -1209,7 +1209,7 @@ http采用useStore
 规范化及兼容性增强
 
 ## 3.2.8（2024-04-15）
-修复up-tag语法错
+修复u-tag语法错
 ## 3.2.7（2024-04-15）
 修复下拉菜单背景色在支付宝小程序无效
 
@@ -1264,13 +1264,13 @@ checkbox支持独立使用
 修复轮播图在nvue显示
 修复疑似u-slider名称被占用导致slider在App下不显示
 解决微信小程序提示 Some selectors are not allowed in component wxss
-示例中u-前缀统一为up-
+示例中u-前缀统一为u-
 增加瀑布流与图片懒加载组件
 fix: #308修复tag组件缺失iconColor参数
 fix: #297使用grid布局解决目前编译为抖音小程序无法开启virtualHost
 ## 3.1.52（2024-04-07）
 工具类方法调用import化改造
-新增up-copy复制组件
+新增u-copy复制组件
 ## 3.1.51（2024-04-07）
 优化时间选择器自带输入框格式化显示
 防止按钮文字换行

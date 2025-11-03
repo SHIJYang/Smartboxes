@@ -12,7 +12,7 @@
       <template v-if="prevText">
         {{ prevText }}
       </template>
-      <up-icon v-else name="arrow-left"></up-icon>
+      <u-icon v-else name="arrow-left"></u-icon>
     </view>
 
     <!-- 页码列表 -->
@@ -58,7 +58,7 @@
       <template v-if="nextText">
         {{ nextText }}
       </template>
-      <up-icon v-else name="arrow-right"></up-icon>
+      <u-icon v-else name="arrow-right"></u-icon>
     </view>
 
     <!-- 跳转输入框 -->

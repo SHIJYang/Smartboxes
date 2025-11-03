@@ -56,11 +56,11 @@
 					hover-class="u-hover-class"
 					:hover-stay-time="200"
 				>
-					<up-icon
+					<u-icon
 						size="28"
 						name="backspace"
 						color="#303133"
-					></up-icon>
+					></u-icon>
 				</view>
 			</view>
 		</view>

@@ -40,7 +40,7 @@
             <!-- #endif -->
             <view v-if="showLoading && loading" class="u-qrcode__loading"
                   :style="{ width: sizeLocal + unit, height: sizeLocal + unit }">
-                <up-loading-icon vertical :text="loadingText" textSize="14px"></up-loading-icon>
+                <u-loading-icon vertical :text="loadingText" textSize="14px"></u-loading-icon>
             </view>
         </view>
 

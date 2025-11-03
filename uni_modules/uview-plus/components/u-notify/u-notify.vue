@@ -12,13 +12,13 @@
 			<u-status-bar v-if="tmpConfig.safeAreaInsetTop"></u-status-bar>
 			<view class="u-notify__warpper">
 				<slot name="icon">
-					<up-icon
+					<u-icon
 						v-if="['success', 'warning', 'error'].includes(tmpConfig.type)"
 						:name="tmpConfig.icon"
 						:color="tmpConfig.color"
 						:size="1.3 * tmpConfig.fontSize"
 						:customStyle="{marginRight: '4px'}"
-					></up-icon>
+					></u-icon>
 				</slot>
 				<text
 					class="u-notify__warpper__text"

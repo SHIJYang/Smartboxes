@@ -30,10 +30,10 @@
 							<slot v-if="$slots.icon" name="icon" :item="item" :keyName="keyName" :index="index" />
 							<template v-else>
 								<view class="u-tabs__wrapper__nav__item__prefix-icon" v-if="item.icon">
-									<up-icon
+									<u-icon
 										:name="item.icon"
 										:customStyle="addStyle(iconStyle)"
-									></up-icon>
+									></u-icon>
 								</view>
 							</template>
 							<slot v-if="$slots.content" name="content" :item="item" :keyName="keyName" :index="index" />

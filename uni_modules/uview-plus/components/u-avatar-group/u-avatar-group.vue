@@ -19,13 +19,13 @@
 			    v-if="showMore && index === showUrl.length - 1 && (urls.length > maxCount || extraValue > 0)"
 				@tap="clickHandler"
 			>
-				<up-text
+				<u-text
 				    color="#ffffff"
 				    :size="size * 0.4"
 				    :text="`+${extraValue || urls.length - showUrl.length}`"
 					align="center"
 					customStyle="justify-content: center"
-				></up-text>
+				></u-text>
 			</view>
 		</view>
 	</view>

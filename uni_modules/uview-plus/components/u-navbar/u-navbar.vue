@@ -27,12 +27,12 @@
 					@tap="leftClick"
 				>
 					<slot name="left">
-						<up-icon
+						<u-icon
 							v-if="leftIcon"
 							:name="leftIcon"
 							:size="leftIconSize"
 							:color="leftIconColor"
-						></up-icon>
+						></u-icon>
 						<text
 							v-if="leftText"
 							:style="{
@@ -57,11 +57,11 @@
 					@tap="rightClick"
 				>
 					<slot name="right">
-						<up-icon
+						<u-icon
 							v-if="rightIcon"
 							:name="rightIcon"
 							size="20"
-						></up-icon>
+						></u-icon>
 						<text
 							v-if="rightText"
 							class="u-navbar__content__right__text"

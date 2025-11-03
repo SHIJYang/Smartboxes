@@ -56,12 +56,12 @@
 					hover-class="u-popup__content__close--hover"
 					hover-stay-time="150"
 				>
-					<up-icon
+					<u-icon
 						name="close"
 						color="#909399"
 						size="18"
 						bold
-					></up-icon>
+					></u-icon>
 				</view>
 				<u-safe-bottom v-if="safeAreaInsetBottom"></u-safe-bottom>
 			</view>
@@ -343,11 +343,11 @@
 </script>
 
 <style lang="scss" scoped>
-	$u-popup-flex:1 !default;
-	$u-popup-content-background-color: #fff !default;
+	$u-popu-flex:1 !default;
+	$u-popu-content-background-color: #fff !default;
 
 	.u-popup {
-		flex: $u-popup-flex;
+		flex: $u-popu-flex;
 		
 		&__trigger {
 			position: relative;
@@ -361,7 +361,7 @@
 		}
 
 		&__content {
-			background-color: $u-popup-content-background-color;
+			background-color: $u-popu-content-background-color;
 			position: relative;
 
 			&--round-top {

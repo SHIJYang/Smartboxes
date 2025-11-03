@@ -25,19 +25,19 @@
 				    class="u-read-more__toggle__text"
 				    @tap="toggleReadMore"
 				>
-					<up-text
+					<u-text
 					    :text="status === 'close' ? closeText : openText"
 					    :color="color"
 					    :size="fontSize"
 					    :lineHeight="fontSize"
 					    margin="0 5px 0 0"
-					></up-text>
+					></u-text>
 					<view class="u-read-more__toggle__icon">
-						<up-icon
+						<u-icon
 						    :color="color"
 						    :size="fontSize + 2"
 						    :name="status === 'close' ? 'arrow-down' : 'arrow-up'"
-						></up-icon>
+						></u-icon>
 					</view>
 				</view>
 			</slot>

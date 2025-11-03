@@ -5,12 +5,12 @@
 			</slot>
 			<slot name="trigger" :value="inputLabel">
 			</slot>
-			<up-input
+			<u-input
 				v-if="!$slots['default'] && !$slots['$default'] && !$slots['trigger']"
 				:readonly="true"
 				v-model="inputLabel"
 				v-bind="inputPropsInner">
-			</up-input>
+			</u-input>
 			<cover-view class="input-cover"></cover-view>
 		</view>
 		<u-popup

@@ -19,7 +19,7 @@
             borderColor: borderColor,
         }">
             <slot :showList="showList">
-                <up-icon class="cursor-pointer" :class="{'show-list': showList}" name="plus" :color="color"></up-icon>
+                <u-icon class="cursor-pointer" :class="{'show-list': showList}" name="plus" :color="color"></u-icon>
             </slot>
             <view v-if="showList" class="u-float-button__list" :style="{
                 bottom: height
@@ -38,7 +38,7 @@
                             borderRadius: '50%',
                             borderColor: item?.borderColor ? item?.borderColor :  borderColor,
                         }" @click="itemClick(item, index)">
-                            <up-icon :name="item.name" :color="item?.color ? item?.color : color"></up-icon>
+                            <u-icon :name="item.name" :color="item?.color ? item?.color : color"></u-icon>
                         </view>
                     </template>
                 </slot>
@@ -57,7 +57,7 @@ import { addStyle, addUnit, deepMerge } from '../../libs/function/index';
  * @tutorial https://ijry.github.io/uview-plus/components/floatButton.html
  * @property {String}                backgroundColor      背景颜色
  * @event {Function} click  点击触发事件
- * @example <up-float-button></up-float-button>
+ * @example <u-float-button></u-float-button>
  */
 export default {
     name: 'u-float-button',

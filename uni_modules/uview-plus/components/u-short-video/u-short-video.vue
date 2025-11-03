@@ -4,11 +4,11 @@
 		<view class="u-short-video__header">
 			<slot name="menu">
 				<view class="u-short-video__header__menu">
-					<up-icon name="grid" size="24"></up-icon>
+					<u-icon name="grid" size="24"></u-icon>
 				</view>
 			</slot>
 			
-			<up-tabs 
+			<u-tabs 
 				:list="tabsList" 
 				:current="currentTab"
                 lineColor="#ddd"
@@ -23,11 +23,11 @@
                 }"
 				@change="handleTabChange"
 				class="u-short-video__header__tabs"
-			></up-tabs>
+			></u-tabs>
 			
 			<slot name="search">
 				<view class="u-short-video__header__search">
-					<up-icon name="search" size="24"></up-icon>
+					<u-icon name="search" size="24"></u-icon>
 				</view>
 			</slot>
 		</view>
@@ -66,7 +66,7 @@
 						<!-- 倍速设置按钮 -->
 						<!-- <view class="u-short-video__content__video__speed" @click="showSpeedOptions(index)">
 							<text class="speed-text">{{ item.playbackRate || 1.0 }}x</text>
-							<up-icon name="arrow-down" size="12" color="#fff"></up-icon>
+							<u-icon name="arrow-down" size="12" color="#fff"></u-icon>
 						</view> -->
 					</view>
 					
@@ -80,7 +80,7 @@
 							<text class="u-short-video__content__author__desc">{{ item.author.desc }}</text>
 						</view>
 						<view class="u-short-video__content__author__follow">
-							<up-button type="primary" size="mini">关注</up-button>
+							<u-button type="primary" size="mini">关注</u-button>
 						</view>
 					</view>
 					
@@ -88,19 +88,19 @@
 					<view class="u-short-video__content__actions">
 						<slot name="actions" :item="item" :index="index">
 							<view class="u-short-video__content__actions__item" @click="handleLike(item, index)">
-								<up-icon color="#eee" :name="item.isLiked ? 'thumb-up-fill' : 'thumb-up'" size="32px"></up-icon>
+								<u-icon color="#eee" :name="item.isLiked ? 'thumb-u-fill' : 'thumb-up'" size="32px"></u-icon>
 								<text class="u-short-video__content__actions__text">{{ item.likeCount }}</text>
 							</view>
 							<view class="u-short-video__content__actions__item" @click="handleComment(item, index)">
-								<up-icon color="#eee" name="chat" size="32px"></up-icon>
+								<u-icon color="#eee" name="chat" size="32px"></u-icon>
 								<text class="u-short-video__content__actions__text">{{ item.commentCount }}</text>
 							</view>
 							<view class="u-short-video__content__actions__item" @click="handleShare(item, index)">
-								<up-icon color="#eee" name="share" size="32px"></up-icon>
+								<u-icon color="#eee" name="share" size="32px"></u-icon>
 								<text class="u-short-video__content__actions__text">{{ item.shareCount }}</text>
 							</view>
 							<view class="u-short-video__content__actions__item" @click="handleCollect(item, index)">
-								<up-icon color="#eee" :name="item.isCollected ? 'bookmark-fill' : 'bookmark'" size="32px"></up-icon>
+								<u-icon color="#eee" :name="item.isCollected ? 'bookmark-fill' : 'bookmark'" size="32px"></u-icon>
 								<text class="u-short-video__content__actions__text">{{ item.collectCount }}</text>
 							</view>
 						</slot>
@@ -110,19 +110,19 @@
 		</swiper>
 		
 		<!-- 倍速选择弹窗 -->
-		<up-action-sheet
+		<u-action-sheet
 			:show="showSpeedSheet"
 			:actions="speedOptions"
 			title="播放速度"
 			@close="showSpeedSheet = false"
 			@select="selectSpeed"
-		></up-action-sheet>
+		></u-action-sheet>
 		
 		<!-- 底部导航栏 -->
 		<view class="u-short-video__footer">
 			<!-- 进度条 -->
 			<view class="u-short-video__progress" style="z-index: 999;">
-				<up-slider 
+				<u-slider 
 					:value="videoList[currentVideo]?.progress" 
 					:min="0" 
 					:max="100" 
@@ -136,36 +136,36 @@
 					height="1px"
 					@changing="onProgressChanging"
 					@change="onProgressChange"
-				></up-slider>
+				></u-slider>
 			</view>
 			
 			<slot name="tabbar">
-				<up-tabbar
+				<u-tabbar
                     :fixed="true"
                     :placeholder="true"
                     :safeAreaInsetBottom="true"
                     borderColor="rgba(255,255,255,0.25) !important"
                     backgroundColor="rgba(255,255,255,0.05)"
                 >
-				<up-tabbar-item
+				<u-tabbar-item
 					@click="goNext"
 					text="首页"
 					icon="home"
 				>
-				</up-tabbar-item>
-				<up-tabbar-item
+				</u-tabbar-item>
+				<u-tabbar-item
 					text="放映厅"
 					icon="photo"
-				></up-tabbar-item>
-				<up-tabbar-item
+				></u-tabbar-item>
+				<u-tabbar-item
 					text="直播"
 					icon="play-right"
-				></up-tabbar-item>
-				<up-tabbar-item
+				></u-tabbar-item>
+				<u-tabbar-item
 					text="我的"
 					icon="account"
-				></up-tabbar-item>
-			</up-tabbar>
+				></u-tabbar-item>
+			</u-tabbar>
 			</slot>
 		</view>
 	</view>

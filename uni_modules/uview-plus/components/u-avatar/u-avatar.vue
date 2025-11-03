@@ -23,20 +23,20 @@
 			<!-- #ifndef MP-WEIXIN && MP-QQ && MP-BAIDU  -->
 			<template v-if="mpAvatar && allowMp"></template>
 			<!-- #endif -->
-			<up-icon
+			<u-icon
 				v-else-if="icon"
 				:name="icon"
 				:size="fontSize"
 				:color="color"
-			></up-icon>
-			<up-text
+			></u-icon>
+			<u-text
 				v-else-if="text"
 				:text="text"
 				:size="fontSize"
 				:color="color"
 				align="center"
 				customStyle="justify-content: center"
-			></up-text>
+			></u-text>
 			<image
 				class="u-avatar__image"
 				v-else

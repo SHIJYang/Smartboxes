@@ -14,8 +14,8 @@
 </style>
 
 <template>
-    <view class="up-agreement">
-        <up-modal v-model:show="show" showCancelButton @confirm="confirm" @cancel="close" confirmText="阅读并同意">
+    <view class="u-agreement">
+        <u-modal v-model:show="show" showCancelButton @confirm="confirm" @cancel="close" confirmText="阅读并同意">
             <view class="agreement-content">
                 <slot>
                     我们非常重视您的个人信息和隐私保护。为了更好地保障您的个人权益，在您使用我们的产品前，
@@ -26,13 +26,13 @@
                     完毕并同意以上协议的全部内容。
                 </slot>
             </view>
-        </up-modal>
+        </u-modal>
     </view>
 </template>
 
 <script>
     export default {
-        name: 'up-agreement',
+        name: 'u-agreement',
         props: {
             urlProtocol: {
                 type: String,

@@ -40,21 +40,21 @@
 
 <style lang="scss" scoped>
 	
-	$u-cell-group-title-padding: 16px 16px 8px !default;
-	$u-cell-group-title-font-size: 15px !default;
-	$u-cell-group-title-line-height: 16px !default;
-	$u-cell-group-title-color: $u-main-color !default;
+	$u-cell-grou-title-padding: 16px 16px 8px !default;
+	$u-cell-grou-title-font-size: 15px !default;
+	$u-cell-grou-title-line-height: 16px !default;
+	$u-cell-grou-title-color: $u-main-color !default;
 
     .u-cell-group {
 		flex: 1;
 		
         &__title {
-            padding: $u-cell-group-title-padding;
+            padding: $u-cell-grou-title-padding;
 
             &__text {
-                font-size: $u-cell-group-title-font-size;
-                line-height: $u-cell-group-title-line-height;
-                color: $u-cell-group-title-color;
+                font-size: $u-cell-grou-title-font-size;
+                line-height: $u-cell-grou-title-line-height;
+                color: $u-cell-grou-title-color;
             }
         }
 		

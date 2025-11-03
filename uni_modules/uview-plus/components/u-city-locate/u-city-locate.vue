@@ -1,6 +1,6 @@
 <template>
 	<view class="u-city-locate">
-		<up-index-list :indexList="indexList">
+		<u-index-list :indexList="indexList">
 			<template #header>
 				<view class="u-current-city-wrap">
 					<view class="u-current-city-title">{{ t("up.cityLocate.locateCity") }}</view>
@@ -11,11 +11,11 @@
 			</template>
 			<template :key="index" v-for="(item, index) in cityList">
 				<!-- #ifdef APP-NVUE -->
-				<up-index-anchor :text="indexList[index]"></up-index-anchor>
+				<u-index-anchor :text="indexList[index]"></u-index-anchor>
 				<!-- #endif -->
-				<up-index-item>
+				<u-index-item>
 					<!-- #ifndef APP-NVUE -->
-					<up-index-anchor :text="indexList[index]"></up-index-anchor>
+					<u-index-anchor :text="indexList[index]"></u-index-anchor>
 					<!-- #endif -->
 					<view class="hot-city-list" v-if="index == 0">
 						<view class="" v-for="(item1, index1) in item" @tap="selectedCity(item1)">
@@ -26,16 +26,16 @@
 						<view class="list__item" @tap="selectedCity(item1)">
 							<text class="list__item__city-name">{{item1[nameKey]}}</text>
 						</view>
-						<up-line></up-line>
+						<u-line></u-line>
 					</view>
-				</up-index-item>
+				</u-index-item>
 			</template>
 			<template #footer>
 				<view class="u-safe-area-inset--bottom">
 					<text class="list__footer"></text>
 				</view>
 			</template>
-		</up-index-list>
+		</u-index-list>
 	</view>
 </template>
 
@@ -46,7 +46,7 @@
 		props:{
 			indexList: {
 				type: Array,
-				default: ['🔥']
+				default: ['']
 			},
 			cityList:{
 				type: Array,

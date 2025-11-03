@@ -6,7 +6,7 @@
 <script>
 import { t } from '../../libs/i18n'
 export default {
-    name: "up-copy",
+    name: "u-copy",
     props: {
         content: {
             type: String,

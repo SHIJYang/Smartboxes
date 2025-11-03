@@ -26,10 +26,10 @@ import { addStyle, addUnit, deepMerge } from '../../libs/function/index';
  * @tutorial https://ijry.github.io/uview-plus/components/view.html
  * @property {String} 					bgColor		背景颜色
  * @event {Function} click  点击触发事件
- * @example <up-view></up-view>
+ * @example <u-view></u-view>
  */
 export default {
-    name: 'up-view',
+    name: 'u-view',
     // #ifdef MP
     mixins: [mpMixin, mixin],
     // #endif

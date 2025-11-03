@@ -48,13 +48,13 @@
 					    borderRadius: shape == 'circle' ? '50%' : addUnit(radius),
 				    }"
                 >
-                    <up-text
+                    <u-text
                         :text="`+${urls.length - maxCount}`"
                         color="#fff"
                         :size="multipleSize * 0.3"
                         align="center"
                         customStyle="justify-content: center"
-                    ></up-text>
+                    ></u-text>
                 </view>
             </view>
         </view>

@@ -1,15 +1,15 @@
 <template>
-	<view class="up-poster">
+	<view class="u-poster">
 		<!-- canvas用于绘制海报 -->
 		<canvas 
 			v-if="showCanvas" 
-			class="up-poster__hidden-canvas" 
+			class="u-poster__hidden-canvas" 
 			:canvas-id="canvasId" 
 			:id="canvasId"
 			:style="{ width: canvasWidth + 'px', height: canvasHeight + 'px' }">
 		</canvas>
 		<!-- 隐藏的二维码组件，用于生成二维码图片 -->
-		<up-qrcode 
+		<u-qrcode 
 			ref="qrCode" 
 			:val="qrCodeValue" 
 			:size="qrCodeSize" 
@@ -17,7 +17,7 @@
             :loadMake="false"
 			background="#ffffff"
 			foreground="#000000"
-			:class="['up-poster__hidden-qrcode', qrCodeShow ? '' : 'up-poster__hidden-qrcode--hidden']"
+			:class="['u-poster__hidden-qrcode', qrCodeShow ? '' : 'u-poster__hidden-qrcode--hidden']"
 		/>
 	</view>
 </template>
@@ -36,14 +36,14 @@
  * @property {String} json.views.src 图片地址(仅image/qrcode类型)
  * @property {Object} json.views.css 元素样式
  * 
- * @example <up-poster :json="posterJson"></up-poster>
+ * @example <u-poster :json="posterJson"></u-poster>
  */
 
 import {
 	rpx2px
 } from '../../libs/function/index.js';
 export default {
-	name: 'up-poster',
+	name: 'u-poster',
 	props: {
 		json: {
 			type: Object,
@@ -600,7 +600,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.up-poster {
+.u-poster {
 	position: relative;
 	
 	&__canvas {

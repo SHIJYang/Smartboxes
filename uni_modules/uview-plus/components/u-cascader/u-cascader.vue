@@ -1,17 +1,17 @@
 <template>
-	<up-popup :show="popupShow" mode="bottom" :popup="false"
+	<u-popup :show="popupShow" mode="bottom" :popup="false"
 		:mask="true" :closeable="true" :safe-area-inset-bottom="true"
 		close-icon-color="#ffffff" :z-index="uZIndex"
 		:maskCloseAble="maskCloseAble" @close="close">
-		<view class="up-p-t-30 up-p-l-20 up-m-b-10" v-if="headerDirection =='column'">
-			<up-steps v-if="popupShow" dot direction="column" v-model:current="tabsIndex">
-				<up-steps-item  v-for="(item, index) in genTabsList"
-					@click="tabsIndex = index" :title="item.name"></up-steps-item>
-			</up-steps>
+		<view class="u-p-t-30 u-p-l-20 u-m-b-10" v-if="headerDirection =='column'">
+			<u-steps v-if="popupShow" dot direction="column" v-model:current="tabsIndex">
+				<u-steps-item  v-for="(item, index) in genTabsList"
+					@click="tabsIndex = index" :title="item.name"></u-steps-item>
+			</u-steps>
 		</view>
-		<view class="up-p-t-20 up-m-b-10" v-else>
-			<up-tabs v-if="popupShow" :list="genTabsList"
-				:scrollable="true" v-model:current="tabsIndex" @change="tabsChange" ref="tabs"></up-tabs>
+		<view class="u-p-t-20 u-m-b-10" v-else>
+			<u-tabs v-if="popupShow" :list="genTabsList"
+				:scrollable="true" v-model:current="tabsIndex" @change="tabsChange" ref="tabs"></u-tabs>
 		</view>
 		<view class="area-box">
 			<view class="u-flex" :class="{ 'change':isChange }"
@@ -21,17 +21,17 @@
 						:style="{ width: optionsCols == 2 ? '33.33333%' : '750rpx'}">
 						<view class="u-padding-10 u-bg-gray" style="height: 100%;">
 							<scroll-view :scroll-y="true" style="height: 100%">
-								<up-cell-group v-if="levelIndex === 0 || selectedValueIndexs[levelIndex - 1] !== undefined">
-									<up-cell v-for="(item,index) in levelData"
+								<u-cell-group v-if="levelIndex === 0 || selectedValueIndexs[levelIndex - 1] !== undefined">
+									<u-cell v-for="(item,index) in levelData"
 										:title="item[labelKey]" :arrow="false"
 										:index="index" :key="index"
 										@click="levelChange(levelIndex, index)">
 										<template v-slot:right-icon>
-											<up-icon v-if="selectedValueIndexs[levelIndex] === index"
-												size="17" name="checkbox-mark"></up-icon>
+											<u-icon v-if="selectedValueIndexs[levelIndex] === index"
+												size="17" name="checkbox-mark"></u-icon>
 										</template>
-									</up-cell>
-								</up-cell-group>
+									</u-cell>
+								</u-cell-group>
 							</scroll-view>
 						</view>
 					</view>
@@ -39,15 +39,15 @@
 			</view>
 		</view>
 		<!-- 添加按钮区域 -->
-		<view class="u-cascader-action up-flex up-flex-between">
-			<view class="u-padding-20 up-flex-fill">
-				<up-button @click="handleCancel" type="default">{{ t("up.common.cancel") }}</up-button>
+		<view class="u-cascader-action u-flex u-flex-between">
+			<view class="u-padding-20 u-flex-fill">
+				<u-button @click="handleCancel" type="default">{{ t("up.common.cancel") }}</u-button>
 			</view>
-			<view class="u-padding-20 up-flex-fill">
-				<up-button @click="handleConfirm" type="primary">{{ t("up.common.confirm") }}</up-button>
+			<view class="u-padding-20 u-flex-fill">
+				<u-button @click="handleConfirm" type="primary">{{ t("up.common.confirm") }}</u-button>
 			</view>
 		</view>
-	</up-popup>
+	</u-popup>
 </template>
 
 <script>
@@ -64,7 +64,7 @@
 	 */
 	import { t } from '../../libs/i18n'
 	export default {
-		name: 'up-cascader',
+		name: 'u-cascader',
 		props: {
 			// 通过双向绑定控制组件的弹出与收起
 			show: {

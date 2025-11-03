@@ -13,10 +13,10 @@
             >￥</text
         >
         <view class="u-text__prefix-icon" v-if="prefixIcon">
-            <up-icon
+            <u-icon
                 :name="prefixIcon"
                 :customStyle="addStyle(iconStyle)"
-            ></up-icon>
+            ></u-icon>
         </view>
         <u-link
             v-if="mode === 'link'" class="u-text__value"
@@ -59,10 +59,10 @@
             >{{ value }}</text
         >
         <view class="u-text__suffix-icon" v-if="suffixIcon">
-            <up-icon
+            <u-icon
                 :name="suffixIcon"
                 :customStyle="addStyle(iconStyle)"
-            ></up-icon>
+            ></u-icon>
         </view>
     </view>
 </template>
@@ -101,10 +101,10 @@ import { addStyle, addUnit, deepMerge } from '../../libs/function/index';
  * @property {String} 					align		文本对齐方式，可选值left|center|right（默认 'left' ）
  * @property {String} 					wordWrap	文字换行，可选值break-word|normal|anywhere（默认 'normal' ）
  * @event {Function} click  点击触发事件
- * @example <up-text text="我用十年青春,赴你最后之约"></up-text>
+ * @example <u-text text="我用十年青春,赴你最后之约"></u-text>
  */
 export default {
-    name: 'up-text',
+    name: 'u-text',
     // #ifdef MP
     mixins: [mpMixin, mixin, value, buttonMixin, openType, props],
     // #endif

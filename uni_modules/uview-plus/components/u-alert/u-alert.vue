@@ -1,5 +1,5 @@
 <template>
-	<up-transition
+	<u-transition
 	    :mode="transitionMode"
 	    :show="show"
 	>
@@ -14,11 +14,11 @@
 			    class="u-alert__icon"
 			    v-if="showIcon"
 			>
-				<up-icon
+				<u-icon
 				    :name="iconName"
 				    size="18"
 				    :color="iconColor"
-				></up-icon>
+				></u-icon>
 			</view>
 			<!-- 内容区域 -->
 			<view
@@ -55,15 +55,15 @@
 			    @tap.stop="closeHandler"
 			>
 				<slot name="close">
-					<up-icon
+					<u-icon
 					    name="close"
 					    :color="iconColor"
 					    size="15"
-					></up-icon>
+					></u-icon>
 				</slot>
 			</view>
 		</view>
-	</up-transition>
+	</u-transition>
 </template>
 
 <script>
@@ -92,7 +92,7 @@
 	 * @event    {Function}        click       点击组件时触发
 	 * @event    {Function}        close       点击关闭按钮时触发
 	 * @event    {Function}        closed      关闭动画结束时触发
-	 * @example  <up-alert :title="title"  type = "warning" :closable="closable" :description = "description"></up-alert>
+	 * @example  <u-alert :title="title"  type = "warning" :closable="closable" :description = "description"></u-alert>
 	 */
 	export default {
 		name: 'u-alert',

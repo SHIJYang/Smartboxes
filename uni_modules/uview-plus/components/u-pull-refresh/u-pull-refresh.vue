@@ -22,7 +22,7 @@
         <!-- 默认下拉状态 -->
         <view class="refresh-content">
           <view class="refresh-indicator">
-            <up-icon name="arrow-downward" size="26px"></up-icon>
+            <u-icon name="arrow-downward" size="26px"></u-icon>
           </view>
           <text class="refresh-text">{{ t("up.pullRefresh.pull") }}</text>
         </view>
@@ -37,7 +37,7 @@
         <!-- 默认释放状态 -->
         <view class="refresh-content">
           <view class="refresh-indicator">
-            <up-icon name="arrow-upward" size="26px"></up-icon>
+            <u-icon name="arrow-upward" size="26px"></u-icon>
           </view>
           <text class="refresh-text">{{ t("up.pullRefresh.release") }}</text>
         </view>

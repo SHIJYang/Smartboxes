@@ -1,6 +1,6 @@
 <template>
-  <view class="up-markdown" :class="theme">
-    <up-parse :content="parsedContent" :previewImg="previewImg"></up-parse>
+  <view class="u-markdown" :class="theme">
+    <u-parse :content="parsedContent" :previewImg="previewImg"></u-parse>
   </view>
 </template>
 
@@ -8,7 +8,7 @@
 import { marked } from './marked.esm.js';
 
 export default {
-  name: 'up-markdown',
+  name: 'u-markdown',
   props: {
     // markdown内容
     content: {
@@ -71,15 +71,15 @@ export default {
         const language = lang.match(/class="language-([^"]+)"/);
         const langClass = language ? `language-${language[1]}` : '';
         
-        let result = `<pre class="up-markdown-code ${langClass}">`;
+        let result = `<pre class="u-markdown-code ${langClass}">`;
         
         if (this.showLineNumber) {
           // 添加行号
           const lines = code.split('\n').filter(line => line.trim() !== '');
-          result += '<span class="up-markdown-line-numbers">';
+          result += '<span class="u-markdown-line-numbers">';
           lines.push('');
           lines.forEach((_, index) => {
-            result += `<span class="up-markdown-line-number">${index + 1}</span>`;
+            result += `<span class="u-markdown-line-number">${index + 1}</span>`;
           });
           result += '</span>';
         }
@@ -99,7 +99,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.up-markdown {
+.u-markdown {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   font-size: 16px;
   line-height: 1.6;
@@ -282,7 +282,7 @@ export default {
 }
 
 /* 代码块行号样式 */
-::v-deep .up-markdown-line-numbers {
+::v-deep .u-markdown-line-numbers {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -291,7 +291,7 @@ export default {
   border-right: 1px solid #ddd;
   user-select: none;
   
-  .up-markdown-line-number {
+  .u-markdown-line-number {
     color: #999;
     font-size: 14px;
     line-height: 1.6;

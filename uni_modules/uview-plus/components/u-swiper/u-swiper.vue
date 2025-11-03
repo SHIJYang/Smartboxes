@@ -11,7 +11,7 @@
 			class="u-swiper__loading"
 			v-if="loading"
 		>
-			<up-loading-icon mode="circle"></up-loading-icon>
+			<u-loading-icon mode="circle"></u-loading-icon>
 		</view>
 		<swiper
 			v-else
@@ -79,14 +79,14 @@
 		</swiper>
 		<view class="u-swiper__indicator" :style="[addStyle(indicatorStyle)]">
 			<slot name="indicator">
-				<up-swiper-indicator
+				<u-swiper-indicator
 					v-if="!loading && indicator && !showTitle"
 					:indicatorActiveColor="indicatorActiveColor"
 					:indicatorInactiveColor="indicatorInactiveColor"
 					:length="list.length"
 					:current="currentIndex"
 					:indicatorMode="indicatorMode"
-				></up-swiper-indicator>
+				></u-swiper-indicator>
 			</slot>
 		</view>
 	</view>

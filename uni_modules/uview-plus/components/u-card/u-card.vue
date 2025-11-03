@@ -109,7 +109,7 @@
      * @example <u-card paddingFoot="2px 15px" title="card"></u-card>
      */
     export default {
-        name: 'up-card',
+        name: 'u-card',
         data() {
             return {};
         },

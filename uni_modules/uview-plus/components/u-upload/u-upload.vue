@@ -35,19 +35,19 @@
 								height: addUnit(height)
 							}]"
 						/>
-						<up-icon
+						<u-icon
 							v-else
 						    color="#80CBF9"
 						    size="26"
 						    :name="item.isVideo || (item.type && item.type === 'video') ? 'movie' : 'file-text'"
-						></up-icon>
+						></u-icon>
 						<view v-if="item.status === 'success'"
 							class="u-upload__wrap__play"
 							@tap="onClickPreview(item, index)">
 							<slot name="playIcon"></slot>
-							<up-icon v-if="!$slots['playIcon']"
+							<u-icon v-if="!$slots['playIcon']"
 								class="u-upload__wrap__play__icon"
-								name="play-right" size="22px"></up-icon>
+								name="play-right" size="22px"></u-icon>
 						</view>
 					</view>
 					<view
@@ -59,11 +59,11 @@
 							height: addUnit(height)
 						}]"
 					>
-						<up-icon
+						<u-icon
 						    color="#80CBF9"
 						    size="26"
 						    :name="item.isVideo || (item.type && item.type === 'video') ? 'movie' : 'folder'"
-						></up-icon>
+						></u-icon>
 						<text class="u-upload__wrap__preview__other__text">
 							{{item.isVideo || (item.type && item.type === 'video') ? item.name || t("up.common.video") : item.name || t("up.common.file")}}
 						</text>
@@ -73,7 +73,7 @@
 					    v-if="item.status === 'uploading' || item.status === 'failed'"
 					>
 						<view class="u-upload__status__icon">
-							<up-icon
+							<u-icon
 							    v-if="item.status === 'failed'"
 							    name="close-circle"
 							    color="#ffffff"
@@ -89,8 +89,8 @@
 						    v-if="item.message"
 						    class="u-upload__status__message"
 						>{{ item.message }}</text>
-						<up-gap class="u-upload__progress" height="3px"
-							:style="{width: item.progress + '%'}"></up-gap>
+						<u-gap class="u-upload__progress" height="3px"
+							:style="{width: item.progress + '%'}"></u-gap>
 					</view>
 					<view
 					    class="u-upload__deletable"
@@ -98,11 +98,11 @@
 					    @tap.stop="deleteItem(index)"
 					>
 						<view class="u-upload__deletable__icon">
-							<up-icon
+							<u-icon
 							    name="close"
 							    color="#ffffff"
 							    size="10"
-							></up-icon>
+							></u-icon>
 						</view>
 					</view>
 					<slot name="success">
@@ -118,11 +118,11 @@
 							<!-- #endif -->
 							<!-- #ifndef APP-NVUE -->
 							<view class="u-upload__success__icon">
-								<up-icon
+								<u-icon
 									name="checkmark"
 									color="#ffffff"
 									size="12"
-								></up-icon>
+								></u-icon>
 							</view>
 							<!-- #endif -->
 						</view>
@@ -156,11 +156,11 @@
 						height: addUnit(height)
 					}]"
 				>
-					<up-icon
+					<u-icon
 					    :name="uploadIcon"
 					    size="26"
 					    :color="uploadIconColor"
-					></up-icon>
+					></u-icon>
 					<text
 					    v-if="uploadText"
 					    class="u-upload__button__text"
@@ -168,9 +168,10 @@
 				</view>
 			</template>
 		</view>
-		<up-popup
+		<u-popup
 			mode="center"
-			v-model:show="popupShow">
+			:show="popupShow"
+			@update:show="popupShow = $event">
 			<video id="myVideo" v-if="popupShow"
 				:src="currentItemIndex >= 0 ? lists[currentItemIndex].url : ''"
 				@error="videoErrorCallback" show-center-play-btn
@@ -180,7 +181,7 @@
 				@loadedmetadata="loadedVideoMetadata"
 				:initial-time='0.1'>
 			</video>
-		</up-popup>
+		</u-popup>
 	</view>
 </template>
 

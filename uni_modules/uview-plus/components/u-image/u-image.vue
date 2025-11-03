@@ -36,9 +36,9 @@
 				}"
 			>
 				<slot name="loading">
-					<up-icon
+					<u-icon
 						:name="loadingIcon"
-					></up-icon>
+					></u-icon>
 				</slot>
 			</view>
 			<view
@@ -52,9 +52,9 @@
 				}"
 			>
 				<slot name="error">
-					<up-icon
+					<u-icon
 						:name="errorIcon"
-					></up-icon>
+					></u-icon>
 				</slot>
 			</view>
 		</view>

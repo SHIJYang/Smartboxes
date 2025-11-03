@@ -1,49 +1,49 @@
 <template>
-	<view class="up-coupon" :class="[`up-coupon--${shape}`, `up-coupon--${type}`, `up-coupon--${size}`, {'up-coupon--disabled': disabled}]" 
+	<view class="u-coupon" :class="[`u-coupon--${shape}`, `u-coupon--${type}`, `u-coupon--${size}`, {'u-coupon--disabled': disabled}]" 
 		:style="[couponStyle]" @click="handleClick">
-		<view class="up-coupon__content">
+		<view class="u-coupon__content">
 			<!-- 左侧金额区域 -->
-			<view class="up-coupon__amount">
+			<view class="u-coupon__amount">
 				<slot name="unit" :unit="unit" :unitPosition="unitPosition" v-if="unitPosition === 'left'">
-					<text class="up-coupon__amount-unit" v-if="unitPosition === 'left'">{{ unit }}</text>
+					<text class="u-coupon__amount-unit" v-if="unitPosition === 'left'">{{ unit }}</text>
 				</slot>
 				<slot name="amount" :amount="amount">
-					<text class="up-coupon__amount-value">{{ amount }}</text>
+					<text class="u-coupon__amount-value">{{ amount }}</text>
 				</slot>
 				<slot name="unit" :unit="unit" :unitPosition="unitPosition" v-if="unitPosition === 'right'">
-					<text class="up-coupon__amount-unit" v-if="unitPosition === 'right'">{{ unit }}</text>
+					<text class="u-coupon__amount-unit" v-if="unitPosition === 'right'">{{ unit }}</text>
 				</slot>
 				<slot name="limit" :limit="limit">
-					<text class="up-coupon__amount-limit" v-if="limit">{{ limit }}</text>
+					<text class="u-coupon__amount-limit" v-if="limit">{{ limit }}</text>
 				</slot>
 			</view>
 			
 			<!-- 中间描述区域 -->
-			<view class="up-coupon__info">
+			<view class="u-coupon__info">
 				<slot name="title" :title="title">
-					<text class="up-coupon__info-title">{{ title }}</text>
+					<text class="u-coupon__info-title">{{ title }}</text>
 				</slot>
 				<slot name="desc" :desc="desc">
-					<text class="up-coupon__info-desc" v-if="desc">{{ desc }}</text>
+					<text class="u-coupon__info-desc" v-if="desc">{{ desc }}</text>
 				</slot>
 				<slot name="time" :time="time">
-					<text class="up-coupon__info-time" v-if="time">{{ time }}</text>
+					<text class="u-coupon__info-time" v-if="time">{{ time }}</text>
 				</slot>
 			</view>
 			
 			<!-- 右侧操作区域 -->
-			<view class="up-coupon__action u-padding-right-20">
+			<view class="u-coupon__action u-padding-right-20">
 				<slot name="action" :actionText="actionText" :circle="circle">
-                    <up-tag type="error" :bgColor="type ? 'transparent' : '#eb433d'"
+                    <u-tag type="error" :bgColor="type ? 'transparent' : '#eb433d'"
                         :borderColor="type ? '#eee' : '#eb433d'" borderRadius="6px"
-                        size="medium" class="up-coupon__action-text"
-                        :shape="circle ? 'circle': 'circle'">{{ actionText }}</up-tag>
+                        size="medium" class="u-coupon__action-text"
+                        :shape="circle ? 'circle': 'circle'">{{ actionText }}</u-tag>
 				</slot>
 			</view>
 		</view>
 		
 		<!-- 红包绳子效果 -->
-		<view v-if="shape === 'envelope'" class="up-coupon__rope"></view>
+		<view v-if="shape === 'envelope'" class="u-coupon__rope"></view>
 		
 		<!-- 默认插槽，可用于添加额外内容 -->
 		<slot></slot>
@@ -52,7 +52,7 @@
 
 <script>
 	export default {
-		name: 'up-coupon',
+		name: 'u-coupon',
 		props: {
 			// 金额
 			amount: {
@@ -157,7 +157,7 @@
 </script>
 
 <style lang="scss" scoped>
-	.up-coupon {
+	.u-coupon {
 		position: relative;
 		overflow: hidden;
 		border-radius: 8rpx;
@@ -362,10 +362,10 @@
 		&--primary {
 			background: linear-gradient(90deg, #43afff, #3b8cff);
             color: #fff;
-            .up-coupon__amount {
+            .u-coupon__amount {
                 border-right: 1px dashed #eee;
             }
-            .up-coupon__amount-value {
+            .u-coupon__amount-value {
                 color: #fff;
             }
 		}
@@ -373,10 +373,10 @@
 		&--success {
 			background: linear-gradient(90deg, #67dda9, #19be6b);
             color: #fff !important;
-            .up-coupon__amount {
+            .u-coupon__amount {
                 border-right: 1px dashed #eee;
             }
-            .up-coupon__amount-value {
+            .u-coupon__amount-value {
                 color: #fff;
             }
 		}
@@ -384,10 +384,10 @@
 		&--warning {
 			background: linear-gradient(90deg, #ff9739, #ff6a39);
             color: #fff;
-            .up-coupon__amount {
+            .u-coupon__amount {
                 border-right: 1px dashed #eee;
             }
-            .up-coupon__amount-value {
+            .u-coupon__amount-value {
                 color: #fff;
             }
 		}
@@ -395,10 +395,10 @@
 		&--error {
 			background: linear-gradient(90deg, #ff7070, #ff4747);
             color: #fff;
-            .up-coupon__amount {
+            .u-coupon__amount {
                 border-right: 1px dashed #eee;
             }
-            .up-coupon__amount-value {
+            .u-coupon__amount-value {
                 color: #fff;
             }
 		}

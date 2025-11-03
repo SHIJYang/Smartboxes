@@ -6,11 +6,11 @@
                 v-if="prefixIcon || $slots.prefix"
             >
                 <slot name="prefix">
-                    <up-icon
+                    <u-icon
                         :name="prefixIcon"
                         size="18"
                         :customStyle="prefixIconStyle"
-                    ></up-icon>
+                    ></u-icon>
                 </slot>
             </view>
             <view class="u-input__content__field-wrapper" @tap="clickHandler">
@@ -54,32 +54,32 @@
                 v-if="isShowClear"
                 @click="onClear"
             >
-                <up-icon
+                <u-icon
                     name="close"
                     size="11"
                     color="#ffffff"
                     customStyle="line-height: 12px"
-                ></up-icon>
+                ></u-icon>
             </view>
             <view
                 class="u-input__content__subfix-password-shower"
                 v-if="(type == 'password' || password) && passwordVisibilityToggle"
             >
-                <up-icon @click="showPassword = !showPassword"
+                <u-icon @click="showPassword = !showPassword"
                     :name="showPassword ? 'eye-off' : 'eye-fill'"
                     size="18"
-                ></up-icon>
+                ></u-icon>
             </view>
             <view
                 class="u-input__content__subfix-icon"
                 v-if="suffixIcon || $slots.suffix"
             >
                 <slot name="suffix">
-                    <up-icon
+                    <u-icon
                         :name="suffixIcon"
                         size="18"
                         :customStyle="suffixIconStyle"
-                    ></up-icon>
+                    ></u-icon>
                 </slot>
             </view>
         </view>
@@ -178,7 +178,7 @@ export default {
                 ) {
                     this.valueChange(this.innerValue, true);
                 } else {
-					// 尝试调用up-form的验证方法
+					// 尝试调用u-form的验证方法
                     if(!this.firstChange) formValidate(this, "change");
 				}
                 this.firstChange = false;

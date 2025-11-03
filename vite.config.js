@@ -10,22 +10,13 @@ import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
 	plugins: [
-
 		uni({
-			vueOptions: {
-				template: {
-					compilerOptions: {
-						// 关键配置：声明所有 up- 开头的标签为自定义元素
-						isCustomElement: (tag) => tag.startsWith('up-')
-					}
-				}
-			}
+			vueOptions: {}
 		}) // uni插件放在后面
 	],
 	resolve: {
 		alias: {
 			'@': resolve(__dirname, './src'),
-			'uview-plus': resolve(__dirname, './node_modules/uview-plus'),
 			'gsap': resolve(__dirname, './node_modules/gsap')
 		}
 	},

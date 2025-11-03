@@ -4,9 +4,9 @@
       <!-- <text v-if="hasChildren" class="u-tree-node-toggle">
         {{ node.expanded ? '▼' : '▶' }}
       </text> -->
-      <up-icon v-if="hasChildren" class="u-tree-node-toggle"
+      <u-icon v-if="hasChildren" class="u-tree-node-toggle"
        :name="node.expanded ? 'arrow-down-fill' : 'play-right-fill'" size="12" />
-      <up-checkbox
+      <u-checkbox
         v-if="showCheckbox"
         usedAlone
         :size="12"

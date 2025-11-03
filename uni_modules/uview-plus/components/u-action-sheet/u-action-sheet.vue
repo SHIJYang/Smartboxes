@@ -17,12 +17,12 @@
 				    class="u-action-sheet__header__icon-wrap"
 				    @tap.stop="cancel"
 				>
-					<up-icon
+					<u-icon
 					    name="close"
 					    size="17"
 					    color="#c8c9cc"
 					    bold
-					></up-icon>
+					></u-icon>
 				</view>
 			</view>
 			<!-- 描述信息 -->

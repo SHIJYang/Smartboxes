@@ -1,5 +1,5 @@
 <template>
-	<view class="up-pdf-reader" :style="{ height: height }">
+	<view class="u-pdf-reader" :style="{ height: height }">
 		<web-view :fullscreen="false"
 			:src="viewerUrl" :style="{ width: '750rpx', height: height }"
             :webview-styles="{ width: '750rpx', height: height }"
@@ -18,10 +18,10 @@
 	 * @property {String}			src				PDF文件地址
 	 * @property {String}	        height			组件高度，默认为'700px'
 	 * @property {String}			pdfjsDomain		pdfjs资源域名，默认为'https://uview-plus.jiangruyi.com/h5'
-	 * @example <up-pdf-reader src="https://example.com/file.pdf"></up-pdf-reader>
+	 * @example <u-pdf-reader src="https://example.com/file.pdf"></u-pdf-reader>
 	 */
 	export default {
-		name: 'up-pdf-reader',
+		name: 'u-pdf-reader',
 		mixins: [props],
         data() {
             return {
@@ -47,6 +47,6 @@
 </script>
 
 <style lang="scss" scoped>	
-	.up-pdf-reader {
+	.u-pdf-reader {
 	}
 </style>

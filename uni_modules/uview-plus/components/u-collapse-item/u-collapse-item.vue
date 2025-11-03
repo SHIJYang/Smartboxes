@@ -24,7 +24,7 @@
 			</template>
 			<template #icon>
 				<slot name="icon">
-					<up-icon v-if="!$slots.icon && icon" :size="22" :name="icon"></up-icon>
+					<u-icon v-if="!$slots.icon && icon" :size="22" :name="icon"></u-icon>
 				</slot>
 			</template>
 			<template #value>
@@ -36,7 +36,7 @@
 			</template>
 			<template #right-icon>
 				<template v-if="showRight">
-					<up-icon v-if="!$slots['right-icon']" :size="16" name="arrow-right"></up-icon>
+					<u-icon v-if="!$slots['right-icon']" :size="16" name="arrow-right"></u-icon>
 					<slot name="right-icon">
 					</slot>
 				</template>

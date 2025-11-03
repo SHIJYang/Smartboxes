@@ -35,7 +35,7 @@
 				</slot>
 			</view>
 			<view
-				class="u-modal__button-group--confirm-button"
+				class="u-modal__button-grou--confirm-button"
 				v-if="$slots.confirmButton"
 			>
 				<slot name="confirmButton"></slot>
