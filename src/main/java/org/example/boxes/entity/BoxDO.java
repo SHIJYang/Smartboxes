@@ -48,6 +48,12 @@ public class BoxDO {
     private String boxName;
 
     /**
+     * 箱体类型 0-子箱，1-主箱
+     */
+    @Column(name = "`box_type`", nullable = false)
+    private Integer boxType;
+
+    /**
      * 状态
      */
     @Column(name = "`status`", nullable = false)
@@ -64,6 +70,12 @@ public class BoxDO {
      */
     @Column(name = "`battery`")
     private Integer battery;
+
+    /**
+     * 网络时延(ms) 仅主箱记录
+     */
+    @Column(name = "`network_delay`")
+    private Integer networkDelay;
 
     /**
      * 最后心跳时间

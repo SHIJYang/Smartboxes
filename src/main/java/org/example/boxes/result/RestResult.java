@@ -19,7 +19,7 @@ public class RestResult<T> {
     /**
      * 响应码
      */
-    private String code;
+    private Integer code;
 
     /**
      * 响应信息
@@ -41,7 +41,7 @@ public class RestResult<T> {
      * @return RestResult 对象
      */
     public static <T> RestResult<T> success(T data) {
-        return new RestResult<>("000000", "调用成功", data);
+        return new RestResult<>(200, "调用成功", data);
     }
 
     /**
@@ -52,7 +52,7 @@ public class RestResult<T> {
      * @return 构建好的RestResult实例
      */
     public static <T> RestResult<T> error(String message) {
-        return new RestResult<>("000001", message, null);
+        return new RestResult<>(500, message, null);
     }
 
     /**
@@ -73,7 +73,7 @@ public class RestResult<T> {
      * @return RestResult 对象
      */
     public static <T> RestResult<T> fail(String msg) {
-        return new RestResult<>("000001", msg, null);
+        return new RestResult<>(500, msg, null);
     }
 
     /**
@@ -83,6 +83,6 @@ public class RestResult<T> {
      * @return RestResult 对象
      */
     public static <T> RestResult<T> systemError() {
-        return new RestResult<>("999999", "系统异常", null);
+        return new RestResult<>(500, "系统异常", null);
     }
 }

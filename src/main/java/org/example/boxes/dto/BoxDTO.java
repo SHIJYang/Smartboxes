@@ -44,11 +44,19 @@ public class BoxDTO {
     private String boxName;
 
     /**
-     * 盒子状态（0-离线 1-在线）
+     * 箱体类型 0-子箱，1-主箱
+     */
+    @NotNull(message = "箱体类型不能为空")
+    @Min(0)
+    @Max(1)
+    private Integer boxType;
+
+    /**
+     * 盒子状态（0-离线 1-在线 2-低电 3-故障）
      */
     @NotNull(message = "盒子状态不能为空")
-    @Min(value = 0, message = "状态值不合法")
-    @Max(value = 1, message = "状态值不合法")
+    @Min(0)
+    @Max(3)
     private Integer status;
 
     /**

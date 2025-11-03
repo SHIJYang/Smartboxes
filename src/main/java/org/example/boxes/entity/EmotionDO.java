@@ -57,9 +57,9 @@ public class EmotionDO {
     private LocalDateTime updateTime;
 
     /**
-     * 关联的物品
+     * 关联的物品（一对一，外键在 t_emotion.item_id）
      */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id", insertable = false, updatable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id", referencedColumnName = "id")
     private ItemDO item;
 }

@@ -101,10 +101,9 @@ public class ItemDO {
     private BoxDO box;
 
     /**
-     * 物品的情感标签
+     * 物品的情感标签（由 EmotionDO.item 维护外键）
      */
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id")
+    @OneToOne(mappedBy = "item", fetch = FetchType.LAZY)
     private EmotionDO emotion;
 
     /**

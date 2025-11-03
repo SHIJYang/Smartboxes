@@ -1,8 +1,8 @@
 
 package org.example.boxes.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.boxes.dto.AiChatRequestDTO;
@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
  * @author 14577
  */
 @RestController
-@RequestMapping("/ai-chat")
+@RequestMapping("/api")
 @RequiredArgsConstructor
-@Api(tags = "AI聊天")
+@Tag(name = "AI聊天")
 public class AiChatController {
 
     private final AiChatService aiChatService;
@@ -33,7 +33,7 @@ public class AiChatController {
      * @return RestResult 响应结果
      */
     @PostMapping("/chat")
-    @ApiOperation("AI聊天")
+    @Operation(summary = "AI聊天")
     public RestResult<?> chat(@Valid @RequestBody AiChatRequestDTO request) {
         return aiChatService.handleAiChat(request);
     }

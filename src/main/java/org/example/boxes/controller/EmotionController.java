@@ -1,8 +1,8 @@
 
 package org.example.boxes.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.*;
  * @author 14577
  */
 @RestController
-@RequestMapping("/api/emotion")
+@RequestMapping("/api/emotions")
 @RequiredArgsConstructor
-@Api(tags = "情感标签管理")
+@Tag(name = "情感标签管理")
 public class EmotionController {
 
     private final EmotionService emotionService;
@@ -32,8 +32,8 @@ public class EmotionController {
      * @param emotionDTO 情感数据传输对象
      * @return RestResult 结果封装
      */
-    @PostMapping("/add")
-    @ApiOperation("添加情感标签")
+    @PostMapping("")
+    @Operation(summary = "添加情感标签")
     public ResponseEntity<RestResult<Void>> addEmotion(@RequestBody @Valid EmotionDTO emotionDTO) {
         return ResponseEntity.ok(emotionService.addEmotion(emotionDTO));
     }
@@ -44,8 +44,8 @@ public class EmotionController {
      * @param id 情感记录主键ID
      * @return RestResult 结果封装
      */
-    @DeleteMapping("/delete/{id}")
-    @ApiOperation("删除情感标签")
+    @DeleteMapping("/{id}")
+    @Operation(summary = "删除情感标签")
     public ResponseEntity<RestResult<Void>> deleteEmotion(@PathVariable Long id) {
         return ResponseEntity.ok(emotionService.deleteEmotion(id));
     }
@@ -56,8 +56,8 @@ public class EmotionController {
      * @param emotionDTO 更新的情感数据
      * @return RestResult 结果封装
      */
-    @PutMapping("/update")
-    @ApiOperation("更新情感标签")
+    @PutMapping("")
+    @Operation(summary = "更新情感标签")
     public ResponseEntity<RestResult<Void>> updateEmotion(@RequestBody @Valid EmotionDTO emotionDTO) {
         return ResponseEntity.ok(emotionService.updateEmotion(emotionDTO));
     }
@@ -68,8 +68,8 @@ public class EmotionController {
      * @param queryEmotionDTO 查询条件参数
      * @return RestResult 结果封装
      */
-    @GetMapping("/list")
-    @ApiOperation("查询情感标签列表")
+    @GetMapping("")
+    @Operation(summary = "查询情感标签列表")
     public ResponseEntity<RestResult<List<EmotionDTO>>> listEmotions(QueryEmotionDTO queryEmotionDTO) {
         return ResponseEntity.ok(emotionService.listEmotions(queryEmotionDTO));
     }
