@@ -58,7 +58,7 @@ public class ItemOperateLogDO {
     /**
      * 更新时间
      */
-    @Column(name = "update_time", nullable = false)
+    @Column(name = "update_time")
     private LocalDateTime updateTime;
 
     // 暂时注释掉关联关系

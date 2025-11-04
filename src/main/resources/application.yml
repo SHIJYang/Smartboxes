@@ -9,12 +9,15 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update  # 生产环境建议设为validate或none
+      ddl-auto: none  # 生产环境建议设为validate或none
     show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
+  sql:
+    init:
+      mode: always    # 启用SQL初始化
 logging:
   level:
     org.hibernate.SQL: DEBUG
