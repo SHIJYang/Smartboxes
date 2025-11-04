@@ -32,10 +32,9 @@ public class EmotionDO {
     @Column(name = "update_time", nullable = false)
     private LocalDateTime updateTime;
 
-    // 暂时注释掉关联关系，先让应用启动
-    /*
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", insertable = false, updatable = false)
     private ItemDO item;
-    */
+
 }

@@ -50,10 +50,9 @@ public class ItemDO {
     @Column(name = "update_time", nullable = false)
     private LocalDateTime updateTime;
 
-    // 暂时注释掉关联关系
-    /*
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "box_id", insertable = false, updatable = false)
     private BoxDO box;
-    */
+
 }

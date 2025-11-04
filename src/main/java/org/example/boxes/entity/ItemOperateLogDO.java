@@ -61,10 +61,9 @@ public class ItemOperateLogDO {
     @Column(name = "update_time")
     private LocalDateTime updateTime;
 
-    // 暂时注释掉关联关系
-    /*
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", insertable = false, updatable = false)
     private ItemDO item;
-    */
+
 }
