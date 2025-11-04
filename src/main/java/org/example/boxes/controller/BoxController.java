@@ -18,9 +18,13 @@ import org.springframework.web.bind.annotation.*;
  * @author 14577
  */
 @RestController
-@RequestMapping("/api/box")
+@RequestMapping("/api/boxes")
 @RequiredArgsConstructor
+<<<<<<< HEAD
 @Tag(name = "盒子管理", description = "盒子相关API")
+=======
+@Tag(name = "盒子管理")
+>>>>>>> 274ee59967deb523f16d5cc722ba6731b64355b7
 public class BoxController {
 
     private final BoxService boxService;
@@ -37,7 +41,11 @@ public class BoxController {
     /**
      * 删除盒子
      */
+<<<<<<< HEAD
     @DeleteMapping("/delete/{id}")
+=======
+    @DeleteMapping("/{id}")
+>>>>>>> 274ee59967deb523f16d5cc722ba6731b64355b7
     @Operation(summary = "删除盒子")
     public ResponseEntity<RestResult<Void>> deleteBox(@PathVariable Long id) {
         return ResponseEntity.ok(boxService.deleteBox(id));
@@ -46,8 +54,13 @@ public class BoxController {
     /**
      * 修改盒子信息
      */
+<<<<<<< HEAD
     @PutMapping("/update")
     @Operation(summary = "修改盒子")
+=======
+    @PutMapping("")
+    @ApiOperation("修改盒子")
+>>>>>>> 274ee59967deb523f16d5cc722ba6731b64355b7
     public ResponseEntity<RestResult<Void>> updateBox(@RequestBody @Valid BoxDTO boxDTO) {
         return ResponseEntity.ok(boxService.updateBox(boxDTO));
     }
@@ -55,7 +68,11 @@ public class BoxController {
     /**
      * 查询盒子列表
      */
+<<<<<<< HEAD
     @GetMapping("/list")
+=======
+    @GetMapping("")
+>>>>>>> 274ee59967deb523f16d5cc722ba6731b64355b7
     @Operation(summary = "查询盒子列表")
     public ResponseEntity<RestResult<List<BoxDTO>>> listBoxes(QueryBoxDTO queryBoxDTO) {
         return ResponseEntity.ok(boxService.listBoxes(queryBoxDTO));

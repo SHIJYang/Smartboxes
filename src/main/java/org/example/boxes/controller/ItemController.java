@@ -18,9 +18,13 @@ import org.springframework.web.bind.annotation.*;
  * @author 14577
  */
 @RestController
-@RequestMapping("/api/item")
+@RequestMapping("/api/items")
 @RequiredArgsConstructor
+<<<<<<< HEAD
 @Tag(name = "商品管理", description = "商品相关API")
+=======
+@Tag(name = "商品管理")
+>>>>>>> 274ee59967deb523f16d5cc722ba6731b64355b7
 public class ItemController {
 
     private final ItemService itemService;
@@ -32,7 +36,11 @@ public class ItemController {
      * @return RestResult 结果封装
      */
     @PostMapping("/add")
+<<<<<<< HEAD
     @Operation(summary = "添加新商品", description = "创建新的商品记录")
+=======
+    @Operation(summary = "添加新商品")
+>>>>>>> 274ee59967deb523f16d5cc722ba6731b64355b7
     public ResponseEntity<RestResult<Void>> addItem(@RequestBody @Valid ItemDTO itemDTO) {
         return ResponseEntity.ok(itemService.addItem(itemDTO));
     }
@@ -43,8 +51,13 @@ public class ItemController {
      * @param id 商品主键ID
      * @return RestResult 结果封装
      */
+<<<<<<< HEAD
     @DeleteMapping("/delete/{id}")
     @Operation(summary = "删除商品", description = "删除指定的商品记录")
+=======
+    @DeleteMapping("/{id}")
+    @Operation(summary = "删除商品")
+>>>>>>> 274ee59967deb523f16d5cc722ba6731b64355b7
     public ResponseEntity<RestResult<Void>> deleteItem(@PathVariable Long id) {
         return ResponseEntity.ok(itemService.deleteItem(id));
     }
@@ -55,8 +68,13 @@ public class ItemController {
      * @param itemDTO 更新的商品数据
      * @return RestResult 结果封装
      */
+<<<<<<< HEAD
     @PutMapping("/update")
     @Operation(summary = "更新商品信息", description = "更新商品的基本信息")
+=======
+    @PutMapping("")
+    @Operation(summary = "更新商品信息")
+>>>>>>> 274ee59967deb523f16d5cc722ba6731b64355b7
     public ResponseEntity<RestResult<Void>> updateItem(@RequestBody @Valid ItemDTO itemDTO) {
         return ResponseEntity.ok(itemService.updateItem(itemDTO));
     }
@@ -67,8 +85,13 @@ public class ItemController {
      * @param queryItemDTO 查询参数
      * @return RestResult 结果封装
      */
+<<<<<<< HEAD
     @GetMapping("/list")
     @Operation(summary = "查询商品列表", description = "根据条件查询商品列表")
+=======
+    @GetMapping("")
+    @Operation(summary = "查询商品列表")
+>>>>>>> 274ee59967deb523f16d5cc722ba6731b64355b7
     public ResponseEntity<RestResult<List<ItemDTO>>> listItem(QueryItemDTO queryItemDTO) {
         return ResponseEntity.ok(itemService.listItems(queryItemDTO));
     }

@@ -55,4 +55,20 @@ public class ItemDO {
     @JoinColumn(name = "box_id", insertable = false, updatable = false)
     private BoxDO box;
 
+<<<<<<< HEAD
 }
+=======
+    /**
+     * 物品的情感标签（由 EmotionDO.item 维护外键）
+     */
+    @OneToOne(mappedBy = "item", fetch = FetchType.LAZY)
+    private EmotionDO emotion;
+
+    /**
+     * 物品的操作日志列表
+     */
+    @OneToMany(mappedBy = "item", fetch = FetchType.LAZY)
+    private List<ItemOperateLogDO> operateLogs;
+}
+
+>>>>>>> 274ee59967deb523f16d5cc722ba6731b64355b7
