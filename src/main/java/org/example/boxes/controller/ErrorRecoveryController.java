@@ -1,7 +1,7 @@
 package org.example.boxes.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.boxes.dto.ErrorLogDTO;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/error-recovery")
-@Api(tags = "错误修复管理")
+@Tag(name = "错误修复管理", description = "错误日志和降级管理API")
 @RequiredArgsConstructor
 public class ErrorRecoveryController {
 
@@ -35,7 +35,7 @@ public class ErrorRecoveryController {
      * @return RestResult 结果封装
      */
     @PostMapping("/record-error")
-    @ApiOperation(value = "记录运行时错误")
+    @Operation(summary = "记录运行时错误", description = "记录系统运行时错误日志")
     public RestResult<Void> recordRuntimeError(@Valid @RequestBody ErrorLogDTO errorLogDTO) {
         return errorLogService.recordRuntimeError(errorLogDTO);
     }
@@ -47,7 +47,7 @@ public class ErrorRecoveryController {
      * @return RestResult 结果封装
      */
     @PostMapping("/trigger-fallback")
-    @ApiOperation(value = "触发优雅降级策略")
+    @Operation(summary = "触发优雅降级策略", description = "在服务异常时触发降级策略")
     public RestResult<Object> triggerGracefulFallback(@Valid @RequestBody FallbackRequestDTO requestDTO) {
         return fallbackService.triggerGracefulFallback(requestDTO);
     }

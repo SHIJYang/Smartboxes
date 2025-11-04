@@ -1,4 +1,3 @@
-
 package org.example.boxes.service.impl;
 
 import jakarta.persistence.criteria.Predicate;
@@ -9,11 +8,15 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.boxes.dto.BoxDTO;
+import org.example.boxes.dto.PageQueryDTO;
 import org.example.boxes.dto.QueryBoxDTO;
 import org.example.boxes.entity.BoxDO;
 import org.example.boxes.repository.BoxRepository;
+import org.example.boxes.result.PageResult;
 import org.example.boxes.result.RestResult;
 import org.example.boxes.service.BoxService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -26,7 +29,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public abstract class BoxServiceImpl implements BoxService {
+public class BoxServiceImpl implements BoxService {
 
     private final BoxRepository boxRepository;
 
@@ -47,6 +50,10 @@ public abstract class BoxServiceImpl implements BoxService {
 
         // 将新盒子信息保存到数据库
         BoxDO boxDO = convertToEntity(boxDTO);
+
+        // 确保 ID 为 null，表示新增操作
+        boxDO.setId(null);
+
         boxDO.setCreateTime(LocalDateTime.now());
         boxDO.setUpdateTime(LocalDateTime.now());
 
@@ -121,9 +128,6 @@ public abstract class BoxServiceImpl implements BoxService {
         if (boxDTO.getBattery() != null) {
             boxDO.setBattery(boxDTO.getBattery());
         }
-        if (boxDTO.getNetworkDelay() != null) {
-            boxDO.setNetworkDelay(boxDTO.getNetworkDelay());
-        }
         if (boxDTO.getLastHeartbeatTime() != null) {
             boxDO.setLastHeartbeatTime(boxDTO.getLastHeartbeatTime());
         }
@@ -147,22 +151,7 @@ public abstract class BoxServiceImpl implements BoxService {
      */
     @Override
     public RestResult<List<BoxDTO>> listBoxes(QueryBoxDTO queryBoxDTO) {
-        Specification<BoxDO> spec = (root, criteriaQuery, criteriaBuilder) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (queryBoxDTO.getUserId() != null) {
-                predicates.add(criteriaBuilder.equal(root.get("userId"), queryBoxDTO.getUserId()));
-            }
-            if (queryBoxDTO.getBoxCode() != null && !queryBoxDTO.getBoxCode().isEmpty()) {
-                predicates.add(criteriaBuilder.like(root.get("boxCode"), "%" + queryBoxDTO.getBoxCode() + "%"));
-            }
-            if (queryBoxDTO.getBoxName() != null && !queryBoxDTO.getBoxName().isEmpty()) {
-                predicates.add(criteriaBuilder.like(root.get("boxName"), "%" + queryBoxDTO.getBoxName() + "%"));
-            }
-            if (queryBoxDTO.getStatus() != null) {
-                predicates.add(criteriaBuilder.equal(root.get("status"), queryBoxDTO.getStatus()));
-            }
-            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-        };
+        Specification<BoxDO> spec = buildSpecification(queryBoxDTO);
 
         try {
             List<BoxDO> boxes = boxRepository.findAll(spec, Sort.by(Sort.Direction.DESC, "createTime"));
@@ -173,6 +162,8 @@ public abstract class BoxServiceImpl implements BoxService {
             log.error("查询盒子列表异常：{}", e.getMessage(), e);
             return RestResult.error("系统错误");
         }
+    }
+
     /**
      * 分页查询盒子列表
      *
@@ -182,7 +173,45 @@ public abstract class BoxServiceImpl implements BoxService {
      */
     @Override
     public RestResult<PageResult<BoxDTO>> listBoxesByPage(QueryBoxDTO queryBoxDTO, PageQueryDTO pageQueryDTO) {
-        Specification<BoxDO> spec = (root, criteriaQuery, criteriaBuilder) -> {
+        Specification<BoxDO> spec = buildSpecification(queryBoxDTO);
+
+        try {
+            // 设置默认值
+            int page = pageQueryDTO.getPage() != null ? pageQueryDTO.getPage() - 1 : 0;
+            int size = pageQueryDTO.getSize() != null ? pageQueryDTO.getSize() : 10;
+            String sortOrder = pageQueryDTO.getSortOrder() != null ? pageQueryDTO.getSortOrder() : "DESC";
+            String sortField = pageQueryDTO.getSortField() != null ? pageQueryDTO.getSortField() : "createTime";
+
+            // 构造排序对象
+            Sort sort = Sort.by(Sort.Direction.fromString(sortOrder), sortField);
+
+            // 执行分页查询
+            Page<BoxDO> boxPage = boxRepository.findAll(spec, PageRequest.of(page, size, sort));
+
+            // 转换为DTO列表
+            List<BoxDTO> dtos = boxPage.getContent().stream().map(this::convertToDto).toList();
+
+            // 封装分页结果
+            PageResult<BoxDTO> pageResult = new PageResult<>(
+                    page + 1,
+                    size,
+                    boxPage.getTotalElements(),
+                    dtos
+            );
+
+            log.info("分页查询盒子列表成功，共 {} 条记录", dtos.size());
+            return RestResult.success(pageResult);
+        } catch (Exception e) {
+            log.error("分页查询盒子列表异常：{}", e.getMessage(), e);
+            return RestResult.error("系统错误");
+        }
+    }
+
+    /**
+     * 构建查询条件
+     */
+    private Specification<BoxDO> buildSpecification(QueryBoxDTO queryBoxDTO) {
+        return (root, criteriaQuery, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             if (queryBoxDTO.getUserId() != null) {
                 predicates.add(criteriaBuilder.equal(root.get("userId"), queryBoxDTO.getUserId()));
@@ -193,74 +222,52 @@ public abstract class BoxServiceImpl implements BoxService {
             if (queryBoxDTO.getBoxName() != null && !queryBoxDTO.getBoxName().isEmpty()) {
                 predicates.add(criteriaBuilder.like(root.get("boxName"), "%" + queryBoxDTO.getBoxName() + "%"));
             }
+            // 修改这里：对于boxType，使用等值查询
+            if (queryBoxDTO.getBoxType() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("boxType"), queryBoxDTO.getBoxType()));
+            }
             if (queryBoxDTO.getStatus() != null) {
                 predicates.add(criteriaBuilder.equal(root.get("status"), queryBoxDTO.getStatus()));
             }
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
-
-        try {
-            // 构造排序对象
-            Sort sort = Sort.by(Sort.Direction.fromString(pageQueryDTO.getSortOrder()), pageQueryDTO.getSortField());
-            // 执行分页查询
-            org.springframework.data.domain.Page<BoxDO> boxPage = boxRepository.findAll(spec, 
-                org.springframework.data.domain.PageRequest.of(pageQueryDTO.getPage() - 1, pageQueryDTO.getSize(), sort));
-            
-            // 转换为DTO列表
-            List<BoxDTO> dtos = boxPage.getContent().stream().map(this::convertToDto).toList();
-            
-            // 封装分页结果
-            PageResult<BoxDTO> pageResult = new PageResult<>(
-                pageQueryDTO.getPage(), 
-                pageQueryDTO.getSize(), 
-                boxPage.getTotalElements(), 
-                dtos
-            );
-            
-            log.info("分页查询盒子列表成功，共 {} 条记录", dtos.size());
-            return RestResult.success(pageResult);
-        } catch (Exception e) {
-            log.error("分页查询盒子列表异常：{}", e.getMessage(), e);
-            return RestResult.error("系统错误");
-        }
-    }
     }
 
     /**
-     * 将DTO转换为DO
-     *
-     * @param dto DTO对象
-     * @return DO对象
+     * 将实体转换为DTO
      */
-    private BoxDO convertToEntity(BoxDTO dto) {
-        BoxDO entity = new BoxDO();
-        entity.setId(dto.getId());
-        entity.setBoxCode(dto.getBoxCode());
-        entity.setUserId(dto.getUserId());
-        entity.setBoxName(dto.getBoxName());
-        entity.setStatus(dto.getStatus());
-        entity.setRssi(dto.getRssi());
-        entity.setBattery(dto.getBattery());
-        entity.setLastHeartbeatTime(dto.getLastHeartbeatTime());
-        return entity;
+    private BoxDTO convertToDto(BoxDO boxDO) {
+        BoxDTO boxDTO = new BoxDTO();
+        boxDTO.setId(boxDO.getId());
+        boxDTO.setBoxCode(boxDO.getBoxCode());
+        boxDTO.setUserId(boxDO.getUserId());
+        boxDTO.setBoxName(boxDO.getBoxName());
+        boxDTO.setBoxType(boxDO.getBoxType());
+        boxDTO.setStatus(boxDO.getStatus());
+        boxDTO.setRssi(boxDO.getRssi());
+        boxDTO.setBattery(boxDO.getBattery());
+        boxDTO.setLastHeartbeatTime(boxDO.getLastHeartbeatTime());
+        boxDTO.setCreateTime(boxDO.getCreateTime());
+        boxDTO.setUpdateTime(boxDO.getUpdateTime());
+        return boxDTO;
     }
 
     /**
-     * 将DO转换为DTO
-     *
-     * @param entity DO对象
-     * @return DTO对象
+     * 将DTO转换为实体
      */
-    private BoxDTO convertToDto(BoxDO entity) {
-        BoxDTO dto = new BoxDTO();
-        dto.setId(entity.getId());
-        dto.setBoxCode(entity.getBoxCode());
-        dto.setUserId(entity.getUserId());
-        dto.setBoxName(entity.getBoxName());
-        dto.setStatus(entity.getStatus());
-        dto.setRssi(entity.getRssi());
-        dto.setBattery(entity.getBattery());
-        dto.setLastHeartbeatTime(entity.getLastHeartbeatTime());
-        return dto;
+    private BoxDO convertToEntity(BoxDTO boxDTO) {
+        BoxDO boxDO = new BoxDO();
+        boxDO.setId(boxDTO.getId());
+        boxDO.setBoxCode(boxDTO.getBoxCode());
+        boxDO.setUserId(boxDTO.getUserId());
+        boxDO.setBoxName(boxDTO.getBoxName());
+        boxDO.setBoxType(boxDTO.getBoxType());
+        boxDO.setStatus(boxDTO.getStatus());
+        boxDO.setRssi(boxDTO.getRssi());
+        boxDO.setBattery(boxDTO.getBattery());
+        boxDO.setLastHeartbeatTime(boxDTO.getLastHeartbeatTime());
+        boxDO.setCreateTime(boxDTO.getCreateTime());
+        boxDO.setUpdateTime(boxDTO.getUpdateTime());
+        return boxDO;
     }
 }

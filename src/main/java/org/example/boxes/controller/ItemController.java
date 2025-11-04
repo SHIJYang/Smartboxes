@@ -1,8 +1,7 @@
-
 package org.example.boxes.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/item")
 @RequiredArgsConstructor
-@Api(tags = "商品管理")
+@Tag(name = "商品管理", description = "商品相关API")
 public class ItemController {
 
     private final ItemService itemService;
@@ -33,7 +32,7 @@ public class ItemController {
      * @return RestResult 结果封装
      */
     @PostMapping("/add")
-    @ApiOperation("添加新商品")
+    @Operation(summary = "添加新商品", description = "创建新的商品记录")
     public ResponseEntity<RestResult<Void>> addItem(@RequestBody @Valid ItemDTO itemDTO) {
         return ResponseEntity.ok(itemService.addItem(itemDTO));
     }
@@ -45,7 +44,7 @@ public class ItemController {
      * @return RestResult 结果封装
      */
     @DeleteMapping("/delete/{id}")
-    @ApiOperation("删除商品")
+    @Operation(summary = "删除商品", description = "删除指定的商品记录")
     public ResponseEntity<RestResult<Void>> deleteItem(@PathVariable Long id) {
         return ResponseEntity.ok(itemService.deleteItem(id));
     }
@@ -57,7 +56,7 @@ public class ItemController {
      * @return RestResult 结果封装
      */
     @PutMapping("/update")
-    @ApiOperation("更新商品信息")
+    @Operation(summary = "更新商品信息", description = "更新商品的基本信息")
     public ResponseEntity<RestResult<Void>> updateItem(@RequestBody @Valid ItemDTO itemDTO) {
         return ResponseEntity.ok(itemService.updateItem(itemDTO));
     }
@@ -69,7 +68,7 @@ public class ItemController {
      * @return RestResult 结果封装
      */
     @GetMapping("/list")
-    @ApiOperation("查询商品列表")
+    @Operation(summary = "查询商品列表", description = "根据条件查询商品列表")
     public ResponseEntity<RestResult<List<ItemDTO>>> listItem(QueryItemDTO queryItemDTO) {
         return ResponseEntity.ok(itemService.listItems(queryItemDTO));
     }

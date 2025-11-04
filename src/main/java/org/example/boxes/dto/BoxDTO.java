@@ -44,6 +44,14 @@ public class BoxDTO {
     private String boxName;
 
     /**
+     * 盒子类型
+     */
+    @NotNull(message = "盒子类型不能为空")
+    @Min(value = 0, message = "盒子类型值不合法")
+    @Max(value = 1, message = "盒子类型值不合法")
+    private Integer boxType;
+
+    /**
      * 盒子状态（0-离线 1-在线）
      */
     @NotNull(message = "盒子状态不能为空")
@@ -76,6 +84,4 @@ public class BoxDTO {
      * 更新时间
      */
     private java.time.LocalDateTime updateTime;
-
-
 }

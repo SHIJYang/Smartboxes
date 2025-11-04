@@ -1,8 +1,7 @@
-
 package org.example.boxes.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.boxes.dto.AiChatRequestDTO;
@@ -21,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/ai-chat")
 @RequiredArgsConstructor
-@Api(tags = "AI聊天")
+@Tag(name = "AI聊天", description = "AI聊天相关接口")
 public class AiChatController {
 
     private final AiChatService aiChatService;
@@ -33,7 +32,7 @@ public class AiChatController {
      * @return RestResult 响应结果
      */
     @PostMapping("/chat")
-    @ApiOperation("AI聊天")
+    @Operation(summary = "AI聊天", description = "处理用户的AI聊天请求")
     public RestResult<?> chat(@Valid @RequestBody AiChatRequestDTO request) {
         return aiChatService.handleAiChat(request);
     }

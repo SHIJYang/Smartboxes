@@ -1,4 +1,3 @@
-
 package org.example.boxes.entity;
 
 import jakarta.persistence.*;
@@ -13,7 +12,7 @@ import lombok.NoArgsConstructor;
  * @author 14577
  */
 @Entity
-@Table(name = "`t_item_operate_log`")
+@Table(name = "t_item_operate_log")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,43 +28,43 @@ public class ItemOperateLogDO {
     /**
      * 物品ID
      */
-    @Column(name = "`item_id`", nullable = false)
+    @Column(name = "item_id", nullable = false)
     private Long itemId;
 
     /**
      * 操作类型
      */
-    @Column(name = "`operate_type`", nullable = false)
+    @Column(name = "operate_type", nullable = false)
     private Integer operateType;
 
     /**
      * 操作描述
      */
-    @Column(name = "`operate_desc`")
+    @Column(name = "operate_desc")
     private String operateDesc;
 
     /**
      * 操作时间
      */
-    @Column(name = "`operate_time`", nullable = false)
+    @Column(name = "operate_time", nullable = false)
     private LocalDateTime operateTime;
 
     /**
      * 创建时间
      */
-    @Column(name = "`create_time`", nullable = false)
+    @Column(name = "create_time", nullable = false)
     private LocalDateTime createTime;
 
     /**
      * 更新时间
      */
-    @Column(name = "`update_time`", nullable = false)
+    @Column(name = "update_time", nullable = false)
     private LocalDateTime updateTime;
 
-    /**
-     * 关联的物品
-     */
+    // 暂时注释掉关联关系
+    /*
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id")
+    @JoinColumn(name = "item_id", insertable = false, updatable = false)
     private ItemDO item;
+    */
 }

@@ -23,6 +23,13 @@ public class ItemDTO {
     private Long id;
 
     /**
+     * 商品编码
+     */
+    @NotBlank(message = "商品编码不能为空")
+    @Size(max = 255, message = "商品编码长度不能超过255个字符")
+    private String itemCode;
+
+    /**
      * 商品名称
      */
     @NotBlank(message = "商品名称不能为空")
@@ -30,16 +37,16 @@ public class ItemDTO {
     private String itemName;
 
     /**
-     * 商品描述
+     * 商品描述 - 对应数据库的 item_desc 字段
      */
     @Size(max = 500, message = "商品描述长度不能超过500个字符")
-    private String description;
+    private String itemDesc;
 
     /**
-     * 分类ID
+     * 盒子ID
      */
-    @NotNull(message = "分类ID不能为空")
-    private Long categoryId;
+    @NotNull(message = "盒子ID不能为空")
+    private Long boxId;
 
     /**
      * 商品价格
@@ -47,4 +54,14 @@ public class ItemDTO {
     @NotNull(message = "商品价格不能为空")
     @DecimalMin(value = "0.01", message = "商品价格必须大于0")
     private Double price;
+
+    // 其他字段
+    private String autoRecognizeName;
+    private String manualEditName;
+    private String itemTag;
+    private java.time.LocalDateTime putInTime;
+    private java.time.LocalDateTime expireTime;
+    private Integer isValid;
+    private java.time.LocalDateTime createTime;
+    private java.time.LocalDateTime updateTime;
 }

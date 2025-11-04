@@ -13,12 +13,12 @@ public class PageQueryDTO {
     /**
      * 当前页码，默认为1
      */
-    private int page = 1;
+    private Integer page = 1;
 
     /**
-     * 每页大小，默认为10
+     * 每页大小
      */
-    private int size = 10;
+    private Integer size = 10;
 
     /**
      * 排序字段

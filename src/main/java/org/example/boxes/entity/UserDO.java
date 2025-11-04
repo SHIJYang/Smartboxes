@@ -1,72 +1,37 @@
-
 package org.example.boxes.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
 
-/**
- * 用户实体类
- *
- * @author 14577
- */
-@Data
 @Entity
 @Table(name = "t_user")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDO {
 
-    /**
-     * ID
-     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * 普通用户登录账号
-     */
-    @Column(name = "user_account", nullable = false)
+    @Column(name = "user_account", nullable = false, length = 255)
     private String userAccount;
 
-    /**
-     * 登录密码（加密存储）
-     */
-    @Column(name = "user_password", nullable = false)
+    @Column(name = "user_password", nullable = false, length = 255)
     private String userPassword;
 
-    /**
-     * 用户昵称
-     */
-    @Column(name = "username")
+    @Column(name = "username", length = 255)
     private String username;
 
-    /**
-     * 可选，用于密码找回
-     */
-    @Column(name = "phone")
+    @Column(name = "phone", length = 255)
     private String phone;
 
-    /**
-     * 账号注册时间
-     */
     @Column(name = "create_time", nullable = false)
     private LocalDateTime createTime;
 
-    /**
-     * 信息更新时间
-     */
     @Column(name = "update_time", nullable = false)
     private LocalDateTime updateTime;
-
-    /**
-     * 用户拥有的盒子列表
-     */
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<BoxDO> boxes;
 }

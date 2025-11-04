@@ -1,7 +1,7 @@
 package org.example.boxes.service;
 
 import org.example.boxes.dto.UserDTO;
-import org.example.boxes.entity.User;
+import org.example.boxes.entity.UserDO;
 import org.example.boxes.query.UserQuery;
 
 import java.util.List;
@@ -15,10 +15,10 @@ public interface UserService {
     /**
      * 创建用户
      *
-     * @param user 用户实体
+     * @param userDO 用户实体
      * @return 用户DTO
      */
-    UserDTO createUser(User user);
+    UserDTO createUser(UserDO userDO);
 
     /**
      * 根据ID获取用户
@@ -47,10 +47,10 @@ public interface UserService {
      * 更新用户信息
      *
      * @param id 用户ID
-     * @param user 用户实体
+     * @param userDO 用户实体
      * @return 用户DTO
      */
-    UserDTO updateUser(Long id, User user);
+    UserDTO updateUser(Long id, UserDO userDO);
 
     /**
      * 删除用户

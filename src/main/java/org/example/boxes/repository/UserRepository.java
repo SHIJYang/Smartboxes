@@ -1,15 +1,14 @@
 package org.example.boxes.repository;
 
-import org.example.boxes.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
-
+import org.example.boxes.entity.UserDO;
 /**
  * 用户仓库接口
  */
 @Repository
-public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
+public interface UserRepository extends JpaRepository<UserDO, Long>, JpaSpecificationExecutor<UserDO> {
 
     /**
      * 根据用户名查找用户
@@ -17,13 +16,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
      * @param username 用户名
      * @return 用户实体
      */
-    User findByUsername(String username);
+    UserDO findByUsername(String username);
 
-    /**
-     * 根据邮箱查找用户
-     *
-     * @param email 邮箱
-     * @return 用户实体
-     */
-    User findByEmail(String email);
+
 }

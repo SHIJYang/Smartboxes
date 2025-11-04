@@ -1,4 +1,3 @@
-
 package org.example.boxes.dto;
 
 import lombok.Data;
@@ -27,8 +26,12 @@ public class QueryBoxDTO {
     private String boxName;
 
     /**
+     * 盒子类型
+     */
+    private Integer boxType;
+
+    /**
      * 状态
      */
     private Integer status;
 }
-

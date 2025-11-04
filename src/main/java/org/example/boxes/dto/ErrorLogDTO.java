@@ -1,7 +1,7 @@
 package org.example.boxes.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import java.time.LocalDateTime;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
@@ -27,6 +27,6 @@ public class ErrorLogDTO {
     /**
      * 错误时间
      */
-    @NotBlank(message = "错误时间不能为空")
-    private LocalDateTime errorTime;
+    @NotNull(message = "错误时间不能为空")
+    private java.time.LocalDateTime errorTime;
 }

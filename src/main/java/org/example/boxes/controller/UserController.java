@@ -1,15 +1,17 @@
 package org.example.boxes.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.boxes.dto.UserDTO;
-import org.example.boxes.entity.User;
+import org.example.boxes.entity.UserDO;
 import org.example.boxes.query.UserQuery;
 import org.example.boxes.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +21,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@Tag(name = "用户管理", description = "用户相关API")
 public class UserController {
 
     private final UserService userService;
@@ -26,12 +29,13 @@ public class UserController {
     /**
      * 创建用户
      *
-     * @param user 用户信息
+     * @param userDO 用户信息
      * @return 创建的用户DTO
      */
     @PostMapping
-    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody User user) {
-        UserDTO createdUser = userService.createUser(user);
+    @Operation(summary = "创建用户", description = "创建新的用户账户")
+    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserDO userDO) {
+        UserDTO createdUser = userService.createUser(userDO);
         return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
 
@@ -42,6 +46,7 @@ public class UserController {
      * @return 用户DTO
      */
     @GetMapping("/{id}")
+    @Operation(summary = "根据ID获取用户", description = "根据用户ID获取用户详细信息")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
         Optional<UserDTO> user = userService.getUserById(id);
         return user.map(ResponseEntity::ok)
@@ -54,6 +59,7 @@ public class UserController {
      * @return 用户列表
      */
     @GetMapping
+    @Operation(summary = "获取所有用户", description = "获取系统中所有用户列表")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<UserDTO> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
@@ -66,6 +72,7 @@ public class UserController {
      * @return 用户列表
      */
     @GetMapping("/page")
+    @Operation(summary = "分页查询用户", description = "分页查询用户信息")
     public ResponseEntity<List<UserDTO>> getUsersByPage(UserQuery query) {
         List<UserDTO> users = userService.getUsersByPage(query);
         return ResponseEntity.ok(users);
@@ -75,13 +82,14 @@ public class UserController {
      * 更新用户
      *
      * @param id 用户ID
-     * @param user 用户信息
+     * @param userDO 用户信息
      * @return 更新后的用户DTO
      */
     @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @Valid @RequestBody User user) {
+    @Operation(summary = "更新用户", description = "更新用户基本信息")
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @Valid @RequestBody UserDO userDO) {
         try {
-            UserDTO updatedUser = userService.updateUser(id, user);
+            UserDTO updatedUser = userService.updateUser(id, userDO);
             return ResponseEntity.ok(updatedUser);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
@@ -95,6 +103,7 @@ public class UserController {
      * @return 无内容响应
      */
     @DeleteMapping("/{id}")
+    @Operation(summary = "删除用户", description = "删除指定的用户账户")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
