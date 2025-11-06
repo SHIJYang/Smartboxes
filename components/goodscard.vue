@@ -18,18 +18,19 @@
           lazy-load
         />
         <view v-else class="placeholder-icon">
-          <u-icon :name="getIcon(category)" size="40" color="#888" />
+          <u-icon :name="getIcon(item_tag)" size="40" color="#888" />
         </view>
       </view>
 
       <!-- 物品信息 -->
       <view class="info">
-        <text class="name">{{ name }}</text>
-        <text class="desc">{{ description }}</text>
+        <text class="name">{{ displayName }}</text>
+        <text class="desc">{{ item_desc || '暂无描述' }}</text>
         <view class="meta-info">
-          <text class="quantity">数量: {{ quantity }}</text>
-          <text class="location">位置: {{ location }}</text>
-          <text class="time">最后更新: {{ formatDate(lastModified) }}</text>
+          <text class="box">物品编码: {{ item_code }}</text>
+          <text class="time">放入时间: {{ formatDate(put_in_time) }}</text>
+          <text class="expire" v-if="expire_time">到期时间: {{ formatDate(expire_time) }}</text>
+          <text class="status">状态: {{ isValid ? '有效' : '无效' }}</text>
         </view>
       </view>
 
@@ -42,16 +43,22 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 
 const props = defineProps({
-  name: String,
-  description: String,
-  category: String,
+  id: [String, Number],
+  item_code: String,
+  box_id: [String, Number],
+  auto_recognize_name: String,
+  manual_edit_name: String,
+  item_tag: String,
+  item_desc: String,
+  put_in_time: [String, Date],
+  expire_time: [String, Date],
+  is_valid: { type: [String, Number, Boolean], default: 1 },
+  create_time: [String, Date],
+  update_time: [String, Date],
   image: String,
-  quantity: { type: Number, default: 1 },
-  location: String,
-  lastModified: [String, Date],
   border: { type: Boolean, default: true },
   margin: { type: [String, Number], default: "20rpx" },
   padding: { type: [String, Number], default: "24rpx" },
@@ -59,30 +66,38 @@ const props = defineProps({
 
 const emit = defineEmits(["click"]);
 
-const getIcon = (cat) => {
+// 计算显示名称：优先显示手动编辑名称
+const displayName = computed(() => {
+  return props.manual_edit_name || props.auto_recognize_name || '未命名物品'
+})
+
+// 计算有效状态
+const isValid = computed(() => {
+  return props.is_valid === 1 || props.is_valid === true
+})
+
+const getIcon = (tag) => {
   const icons = {
-    pen: "edit",
-    key: "key",
-    book: "book",
-    clothes: "tshirt",
-    tool: "wrench",
-    工具: "wrench",
-    文具: "edit",
-    衣物: "tshirt",
-    书籍: "book",
-    电子: "mobile",
-    default: "cube",
+    '办公用品': "edit",
+    '日常用品': "cube",
+    '文具': "edit-pen",
+    '工具': "wrench",
+    '衣物': "tshirt",
+    '书籍': "book",
+    '电子': "mobile",
+    '默认': "cube",
   };
-  return icons[cat] || icons.default;
+  return icons[tag] || icons['默认'];
 };
 
 const formatDate = (date) => {
   if (!date) return "暂无记录";
-  const d = new Date(date);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
-    2,
-    "0"
-  )}-${String(d.getDate()).padStart(2, "0")}`;
+  try {
+    const d = new Date(date);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  } catch (e) {
+    return "日期错误";
+  }
 };
 
 const handleClick = () => {
@@ -156,13 +171,22 @@ const handleClick = () => {
   margin-top: 8rpx;
 }
 
-.quantity,
-.location,
-.time {
+.box,
+.time,
+.expire,
+.status {
   font-size: 22rpx;
   color: #94a3b8;
   display: block;
   line-height: 1.4;
+}
+
+.expire {
+  color: #f59e0b;
+}
+
+.status {
+  color: #10b981;
 }
 
 .arrow-wrapper {

@@ -38,63 +38,56 @@
 
     <!-- 搜索结果 -->
     <scroll-view scroll-y class="result-list" @scrolltolower="loadMore">
-      <u-empty v-if="items.length === 0" text="暂无物品" mode="search" />
-      <view class="item-list">
-        <view
-          class="item-card"
+      <u-empty v-if="items.length === 0 && !loading" text="暂无物品" mode="search" />
+      <u-loading v-else-if="loading" mode="circle" size="40" color="#4A90E2" />
+      <view class="item-list" v-else>
+        <goodscard
           v-for="item in items"
           :key="item.id"
+          :id="item.id"
+          :item_code="item.item_code"
+          :box_id="item.box_id"
+          :auto_recognize_name="item.auto_recognize_name"
+          :manual_edit_name="item.manual_edit_name"
+          :item_tag="item.item_tag"
+          :item_desc="item.item_desc"
+          :put_in_time="item.put_in_time"
+          :expire_time="item.expire_time"
+          :is_valid="item.is_valid"
           @click="viewDetail(item)"
-        >
-          <u-image
-            :src="item.image"
-            width="180rpx"
-            height="180rpx"
-            radius="12"
-            :fade="true"
-          />
-          <view class="item-info">
-            <text class="item-name">{{ item.itemName }}</text>
-            <text class="item-desc">{{ item.description }}</text>
-            <view class="item-location">
-              <u-icon name="map" size="28rpx" color="#666" />
-              <text>{{ item.boxName }}</text>
-            </view>
-          </view>
-        </view>
+        />
       </view>
-      <u-loadmore v-if="hasMore" status="loading" />
+      <u-loadmore v-if="hasMore && items.length > 0" status="loading" />
     </scroll-view>
   </view>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
-// import http from "@/utils/request";
-import { getItems } from "../../mock/api";
-import { platform } from "@/utils/platform";
+import { getItems } from "@/api/items/itemsapi.js";
+import goodscard from "@/components/goodscard.vue";
 
 const searchText = ref("");
-const categories = ref(["全部", "书籍", "电子", "衣物", "文具"]);
-const currentCategory = ref(""); // 当前分类
+const categories = ref(["全部", "办公用品", "日常用品", "工具", "文具", "衣物", "书籍", "电子"]);
+const currentCategory = ref("");
 const items = ref([]);
 const page = ref(1);
 const hasMore = ref(true);
+const loading = ref(false);
 
 const handleSearch = () => {
-  // 重置分页并搜索
   page.value = 1;
   items.value = [];
   loadData();
 };
 
 const handleClear = () => {
+  searchText.value = "";
   items.value = [];
 };
 
 const onCategoryChange = (index) => {
-  currentCategory.value = categories.value[index] || "";
-  // 重载数据
+  currentCategory.value = categories.value[index] === "全部" ? "" : categories.value[index];
   page.value = 1;
   items.value = [];
   loadData();
@@ -102,21 +95,22 @@ const onCategoryChange = (index) => {
 
 const viewDetail = (item) => {
   uni.navigateTo({
-    url: `/pages/item/detail?id=${item.id}`,
+    url: `/pages/item/item?id=${item.id}`,
   });
 };
 
 const loadData = async () => {
+  if (loading.value) return;
+  
+  loading.value = true;
   try {
     const params = {
       page: page.value,
-      category: currentCategory.value,
-      q: searchText.value,
+      item_tag: currentCategory.value,
+      keyword: searchText.value,
     };
     const res = await getItems(params);
-    // res: { code, data }
     if (res && res.code === 200) {
-      // 如果是第一页，覆盖；否则追加
       if (page.value === 1) {
         items.value = res.data || [];
       } else {
@@ -124,22 +118,24 @@ const loadData = async () => {
       }
       hasMore.value = (res.data || []).length >= 10;
     } else {
-      uni.showToast({ title: "加载失败", icon: "error" });
+      uni.showToast({ title: "加载失败", icon: "none" });
     }
   } catch (e) {
-    uni.showToast({ title: "加载失败", icon: "error" });
+    console.error("搜索失败:", e);
+    uni.showToast({ title: "加载失败", icon: "none" });
+  } finally {
+    loading.value = false;
   }
 };
 
 const loadMore = () => {
-  if (!hasMore.value) return;
+  if (!hasMore.value || loading.value) return;
   page.value++;
   loadData();
 };
 
-// 扫码功能（仅App和小程序支持）
+// 扫码功能
 const scanCode = async () => {
-  if (platform.isH5) return;
   try {
     const res = await uni.scanCode();
     if (res.result) {
@@ -147,7 +143,7 @@ const scanCode = async () => {
       handleSearch();
     }
   } catch (e) {
-    uni.showToast({ title: "扫码失败", icon: "error" });
+    uni.showToast({ title: "扫码失败", icon: "none" });
   }
 };
 
@@ -171,36 +167,9 @@ onMounted(() => {
 }
 .result-list {
   height: calc(100vh - 300rpx);
-}
-.item-list {
   padding: 20rpx;
 }
-.item-card {
-  margin-bottom: 30rpx;
-  background: #fff;
-  border-radius: 16rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
-  transition: all 0.3s;
-}
-.item-card:active {
-  transform: scale(0.98);
-}
-.item-name {
-  font-size: 28rpx;
-  font-weight: bold;
-}
-.item-desc {
-  font-size: 24rpx;
-  color: #999;
-  margin: 8rpx 0;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-}
-.item-location {
-  font-size: 24rpx;
-  color: #666;
-  margin-top: 10rpx;
+.item-list {
+  padding-bottom: 20rpx;
 }
 </style>

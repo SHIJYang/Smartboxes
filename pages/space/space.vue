@@ -35,12 +35,18 @@
         <goodscard
           v-for="item in itemList"
           :key="item.id"
-          :name="item.name"
-          :category="item.category"
-          :description="item.description"
-          :quantity="item.quantity"
-          :location="item.location"
-          :last-modified="item.lastModified"
+          :id="item.id"
+          :item_code="item.item_code"
+          :box_id="item.box_id"
+          :auto_recognize_name="item.auto_recognize_name"
+          :manual_edit_name="item.manual_edit_name"
+          :item_tag="item.item_tag"
+          :item_desc="item.item_desc"
+          :put_in_time="item.put_in_time"
+          :expire_time="item.expire_time"
+          :is_valid="item.is_valid"
+          :create_time="item.create_time"
+          :update_time="item.update_time"
           @click="gotoItem(item.id)"
         />
       </scroll-view>
@@ -56,9 +62,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import goodscard from "@/components/goodscard.vue";
+import { getItems } from "@/api/items/itemsapi.js"; 
 
 const spaceId = ref("");
 const spaceName = ref("");
@@ -82,39 +89,17 @@ onMounted(() => {
 const loadData = async () => {
   loading.value = true;
   try {
-    // 模拟数据加载
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    itemList.value = [
-      {
-        id: 1,
-        name: "螺丝刀套装",
-        category: "工具",
-        description: "多功能家用螺丝刀",
-        quantity: 1,
-        location: "工具箱",
-        lastModified: "2024-01-15",
-      },
-      {
-        id: 2,
-        name: "扳手",
-        category: "工具",
-        description: "10mm开口扳手",
-        quantity: 2,
-        location: "工具箱",
-        lastModified: "2024-01-10",
-      },
-      {
-        id: 3,
-        name: "钳子",
-        category: "工具",
-        description: "尖嘴钳",
-        quantity: 1,
-        location: "工具箱",
-        lastModified: "2024-01-20",
-      },
-    ];
+    // 根据收纳盒ID获取物品列表
+    const res = await getItems({ box_id: spaceId.value });
+    if (res && res.code === 200) {
+      itemList.value = res.data || [];
+    } else {
+      itemList.value = [];
+    }
   } catch (err) {
+    console.error("加载物品失败:", err);
     uni.showToast({ title: "加载失败", icon: "none" });
+    itemList.value = [];
   } finally {
     loading.value = false;
   }
@@ -125,7 +110,9 @@ const gotoItem = (id) => {
 };
 
 const addItem = () => {
-  uni.navigateTo({ url: "/pages/add-item/add-item" });
+  uni.navigateTo({ 
+    url: `/pages/add-item/add-item?box_id=${spaceId.value}&box_name=${spaceName.value}`
+  });
 };
 </script>
 

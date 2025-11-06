@@ -15,24 +15,43 @@
         label-width="150rpx"
         :custom-style="formStyle"
       >
+        <!-- 收纳盒选择 -->
+        <form-item-wrap>
+          <u-form-item label="收纳盒" prop="box_id" border-bottom>
+            <u-input
+              v-model="boxDisplayName"
+              placeholder="请选择收纳盒"
+              disabled
+              @click="showBoxPicker = true"
+              :custom-style="inputStyle"
+            />
+            <u-icon 
+              name="arrow-right" 
+              slot="right" 
+              :color="activeColor"
+              :size="24"
+            />
+          </u-form-item>
+        </form-item-wrap>
+
         <!-- 物品名称 -->
         <form-item-wrap>
-          <u-form-item label="物品名称" prop="name" border-bottom>
+          <u-form-item label="物品名称" prop="manual_edit_name" border-bottom>
             <u-input 
-              v-model="form.name" 
+              v-model="form.manual_edit_name" 
               placeholder="请输入物品名称" 
               :custom-style="inputStyle"
-              @focus="handleInputFocus($event, 'name')"
-              @blur="handleInputBlur($event, 'name')"
+              @focus="handleInputFocus($event, 'manual_edit_name')"
+              @blur="handleInputBlur($event, 'manual_edit_name')"
             />
           </u-form-item>
         </form-item-wrap>
 
         <!-- 物品分类 -->
         <form-item-wrap>
-          <u-form-item label="物品分类" prop="category" border-bottom>
+          <u-form-item label="物品分类" prop="item_tag" border-bottom>
             <u-input
-              v-model="form.category"
+              v-model="form.item_tag"
               placeholder="请选择物品分类"
               disabled
               @click="showCategoryPicker = true"
@@ -49,42 +68,34 @@
 
         <!-- 物品描述 -->
         <form-item-wrap>
-          <u-form-item label="物品描述" prop="description" border-bottom>
+          <u-form-item label="物品描述" prop="item_desc" border-bottom>
             <u-input
-              v-model="form.description"
+              v-model="form.item_desc"
               type="textarea"
               placeholder="请输入物品描述"
               :height="120"
               :custom-style="inputStyle"
-              @focus="handleInputFocus($event, 'description')"
-              @blur="handleInputBlur($event, 'description')"
+              @focus="handleInputFocus($event, 'item_desc')"
+              @blur="handleInputBlur($event, 'item_desc')"
             />
           </u-form-item>
         </form-item-wrap>
 
-        <!-- 数量 -->
+        <!-- 到期时间 -->
         <form-item-wrap>
-          <u-form-item label="数量" prop="quantity" border-bottom>
-            <u-number-box 
-              v-model="form.quantity" 
-              :min="1" 
-              :max="999" 
-              :button-size="36"
-              :input-width="80"
-              @change="handleNumberChange"
-            />
-          </u-form-item>
-        </form-item-wrap>
-
-        <!-- 所在位置 -->
-        <form-item-wrap>
-          <u-form-item label="所在位置" prop="location" border-bottom>
-            <u-input 
-              v-model="form.location" 
-              placeholder="请输入物品位置" 
+          <u-form-item label="到期时间" prop="expire_time" border-bottom>
+            <u-input
+              v-model="form.expire_time"
+              placeholder="请选择到期时间（可选）"
+              disabled
+              @click="showDatePicker = true"
               :custom-style="inputStyle"
-              @focus="handleInputFocus($event, 'location')"
-              @blur="handleInputBlur($event, 'location')"
+            />
+            <u-icon 
+              name="calendar" 
+              slot="right" 
+              :color="activeColor"
+              :size="24"
             />
           </u-form-item>
         </form-item-wrap>
@@ -128,7 +139,18 @@
       </view>
     </view>
 
-    <!-- 分类选择器 (带动画) -->
+    <!-- 收纳盒选择器 -->
+    <u-picker
+      :show="showBoxPicker"
+      :columns="boxColumns"
+      keyName="label"
+      @confirm="confirmBox"
+      @cancel="showBoxPicker = false"
+      :mask-opacity="0.5"
+      :animation="true"
+    />
+
+    <!-- 分类选择器 -->
     <u-picker
       :show="showCategoryPicker"
       :columns="categoryColumns"
@@ -138,11 +160,20 @@
       :mask-opacity="0.5"
       :animation="true"
     />
+
+    <!-- 日期选择器 -->
+    <u-datetime-picker
+      :show="showDatePicker"
+      mode="date"
+      @confirm="confirmDate"
+      @cancel="showDatePicker = false"
+    />
   </view>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, computed } from "vue";
+import { onLoad } from "@dcloudio/uni-app";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -151,36 +182,65 @@ gsap.registerPlugin(ScrollTrigger);
 
 // 表单数据
 const form = reactive({
-  name: "",
-  category: "",
-  description: "",
-  quantity: 1,
-  location: "",
-  image: "",
+  item_code: generateItemCode(),
+  box_id: "",
+  auto_recognize_name: "",
+  manual_edit_name: "",
+  item_tag: "",
+  item_desc: "",
+  put_in_time: new Date().toISOString(),
+  expire_time: "",
+  is_valid: 1,
 });
 
 // 表单验证规则
 const rules = {
-  name: [
+  box_id: [
+    { required: true, message: "请选择收纳盒", trigger: "change" }
+  ],
+  manual_edit_name: [
     { required: true, message: "请输入物品名称", trigger: "blur" },
     { min: 1, max: 20, message: "物品名称长度在1-20个字符", trigger: "blur" },
   ],
-  category: [{ required: true, message: "请选择物品分类", trigger: "change" }],
-  description: [
+  item_tag: [
+    { required: true, message: "请选择物品分类", trigger: "change" }
+  ],
+  item_desc: [
     { max: 200, message: "描述不能超过200个字符", trigger: "blur" },
   ],
-  quantity: [{ required: true, message: "请输入数量", trigger: "blur" }],
-  location: [{ required: true, message: "请输入物品位置", trigger: "blur" }],
 };
 
 // 状态管理
 const fileList = ref([]);
+const showBoxPicker = ref(false);
 const showCategoryPicker = ref(false);
+const showDatePicker = ref(false);
 const loading = ref(false);
 const uForm = ref();
 const formContainer = ref(null);
 const buttonGroup = ref(null);
 const activeColor = "#3c9cff";
+
+// 模拟收纳盒数据
+const boxList = ref([
+  { id: 1, box_name: "书房主收纳盒", box_code: "BOX001" },
+  { id: 2, box_name: "卧室子收纳盒", box_code: "BOX002" },
+]);
+
+// 计算属性：显示选中的收纳盒名称
+const boxDisplayName = computed(() => {
+  if (!form.box_id) return "";
+  const box = boxList.value.find(item => item.id == form.box_id);
+  return box ? `${box.box_name} (${box.box_code})` : "";
+});
+
+// 收纳盒选择列
+const boxColumns = computed(() => [
+  boxList.value.map(box => ({
+    label: `${box.box_name} (${box.box_code})`,
+    value: box.id
+  }))
+]);
 
 // 分类数据
 const categoryColumns = ref([
@@ -238,50 +298,86 @@ const defaultBtnStyle = {
   marginTop: "20rpx"
 };
 
+// 生成物品编码
+const generateItemCode = () => {
+  const timestamp = new Date().getTime();
+  const random = Math.random().toString(36).substr(2, 6).toUpperCase();
+  return `ITEM-${timestamp}-${random}`;
+};
+
+// 在onLoad中获取传递的参数
+onLoad((options) => {
+  if (options.box_id) {
+    form.box_id = options.box_id;
+  }
+});
+
 // 生命周期 - 组件挂载后执行动画
 onMounted(() => {
   // 表单元素入场动画
-  const formItems = formContainer.value.querySelectorAll('.form-item-wrap');
-  
-  gsap.set(formItems, {
-    opacity: 0,
-    y: 20
-  });
-  
-  gsap.to(formItems, {
-    opacity: 1,
-    y: 0,
-    duration: 0.5,
-    stagger: 0.1,
-    ease: "power2.out"
-  });
+  const formItems = formContainer.value?.querySelectorAll('.form-item-wrap');
+  if (formItems) {
+    gsap.set(formItems, {
+      opacity: 0,
+      y: 20
+    });
+    
+    gsap.to(formItems, {
+      opacity: 1,
+      y: 0,
+      duration: 0.5,
+      stagger: 0.1,
+      ease: "power2.out"
+    });
+  }
 
   // 按钮组入场动画
-  gsap.set(buttonGroup.value, {
-    opacity: 0,
-    y: 30
-  });
-  
-  gsap.to(buttonGroup.value, {
-    opacity: 1,
-    y: 0,
-    duration: 0.6,
-    delay: 0.5,
-    ease: "power2.out"
-  });
+  if (buttonGroup.value) {
+    gsap.set(buttonGroup.value, {
+      opacity: 0,
+      y: 30
+    });
+    
+    gsap.to(buttonGroup.value, {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      delay: 0.5,
+      ease: "power2.out"
+    });
+  }
 });
 
-// 分类选择确认
-const confirmCategory = (e) => {
-  form.category = e.value[0];
-  showCategoryPicker.value = false;
+// 收纳盒选择确认
+const confirmBox = (e) => {
+  form.box_id = e.value[0];
+  showBoxPicker.value = false;
   
-  // 选择分类后的反馈动画
-  gsap.from('.form-item-wrap:nth-child(2) input', {
+  // 选择后的反馈动画
+  gsap.from('.form-item-wrap:nth-child(1) input', {
     scale: 0.95,
     duration: 0.3,
     ease: "elastic.out(1, 0.3)"
   });
+};
+
+// 分类选择确认
+const confirmCategory = (e) => {
+  form.item_tag = e.value[0];
+  showCategoryPicker.value = false;
+  
+  // 选择后的反馈动画
+  gsap.from('.form-item-wrap:nth-child(3) input', {
+    scale: 0.95,
+    duration: 0.3,
+    ease: "elastic.out(1, 0.3)"
+  });
+};
+
+// 日期选择确认
+const confirmDate = (e) => {
+  form.expire_time = e.value;
+  showDatePicker.value = false;
 };
 
 // 图片上传处理
@@ -292,7 +388,6 @@ const afterRead = (event) => {
     status: "success",
     message: "上传成功",
   });
-  form.image = file.url;
   
   // 上传成功动画
   gsap.from('.u-upload', {
@@ -306,7 +401,6 @@ const afterRead = (event) => {
 // 图片删除处理
 const deletePic = (event) => {
   fileList.value.splice(event.index, 1);
-  form.image = "";
 };
 
 // 输入框聚焦动画
@@ -329,15 +423,6 @@ const handleInputBlur = (e, field) => {
   });
 };
 
-// 数量变化动画
-const handleNumberChange = () => {
-  gsap.from('.u-number-box', {
-    scale: 1.05,
-    duration: 0.2,
-    ease: "power1.out"
-  });
-};
-
 // 表单提交
 const submitForm = async () => {
   try {
@@ -352,6 +437,15 @@ const submitForm = async () => {
         yoyo: true,
         repeat: 3
       });
+
+      // 准备提交数据
+      const submitData = {
+        ...form,
+        // 如果没有手动编辑名称，使用自动识别名称
+        auto_recognize_name: form.auto_recognize_name || form.manual_edit_name,
+      };
+
+      console.log("提交数据:", submitData);
 
       // 模拟提交过程
       await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -371,12 +465,14 @@ const submitForm = async () => {
   } catch (error) {
     console.log("表单验证失败:", error);
     // 验证失败动画
-    gsap.from(uForm.value.$el, {
-      x: 10,
-      duration: 0.1,
-      yoyo: true,
-      repeat: 3
-    });
+    if (uForm.value?.$el) {
+      gsap.from(uForm.value.$el, {
+        x: 10,
+        duration: 0.1,
+        yoyo: true,
+        repeat: 3
+      });
+    }
   } finally {
     loading.value = false;
   }
@@ -384,15 +480,21 @@ const submitForm = async () => {
 
 // 表单重置
 const resetForm = () => {
-  uForm.value.resetFields();
+  if (uForm.value) {
+    uForm.value.resetFields();
+  }
   fileList.value = [];
+  form.item_code = generateItemCode();
+  form.put_in_time = new Date().toISOString();
   
   // 重置动画
-  gsap.from(formContainer.value, {
-    opacity: 0.6,
-    duration: 0.3,
-    ease: "power1.out"
-  });
+  if (formContainer.value) {
+    gsap.from(formContainer.value, {
+      opacity: 0.6,
+      duration: 0.3,
+      ease: "power1.out"
+    });
+  }
 };
 </script>
 

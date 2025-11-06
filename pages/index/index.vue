@@ -13,12 +13,23 @@
 
 			<scroll-view v-else scroll-y enable-flex class="space-list">
 				<view class="grid">
-					<boxcard v-for="space in spaceList" :key="space.id" :name="space.name || space.boxName || '未命名收纳盒'"
-						:category="space.category || 'box'" :item-count="space.itemCount || getRandomItemCount()"
-						:location="space.location || getRandomLocation()"
-						:last-modified="space.lastModified || space.lastHeartbeatTime"
-						:battery-level="space.batteryLevel || space.battery || 0"
-						:is-charging="space.isCharging || false" @click="gotoSpace(space.id)" class="card" />
+					<boxcard 
+						v-for="space in spaceList" 
+						:key="space.id" 
+						:id="space.id"
+						:box_code="space.box_code"
+						:box_name="space.box_name"
+						:box_type="space.box_type"
+						:idx_user_box_type="space.idx_user_box_type"
+						:status="space.status"
+						:rssi="space.rssi"
+						:battery="space.battery"
+						:last_heartbeat_time="space.last_heartbeat_time"
+						:create_time="space.create_time"
+						:update_time="space.update_time"
+						@click="gotoSpace(space.id)" 
+						class="card" 
+					/>
 				</view>
 			</scroll-view>
 		</view>
@@ -33,10 +44,7 @@
 		onMounted
 	} from "vue";
 
-	import http from "@/utils/request";
-	import {
-		getBoxes
-	} from "@/api/boxesapi.js";
+	import { getBoxes } from "@/api/boxes/boxesapi.js";
 	import boxcard from "@/components/boxcard.vue";
 
 	const spaceList = ref([]);
@@ -50,9 +58,15 @@
 		loading.value = true;
 		try {
 			const res = await getBoxes();
-			console.log("666")
-			spaceList.value = Array.isArray(res) ? res : [];
+			console.log("获取收纳盒数据:", res);
+			// 根据API返回结构调整
+			if (res && res.code === 200) {
+				spaceList.value = Array.isArray(res.data) ? res.data : [];
+			} else {
+				spaceList.value = Array.isArray(res) ? res : [];
+			}
 		} catch (err) {
+			console.error("加载失败:", err);
 			uni.showToast({
 				title: "加载失败",
 				icon: "none"

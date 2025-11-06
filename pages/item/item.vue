@@ -15,7 +15,7 @@
             mode="aspectFit"
           />
           <view v-else class="image-placeholder">
-            <u-icon :name="getIcon(itemData.category)" size="80" color="#ccc" />
+            <u-icon :name="getIcon(itemData.item_tag)" size="80" color="#ccc" />
             <text class="placeholder-text">暂无图片</text>
           </view>
         </view>
@@ -23,33 +23,45 @@
         <!-- 基本信息 -->
         <view class="info-section">
           <view class="info-item">
+            <text class="label">物品编码</text>
+            <text class="value">{{ itemData.item_code }}</text>
+          </view>
+
+          <view class="info-item">
             <text class="label">物品名称</text>
-            <text class="value">{{ itemData.name }}</text>
+            <text class="value">{{ displayName }}</text>
           </view>
 
           <view class="info-item">
             <text class="label">物品分类</text>
-            <text class="value">{{ itemData.category }}</text>
+            <text class="value">{{ itemData.item_tag || '未分类' }}</text>
           </view>
 
           <view class="info-item">
             <text class="label">物品描述</text>
-            <text class="value">{{ itemData.description || "暂无描述" }}</text>
+            <text class="value">{{ itemData.item_desc || "暂无描述" }}</text>
           </view>
 
           <view class="info-item">
-            <text class="label">数量</text>
-            <text class="value">{{ itemData.quantity }} 件</text>
+            <text class="label">收纳盒</text>
+            <text class="value">{{ itemData.box_id }}号盒</text>
           </view>
 
           <view class="info-item">
-            <text class="label">所在位置</text>
-            <text class="value">{{ itemData.location }}</text>
+            <text class="label">放入时间</text>
+            <text class="value">{{ formatDate(itemData.put_in_time) }}</text>
+          </view>
+
+          <view class="info-item" v-if="itemData.expire_time">
+            <text class="label">到期时间</text>
+            <text class="value expire">{{ formatDate(itemData.expire_time) }}</text>
           </view>
 
           <view class="info-item">
-            <text class="label">最后更新</text>
-            <text class="value">{{ formatDate(itemData.lastModified) }}</text>
+            <text class="label">物品状态</text>
+            <text class="value" :class="{ 'status-valid': itemData.is_valid, 'status-invalid': !itemData.is_valid }">
+              {{ itemData.is_valid ? '有效' : '无效' }}
+            </text>
           </view>
         </view>
 
@@ -73,19 +85,25 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
+import { getItemDetail } from "@/api/items/itemsapi.js"; 
 
 const itemId = ref("");
 const itemName = ref("物品详情");
 const itemData = ref({
-  name: "",
-  category: "",
-  description: "",
-  quantity: 1,
-  location: "",
-  lastModified: "",
-  image: "",
+  id: "",
+  item_code: "",
+  box_id: "",
+  auto_recognize_name: "",
+  manual_edit_name: "",
+  item_tag: "",
+  item_desc: "",
+  put_in_time: "",
+  expire_time: "",
+  is_valid: 1,
+  create_time: "",
+  update_time: "",
 });
 
 onLoad((options) => {
@@ -93,52 +111,57 @@ onLoad((options) => {
   loadItemData();
 });
 
+// 计算显示名称
+const displayName = computed(() => {
+  return itemData.value.manual_edit_name || itemData.value.auto_recognize_name || '未命名物品';
+});
+
 const loadItemData = async () => {
-  // 模拟加载数据
-  await new Promise((resolve) => setTimeout(resolve, 500));
-
-  // 模拟数据
-  itemData.value = {
-    id: itemId.value,
-    name: "螺丝刀套装",
-    category: "工具",
-    description: "多功能家用螺丝刀，包含多种规格螺丝刀头",
-    quantity: 1,
-    location: "工具箱",
-    lastModified: "2024-01-15",
-    image: "",
-  };
-
-  itemName.value = itemData.value.name;
+  try {
+    const res = await getItemDetail(itemId.value);
+    if (res && res.code === 200) {
+      itemData.value = res.data;
+      itemName.value = displayName.value;
+    } else {
+      // 加载失败时显示默认数据
+      itemName.value = "物品详情";
+    }
+  } catch (error) {
+    console.error("加载物品详情失败:", error);
+    uni.showToast({
+      title: "加载失败",
+      icon: "none",
+    });
+  }
 };
 
-const getIcon = (cat) => {
+const getIcon = (tag) => {
   const icons = {
-    pen: "edit",
-    key: "key",
-    book: "book",
-    clothes: "tshirt",
-    tool: "wrench",
-    工具: "wrench",
-    文具: "edit",
-    衣物: "tshirt",
-    书籍: "book",
-    电子: "mobile",
-    default: "cube",
+    '办公用品': "edit",
+    '日常用品': "cube",
+    '文具': "edit-pen",
+    '工具': "wrench",
+    '衣物': "tshirt",
+    '书籍': "book",
+    '电子': "mobile",
+    '默认': "cube",
   };
-  return icons[cat] || icons.default;
+  return icons[tag] || icons['默认'];
 };
 
 const formatDate = (date) => {
   if (!date) return "暂无记录";
-  const d = new Date(date);
-  return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+  try {
+    const d = new Date(date);
+    return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+  } catch (e) {
+    return "日期错误";
+  }
 };
 
 const editItem = () => {
-  uni.showToast({
-    title: "编辑功能开发中",
-    icon: "none",
+  uni.navigateTo({
+    url: `/pages/edit-item/edit-item?id=${itemId.value}`
   });
 };
 
@@ -150,14 +173,13 @@ const deleteItem = () => {
     success: (res) => {
       if (res.confirm) {
         uni.showLoading({ title: "删除中..." });
-
+        // 调用删除API
         setTimeout(() => {
           uni.hideLoading();
           uni.showToast({
             title: "删除成功",
             icon: "success",
           });
-
           setTimeout(() => {
             uni.navigateBack();
           }, 1500);
@@ -237,6 +259,18 @@ const deleteItem = () => {
   text-align: right;
   flex: 1;
   margin-left: 20rpx;
+}
+
+.expire {
+  color: #f59e0b;
+}
+
+.status-valid {
+  color: #10b981;
+}
+
+.status-invalid {
+  color: #ef4444;
 }
 
 .action-buttons {

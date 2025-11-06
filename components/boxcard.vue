@@ -1,5 +1,4 @@
 <template>
-  <!-- 统一uview-plus组件使用，补充hover反馈配置 -->
   <u-card
     :border="false"
     :margin="margin"
@@ -10,43 +9,40 @@
     hover-class="none"
   >
     <view class="card-content">
-      <!-- 1. 图标区域：简化设计，确保兼容性 -->
+      <!-- 图标区域 -->
       <view class="icon-box">
         <view class="icon-frame"></view>
         <u-icon
-          :name="getIcon(category)"
+          :name="getIcon(box_type)"
           size="48"
           color="#3B82F6"
           class="icon-main"
         />
       </view>
 
-      <!-- 2. 文字信息：优化布局 -->
+      <!-- 文字信息 -->
       <view class="info">
-        <text class="name">{{ name }}</text>
-        <text class="desc">{{ itemCount }} 件物品 · {{ location || '未设置位置' }}</text>
-        <text class="time">最后整理：{{ formatDate(lastModified) }}</text>
+        <text class="name">{{ box_name }}</text>
+        <text class="desc">{{ box_code }} · {{ getBoxTypeText(idx_user_box_type) }}</text>
+        <text class="time">最后心跳：{{ formatDate(last_heartbeat_time) }}</text>
       </view>
 
-      <!-- 3. 电池状态：调整定位 -->
+      <!-- 电池状态 -->
       <view 
-        v-if="showBattery" 
+        v-if="battery !== null && battery >= 0" 
         class="battery-badge" 
-        :class="[
-          { 'low-battery': isLowBattery },  
-          { 'battery-badge--charging': isCharging }
-        ]"
+        :class="{ 'low-battery': battery < 20 }"
       >
         <u-icon
-          :name="isCharging ? 'battery-charging' : 'battery'"
+          name="battery"
           size="18"
-          :color="isLowBattery && !isCharging ? '#EF4444' : '#3B82F6'"
+          :color="battery < 20 ? '#EF4444' : '#3B82F6'"
           class="battery-icon"
         />
-        <text class="battery-text">{{ batteryLevel }}%</text>
+        <text class="battery-text">{{ battery }}%</text>
       </view>
 
-      <!-- 4. 右侧箭头 -->
+      <!-- 右侧箭头 -->
       <view class="arrow-wrapper">
         <view class="arrow-line" :class="{ 'arrow-line--active': isActive }"></view>
         <u-icon 
@@ -62,77 +58,81 @@
 </template>
 
 <script setup>
-import { ref, computed,onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
-// 保持原有props/emit逻辑，补充默认值防错
 const props = defineProps({
-  name: { type: String, default: '未命名收纳' },
-  category: { type: String, default: 'box' },
-  itemCount: { type: Number, default: 0 },
-  location: { type: String, default: '' },
-  lastModified: [String, Date],
-  batteryLevel: { type: Number, default: 0 },
-  isCharging: { type: Boolean, default: false },
+  id: { type: [String, Number], default: 0 },
+  box_code: { type: String, default: '' },
+  user_id: { type: [String, Number], default: 0 },
+  box_name: { type: String, default: '收纳盒' },
+  box_type: { type: [String, Number], default: 0 },
+  idx_user_box_type: { type: [String, Number], default: 0 },
+  status: { type: [String, Number], default: 1 },
+  rssi: { type: Number, default: null },
+  battery: { type: Number, default: null },
+  last_heartbeat_time: [String, Date],
+  create_time: [String, Date],
+  update_time: [String, Date],
   border: { type: Boolean, default: false },
   margin: { type: [String, Number], default: '24rpx' },
   padding: { type: [String, Number], default: '32rpx' }
 })
 
-// 调试：打印接收到的props
+// 调试信息
 onMounted(() => {
   console.log('📦 boxcard 接收到的数据:', {
-    name: props.name,
-    category: props.category,
-    itemCount: props.itemCount,
-    location: props.location,
-    lastModified: props.lastModified,
-    batteryLevel: props.batteryLevel,
-    isCharging: props.isCharging
+    id: props.id,
+    box_code: props.box_code,
+    box_name: props.box_name,
+    box_type: props.box_type,
+    idx_user_box_type: props.idx_user_box_type,
+    battery: props.battery,
+    last_heartbeat_time: props.last_heartbeat_time
   })
 })
 
 const emit = defineEmits(['click'])
-
-// 保持原有计算属性逻辑
-const showBattery = computed(() => props.batteryLevel !== null && props.batteryLevel >= 0)
-const isLowBattery = computed(() => {
-  return showBattery.value && !props.isCharging && props.batteryLevel < 20
-})
-
 const isActive = ref(false)
 
-// 图标映射：补充更多分类图标，适配不同收纳场景
-const getIcon = (cat) => {
+// 根据 box_type 获取图标
+const getIcon = (boxType) => {
   const icons = {
-    box: 'inbox',       // 收纳盒
-    drawer: 'layers',   // 抽屉
-    shelf: 'book',      // 书架
-    wardrobe: 'tshirt', // 衣柜
-    fridge: 'ice-cream',// 冰箱
-    cabinet: 'home',    // 橱柜
-    default: 'cube'     // 默认
+    0: 'inbox',       // 默认收纳盒
+    1: 'layers',      // 抽屉
+    2: 'book',        // 书架
+    3: 'tshirt',      // 衣柜
+    4: 'ice-cream',   // 冰箱
+    5: 'home',        // 橱柜
+    default: 'cube'
   }
-  return icons[cat] || icons.default
+  return icons[boxType] || icons.default
 }
 
-// 日期格式化：保持原有逻辑，优化空值显示
+// 获取盒子类型文本
+const getBoxTypeText = (boxType) => {
+  const typeMap = {
+    0: '子盒',
+    1: '主盒'
+  }
+  return typeMap[boxType] || '未知类型'
+}
+
+// 日期格式化
 const formatDate = (date) => {
   if (!date) return '暂无记录'
   try {
     const d = new Date(date)
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
   } catch (e) {
     return '日期错误'
   }
 }
 
-// 点击逻辑：保持原有震动+状态切换，优化延迟时间
+// 点击处理
 const handleClick = () => {
-  // 兼容不同环境的震动API
   if (uni.vibrateShort) uni.vibrateShort({ type: 'light' })
   isActive.value = true
   emit('click')
-  // 缩短延迟，提升反馈灵敏度
   setTimeout(() => {
     isActive.value = false
   }, 120)
@@ -140,7 +140,7 @@ const handleClick = () => {
 </script>
 
 <style scoped>
-/* 基础卡片样式：简化样式确保兼容性 */
+/* 样式保持不变 */
 .box-card {
   background-color: #fff;
   border-radius: 20rpx;
@@ -151,14 +151,12 @@ const handleClick = () => {
   overflow: hidden;
 }
 
-/* 激活态样式 */
 .box-card--active {
   border-color: #93c5fd;
   box-shadow: 0 8rpx 32rpx rgba(59, 130, 246, 0.12);
   background: linear-gradient(180deg, rgba(249, 250, 251, 1) 0%, rgba(240, 249, 255, 1) 100%);
 }
 
-/* 左侧激活光条 */
 .box-card::before {
   content: '';
   position: absolute;
@@ -174,7 +172,6 @@ const handleClick = () => {
   opacity: 1;
 }
 
-/* 卡片内容容器：使用更兼容的布局 */
 .card-content {
   display: flex;
   align-items: center;
@@ -183,7 +180,6 @@ const handleClick = () => {
   padding: 0 20rpx;
 }
 
-/* 图标区域：简化设计 */
 .icon-box {
   width: 100rpx;
   height: 100rpx;
@@ -195,7 +191,6 @@ const handleClick = () => {
   margin-right: 20rpx;
 }
 
-/* 框架 */
 .icon-frame {
   position: absolute;
   width: 80rpx;
@@ -211,7 +206,6 @@ const handleClick = () => {
   border-color: #bfdbfe;
 }
 
-/* 主图标 */
 .icon-main {
   position: relative;
   z-index: 1;
@@ -221,7 +215,6 @@ const handleClick = () => {
   transform: scale(1.1);
 }
 
-/* 文字信息：使用弹性布局 */
 .info {
   flex: 1;
   min-width: 0;
@@ -229,7 +222,6 @@ const handleClick = () => {
   flex-direction: column;
 }
 
-/* 名称 */
 .name {
   font-size: 32rpx;
   font-weight: 600;
@@ -245,7 +237,6 @@ const handleClick = () => {
   color: #2563eb;
 }
 
-/* 描述 */
 .desc {
   font-size: 26rpx;
   color: #64748b;
@@ -257,7 +248,6 @@ const handleClick = () => {
   margin-bottom: 4rpx;
 }
 
-/* 时间 */
 .time {
   font-size: 22rpx;
   color: #94a3b8;
@@ -265,7 +255,6 @@ const handleClick = () => {
   line-height: 1.4;
 }
 
-/* 电池状态：调整定位方式 */
 .battery-badge {
   position: absolute;
   top: 20rpx;
@@ -281,19 +270,12 @@ const handleClick = () => {
   z-index: 2;
 }
 
-/* 低电量样式 */
 .low-battery {
   background-color: #fef2f2;
   border-color: #fee2e2;
   color: #EF4444;
 }
 
-/* 充电状态动画 */
-.battery-badge--charging .battery-icon {
-  animation: chargePulse 1.2s infinite alternate;
-}
-
-/* 右侧箭头 */
 .arrow-wrapper {
   display: flex;
   align-items: center;
@@ -301,7 +283,6 @@ const handleClick = () => {
   flex-shrink: 0;
 }
 
-/* 箭头前的线条 */
 .arrow-line {
   width: 20rpx;
   height: 2rpx;
@@ -314,7 +295,6 @@ const handleClick = () => {
   width: 30rpx;
 }
 
-/* 箭头图标 */
 .arrow-icon {
   transition: transform 0.3s ease;
 }
@@ -322,13 +302,6 @@ const handleClick = () => {
   transform: translateX(4rpx);
 }
 
-/* 充电闪烁动画 */
-@keyframes chargePulse {
-  0% { opacity: 0.7; }
-  100% { opacity: 1; }
-}
-
-/* 响应式调整 */
 @media (max-width: 375px) {
   .card-content {
     padding: 0 16rpx;
