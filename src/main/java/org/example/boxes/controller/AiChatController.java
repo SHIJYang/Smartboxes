@@ -7,10 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.boxes.dto.AiChatRequestDTO;
 import org.example.boxes.result.RestResult;
 import org.example.boxes.service.AiChatService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * AI聊天控制器
@@ -20,11 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-<<<<<<< HEAD
 @Tag(name = "AI聊天", description = "AI聊天相关接口")
-=======
-@Tag(name = "AI聊天")
->>>>>>> 274ee59967deb523f16d5cc722ba6731b64355b7
 public class AiChatController {
 
     private final AiChatService aiChatService;
@@ -36,11 +29,7 @@ public class AiChatController {
      * @return RestResult 响应结果
      */
     @PostMapping("/chat")
-<<<<<<< HEAD
     @Operation(summary = "AI聊天", description = "处理用户的AI聊天请求")
-=======
-    @Operation(summary = "AI聊天")
->>>>>>> 274ee59967deb523f16d5cc722ba6731b64355b7
     public RestResult<?> chat(@Valid @RequestBody AiChatRequestDTO request) {
         return aiChatService.handleAiChat(request);
     }

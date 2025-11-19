@@ -25,11 +25,8 @@ public class ItemOperateLogDO {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * 物品ID
-     */
-    @Column(name = "item_id", nullable = false)
-    private Long itemId;
+    // ❌ 删除下面这一行！不要保留 itemId 字段！
+    // private Long itemId;  <-- 必须删除！
 
     /**
      * 操作类型
@@ -61,9 +58,10 @@ public class ItemOperateLogDO {
     @Column(name = "update_time")
     private LocalDateTime updateTime;
 
-
+    /**
+     * 关联的物品（多对一）
+     */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id", insertable = false, updatable = false)
+    @JoinColumn(name = "item_id", nullable = false) // 外键列名
     private ItemDO item;
-
 }

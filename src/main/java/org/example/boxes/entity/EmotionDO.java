@@ -17,9 +17,6 @@ public class EmotionDO {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "item_id", nullable = false)  // 移除反引号
-    private Long itemId;
-
     @Column(name = "emotion_tag", nullable = false)
     private Integer emotionTag;
 
@@ -32,17 +29,10 @@ public class EmotionDO {
     @Column(name = "update_time", nullable = false)
     private LocalDateTime updateTime;
 
-<<<<<<< HEAD
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id", insertable = false, updatable = false)
-=======
     /**
      * 关联的物品（一对一，外键在 t_emotion.item_id）
      */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", referencedColumnName = "id")
->>>>>>> 274ee59967deb523f16d5cc722ba6731b64355b7
     private ItemDO item;
-
 }

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "t_item")
@@ -55,15 +56,11 @@ public class ItemDO {
     @JoinColumn(name = "box_id", insertable = false, updatable = false)
     private BoxDO box;
 
-<<<<<<< HEAD
-}
-=======
     /**
      * 物品的情感标签（由 EmotionDO.item 维护外键）
      */
     @OneToOne(mappedBy = "item", fetch = FetchType.LAZY)
     private EmotionDO emotion;
-
     /**
      * 物品的操作日志列表
      */
@@ -71,4 +68,3 @@ public class ItemDO {
     private List<ItemOperateLogDO> operateLogs;
 }
 
->>>>>>> 274ee59967deb523f16d5cc722ba6731b64355b7

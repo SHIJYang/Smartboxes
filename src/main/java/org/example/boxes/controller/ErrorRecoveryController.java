@@ -9,10 +9,7 @@ import org.example.boxes.dto.FallbackRequestDTO;
 import org.example.boxes.result.RestResult;
 import org.example.boxes.service.ErrorLogService;
 import org.example.boxes.service.FallbackService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 错误修复管理控制器
