@@ -16,6 +16,35 @@
   <properties>
     <java.version>17</java.version>
   </properties>
+  
+  <repositories>
+    <!-- Maven Central Repository -->
+    <repository>
+      <id>central</id>
+      <name>Maven Central Repository</name>
+      <url>https://repo1.maven.org/maven2/</url>
+    </repository>
+    
+    <!-- Spring Milestone Repository -->
+    <repository>
+      <id>spring-milestones</id>
+      <name>Spring Milestones</name>
+      <url>https://repo.spring.io/milestone</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    
+    <!-- Spring Snapshot Repository -->
+    <repository>
+      <id>spring-snapshots</id>
+      <name>Spring Snapshots</name>
+      <url>https://repo.spring.io/snapshot</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </repository>
+  </repositories>
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -48,21 +77,28 @@
       <artifactId>lombok</artifactId>
       <optional>true</optional>
     </dependency>
-<<<<<<< HEAD
+
+
+
+    <!-- SQL 解析器 -->
+     <dependency>
+       <groupId>org.jsqlparser</groupId>
+       <artifactId>jsqlparser</artifactId>
+       <version>4.4</version>
+     </dependency>
+     
+     <!-- HTTP客户端依赖，用于调用Ollama API -->
+     <dependency>
+       <groupId>org.springframework.boot</groupId>
+       <artifactId>spring-boot-starter-webflux</artifactId>
+     </dependency>
 
     <!-- SpringDoc OpenAPI (替代 SpringFox) -->
-    <dependency>
-      <groupId>org.springdoc</groupId>
-      <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-      <version>2.8.5</version>
-=======
-    <!-- OpenAPI (springdoc) for Spring Boot 3 -->
-    <dependency>
-      <groupId>org.springdoc</groupId>
-      <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-      <version>2.6.0</version>
->>>>>>> 274ee59967deb523f16d5cc722ba6731b64355b7
-    </dependency>
+     <dependency>
+       <groupId>org.springdoc</groupId>
+       <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+       <version>2.4.0</version>
+     </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -78,19 +114,6 @@
           </excludes>
         </configuration>
       </plugin>
-<<<<<<< HEAD
-=======
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.11.0</version>
-          <configuration>
-            <source>${java.version}</source>
-            <target>${java.version}</target>
-            <release>${java.version}</release>
-          </configuration>
-        </plugin>
->>>>>>> 274ee59967deb523f16d5cc722ba6731b64355b7
     </plugins>
   </build>
 </project>

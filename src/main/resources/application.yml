@@ -18,6 +18,16 @@ spring:
   sql:
     init:
       mode: always    # 启用SQL初始化
+  # OpenAI 配置
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        options:
+          model: qwen3:4B
+          temperature: 0.7
+          max-tokens: 1000
+
 logging:
   level:
     org.hibernate.SQL: DEBUG
