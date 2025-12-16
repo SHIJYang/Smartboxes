@@ -1,37 +1,8 @@
 {
-  "hash": "cf2e42b7",
-  "configHash": "86c3629f",
-  "lockfileHash": "75c9f3bd",
-  "browserHash": "22274b30",
-  "optimized": {
-    "gsap": {
-      "src": "../../../../../node_modules/gsap/index.js",
-      "file": "gsap.js",
-      "fileHash": "049a23f6",
-      "needsInterop": false
-    },
-    "uview-plus": {
-      "src": "../../../../../node_modules/uview-plus/index.js",
-      "file": "uview-plus.js",
-      "fileHash": "7b0892a4",
-      "needsInterop": false
-    },
-    "gsap/ScrollTrigger": {
-      "src": "../../../../../node_modules/gsap/ScrollTrigger.js",
-      "file": "gsap_ScrollTrigger.js",
-      "fileHash": "985c3636",
-      "needsInterop": false
-    },
-    "uview-ui": {
-      "src": "../../../../../node_modules/uview-ui/index.js",
-      "file": "uview-ui.js",
-      "fileHash": "e35b73b9",
-      "needsInterop": false
-    }
-  },
-  "chunks": {
-    "chunk-LQ2VYIYD": {
-      "file": "chunk-LQ2VYIYD.js"
-    }
-  }
+  "hash": "02947deb",
+  "configHash": "56784069",
+  "lockfileHash": "e3b0c442",
+  "browserHash": "5c171306",
+  "optimized": {},
+  "chunks": {}
 }
