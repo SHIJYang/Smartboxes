@@ -28,15 +28,21 @@ export const request = <T>(
       },
       success: (res: any) => {
         if (res.statusCode === 200) {
-          resolve(res.data as RestResult<T>);
+          // 修复: 后端返回字段可能包含 msg 而非 message，这里做兼容处理
+          const result = res.data as RestResult<T>;
+          // 如果后端有时返回 message 有时返回 msg，可以手动规整一下 (可选)
+          // if (!result.msg && (result as any).message) result.msg = (result as any).message;
+          
+          resolve(result);
         } else if (res.statusCode === 401) {
-          // 未授权，跳转到登录页
           uni.showToast({ title: '请重新登录', icon: 'none' });
           uni.removeStorageSync('userInfo');
           uni.redirectTo({ url: '/pages/user/login' });
           reject(res);
         } else {
-          uni.showToast({ title: res.data?.message || '请求异常', icon: 'none' });
+          // 修复: 优先取 msg
+          const errorMsg = res.data?.msg || res.data?.message || '请求异常';
+          uni.showToast({ title: errorMsg, icon: 'none' });
           reject(res);
         }
       },
@@ -45,7 +51,6 @@ export const request = <T>(
         reject(err);
       },
       complete: () => {
-        // 请求完成后的处理
         console.log(`${method} ${url} 请求完成`);
       }
     });

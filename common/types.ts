@@ -1,13 +1,28 @@
 // common/types.ts
 
-// 基础响应结构
+// 基础响应结构 (修复: message -> msg)
 export interface RestResult<T> {
   code: number;
-  message: string;
+  msg: string; 
   data: T;
 }
 
-// 盒子 (BoxDTO)
+// 登录请求参数 (新增)
+export interface LoginRequest {
+  userAccount: string;
+  userPassword: string;
+}
+
+// 盒子查询参数 (新增)
+export interface QueryBoxDTO {
+  userId?: number;
+  boxCode?: string;
+  boxName?: string;
+  boxType?: number;
+  status?: number;
+}
+
+// 盒子 (BoxDTO) (修复: 补全字段)
 export interface BoxDTO {
   id: number;
   boxCode: string;
@@ -15,36 +30,53 @@ export interface BoxDTO {
   boxName: string;
   boxType: number; // 0-子箱，1-主箱
   status: number;  // 0-离线 1-在线 2-低电 3-故障
+  rssi?: number;   // 新增: 信号强度
   battery?: number;
+  lastHeartbeatTime?: string; // 新增
+  createTime?: string;
+  updateTime?: string;
 }
 
-// 商品 (ItemDTO)
+// 商品查询参数 (新增)
+export interface QueryItemDTO {
+  boxId?: number;
+  itemCode?: string;
+  itemTag?: string;
+  isValid?: number;
+}
+
+// 商品 (ItemDTO) (修复: 补全字段)
 export interface ItemDTO {
   id: number;
-  boxId: number;   // 关联的盒子ID
+  boxId: number;   
   itemCode: string;
   itemName: string;
   itemDesc?: string;
-  itemTag?: string; // 分类标签
+  itemTag?: string; 
   price?: number;
-  isValid: number; // 1-有效
+  autoRecognizeName?: string; // 新增
+  manualEditName?: string;    // 新增
+  isValid: number; 
+  putInTime?: string;         // 新增
   expireTime?: string;
   createTime?: string;
+  updateTime?: string;
 }
 
-// 用户 (UserDTO)
+// 用户 (UserDTO) (修复: 字段匹配)
 export interface UserDTO {
   id: number;
   username: string;
   email?: string;
-  avatar?: string;
+  createdAt?: string; // 对应 openapi: createdAt
+  updatedAt?: string; // 对应 openapi: updatedAt
 }
 
 // 情感标签 (EmotionDTO)
 export interface EmotionDTO {
   id: number;
   itemId: number;
-  emotionTag: number; // 1-快乐 2-悲伤 3-愤怒 4-焦虑 5-平静
+  emotionTag: number; 
   emotionRemark?: string;
 }
 
@@ -54,8 +86,8 @@ export interface AiChatRequestDTO {
   message: string;
 }
 
-// AI 聊天响应数据 (RestResultObject data)
+// AI 聊天响应数据
 export interface AiChatResponse {
-  reply: string;    // AI回复内容
-  action?: string;  // 建议操作 (如: "OPEN_BOX_001")
+  reply: string;    
+  action?: string;  
 }
