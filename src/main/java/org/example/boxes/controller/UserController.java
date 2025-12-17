@@ -4,15 +4,19 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.boxes.dto.LoginRequest;
 import org.example.boxes.dto.UserDTO;
 import org.example.boxes.entity.UserDO;
 import org.example.boxes.query.UserQuery;
 import org.example.boxes.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -23,7 +27,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Tag(name = "用户管理", description = "用户相关API")
 public class UserController {
-
+    @Autowired
     private final UserService userService;
 
     /**
@@ -107,5 +111,24 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+    /**
+     * 用户登录接口
+     */
+    @PostMapping("/login")
+    @Operation(summary = "用户登录", description = "通过账号密码登录，返回Token")
+    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest loginRequest) {
+        // 1. 执行登录逻辑
+        UserDTO userDTO = userService.login(loginRequest.getUserAccount(), loginRequest.getUserPassword());
+
+        // 2. 生成 Token
+        String token = userService.generateToken(userDTO);
+
+        // 3. 构建返回数据
+        Map<String, Object> result = new HashMap<>();
+        result.put("token", token);
+        result.put("user", userDTO);
+
+        return ResponseEntity.ok(result);
     }
 }

@@ -58,4 +58,9 @@ public interface UserService {
      * @param id 用户ID
      */
     void deleteUser(Long id);
+
+
+    UserDTO login(String userAccount, String password);
+    // 添加获取Token的方法(或者直接在login返回包含Token的对象)
+    String generateToken(UserDTO user);
 }
