@@ -55,7 +55,14 @@
 		"style": {
 			"navigationBarTitleText": "登录"
 		}
-	}],
+	},
+	{
+	      "path": "pages/user/register",
+	      "style": {
+	        "navigationBarTitleText": "用户注册",
+	        "navigationStyle": "custom"
+	      }
+	    }],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "收纳管理",

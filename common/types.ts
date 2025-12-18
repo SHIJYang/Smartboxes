@@ -71,7 +71,15 @@ export interface UserDTO {
   createdAt?: string; // 对应 openapi: createdAt
   updatedAt?: string; // 对应 openapi: updatedAt
 }
-
+export interface UserDO {
+  id?: number;
+  userAccount: string;
+  userPassword?: string;
+  username?: string;
+  phone?: string;
+  createTime?: string;
+  updateTime?: string;
+}
 // 情感标签 (EmotionDTO)
 export interface EmotionDTO {
   id: number;

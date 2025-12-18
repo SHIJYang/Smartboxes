@@ -6,61 +6,77 @@
 
     <view class="content-box">
       <view class="header fade-in-down">
-        <view class="logo-box">
-          <text class="logo-icon">📦</text>
-        </view>
-        <text class="app-name">智能收纳盒</text>
-        <text class="sub-title">Smart Box System</text>
+        <text class="app-name">新用户注册</text>
+        <text class="sub-title">Join Smart Box System</text>
       </view>
 
       <view class="card fade-in-up">
-        <view class="welcome-row">
-          <text class="h1">欢迎回来</text>
-          <text class="h2">请登录您的账号</text>
-        </view>
-
         <view class="input-group" :class="{ 'input-focus': focusField === 'account' }">
-          <view class="icon-wrapper">👤</view>
+          <view class="icon-box">👤</view>
           <input 
             class="inp" 
             v-model="formData.userAccount" 
             type="text" 
-            placeholder="请输入账号" 
+            placeholder="设置账号" 
             placeholder-class="placeholder-style"
             @focus="focusField = 'account'"
             @blur="focusField = ''"
           />
         </view>
+
+        <view class="input-group" :class="{ 'input-focus': focusField === 'username' }">
+          <view class="icon-box">🏷️</view>
+          <input 
+            class="inp" 
+            v-model="formData.username" 
+            type="text" 
+            placeholder="您的昵称" 
+            placeholder-class="placeholder-style"
+            @focus="focusField = 'username'"
+            @blur="focusField = ''"
+          />
+        </view>
         
         <view class="input-group" :class="{ 'input-focus': focusField === 'password' }">
-          <view class="icon-wrapper">🔒</view>
+          <view class="icon-box">🔒</view>
           <input 
             class="inp" 
             v-model="formData.userPassword" 
             type="safe-password" 
             password
-            placeholder="请输入密码" 
+            placeholder="设置密码" 
             placeholder-class="placeholder-style"
             @focus="focusField = 'password'"
             @blur="focusField = ''"
-            @confirm="handleLogin"
+          />
+        </view>
+
+        <view class="input-group" :class="{ 'input-focus': focusField === 'confirmPwd' }">
+          <view class="icon-box">🛡️</view>
+          <input 
+            class="inp" 
+            v-model="confirmPassword" 
+            type="safe-password" 
+            password
+            placeholder="确认密码" 
+            placeholder-class="placeholder-style"
+            @focus="focusField = 'confirmPwd'"
+            @blur="focusField = ''"
           />
         </view>
         
         <button 
           class="btn-login" 
           hover-class="btn-hover" 
-          @click="handleLogin" 
-          :loading="loggingIn"
-          :disabled="loggingIn"
+          @click="handleRegister" 
+          :loading="submitting"
+          :disabled="submitting"
         >
-          {{ loggingIn ? '登录中...' : '立 即 登 录' }}
+          {{ submitting ? '注册中...' : '立 即 注 册' }}
         </button>
 
         <view class="footer-links">
-          <text class="link-text" @click="toRegister">注册账号</text>
-          <text class="divider">|</text>
-          <text class="link-text">忘记密码?</text>
+          <text class="link-text" @click="goLogin">已有账号？直接登录</text>
         </view>
       </view>
     </view>
@@ -73,40 +89,57 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import { login } from '@/api'; 
-import type { LoginRequest } from '@/common/types';
-import { useUserStore } from '@/stores/user';
+import { registerUser } from '@/api/index';
+import type { UserDO } from '@/common/types';
 
-const formData = reactive<LoginRequest>({ userAccount: '', userPassword: '' });
-const loggingIn = ref(false);
+// 表单数据
+const formData = reactive<UserDO>({
+  userAccount: '',
+  userPassword: '',
+  username: '',
+  phone: ''
+});
+
+const confirmPassword = ref('');
+const submitting = ref(false);
 const focusField = ref('');
-const userStore = useUserStore();
 
-const toRegister = () => uni.navigateTo({ url: '/pages/user/register' });
-
-const handleLogin = async () => {
-  if (!formData.userAccount || !formData.userPassword) {
-    uni.showToast({ title: '请输入账号和密码', icon: 'none' });
+const handleRegister = async () => {
+  // 1. 校验
+  if (!formData.userAccount || !formData.userPassword || !formData.username) {
+    uni.showToast({ title: '请填写完整信息', icon: 'none' });
     return;
   }
-  loggingIn.value = true;
+  if (formData.userPassword !== confirmPassword.value) {
+    uni.showToast({ title: '两次密码不一致', icon: 'none' });
+    return;
+  }
+  
+  submitting.value = true;
+  
   try {
-    const res = await login(formData);
+    // 2. 调用API
+    const res = await registerUser(formData);
+
     if (res.code === 200) {
-      const resultData = res.data as any; 
-      const token = resultData.token || 'mock-token-' + Date.now();
-      const userInfo = resultData.username ? resultData : (resultData.user || { id: 0, username: formData.userAccount });
-      userStore.login(token, userInfo);
-      uni.showToast({ title: '登录成功', icon: 'success' });
-      setTimeout(() => uni.switchTab({ url: '/pages/index/index' }), 800);
+      uni.showToast({ title: '注册成功', icon: 'success' });
+      // 延迟返回登录页
+      setTimeout(() => {
+        uni.navigateBack();
+      }, 1500);
     } else {
-      uni.showToast({ title: res.msg || '登录失败', icon: 'none' });
+      uni.showToast({ title: res.msg || '注册失败', icon: 'none' });
     }
   } catch (error) {
-    uni.showToast({ title: '服务异常', icon: 'none' });
+    console.error('Register failed:', error);
+    uni.showToast({ title: '网络异常', icon: 'none' });
   } finally {
-    loggingIn.value = false;
+    submitting.value = false;
   }
+};
+
+const goLogin = () => {
+  uni.navigateBack();
 };
 </script>
 

@@ -110,7 +110,7 @@ const scrollToBottom = () => {
 .chat-header {
   background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);
   /* 顶部留白增加，适应刘海屏 */
-  padding: 80rpx 40rpx 40rpx; 
+  padding: 48rpx 40rpx 40rpx; 
   border-bottom-left-radius: 60rpx;
   border-bottom-right-radius: 60rpx;
   box-shadow: 0 8rpx 30rpx rgba(255, 154, 158, 0.3);
