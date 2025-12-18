@@ -1,0 +1,31 @@
+# Node.js dependencies
+node_modules/
+
+# Build outputs
+dist/
+
+# Environment files
+.env.local
+.env.*.local
+
+# Logs
+logs
+*.log
+
+# IDE files
+.vscode/
+.idea/
+
+# OS generated files
+Thumbs.db
+.DS_Store
+
+# Temporary files
+tmp/
+temp/
+
+# Vite cache
+.vite/
+
+# npm debug logs
+npm-debug.log*
