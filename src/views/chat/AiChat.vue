@@ -15,7 +15,7 @@
           :class="['message-item', message.sender === 'user' ? 'user-message' : 'ai-message']"
         >
           <div class="message-avatar">
-            <el-avatar :icon="message.sender === 'user' ? User : Robot" />
+            <el-avatar :icon="message.sender === 'user' ? 'User' : 'ChatLineRound'" />
           </div>
           <div class="message-content">
             <div class="message-text">{{ message.content }}</div>
@@ -35,7 +35,7 @@
         />
         <div class="input-actions">
           <el-button type="primary" @click="handleSend" :loading="sending">
-            <el-icon><Send /></el-icon>
+            <el-icon><el-icon--circle-plus /></el-icon>
             发送
           </el-button>
         </div>
@@ -47,7 +47,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { User, Robot, Send } from '@element-plus/icons-vue'
 import axios from '../../axios'
 import { useUserStore } from '../../stores/user'
 
