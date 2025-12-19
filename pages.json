@@ -77,23 +77,23 @@
 		"list": [{
 			"pagePath": "pages/index/index",
 			"text": "首页",
-			"iconPath": "static/tab-home.png",
-			"selectedIconPath": "static/tab-home-on.png"
+			"iconPath": "static/shouye.png",
+			"selectedIconPath": "static/shouye-a.png"
 		}, {
 			"pagePath": "pages/box/boxlist",
 			"text": "盒子",
-			"iconPath": "static/tab-box.png",
-			"selectedIconPath": "static/tab-box-on.png"
+			"iconPath": "static/box.png",
+			"selectedIconPath": "static/box-a.png"
 		}, {
 			"pagePath": "pages/chat/chat",
 			"text": "助手",
-			"iconPath": "static/tab-chat.png",
-			"selectedIconPath": "static/tab-chat-on.png"
+			"iconPath": "static/chat.png",
+			"selectedIconPath": "static/chat-a.png"
 		}, {
 			"pagePath": "pages/user/user",
 			"text": "我的",
-			"iconPath": "static/tab-user.png",
-			"selectedIconPath": "static/tab-user-on.png"
+			"iconPath": "static/user.png",
+			"selectedIconPath": "static/user-a.png"
 		}]
 	}
 }
