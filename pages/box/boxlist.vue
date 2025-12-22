@@ -1,44 +1,47 @@
 <template>
-  <view class="page-container">
-    <view class="bg-shape shape-1"></view>
-    <view class="bg-shape shape-2"></view>
+  <view class="page-root">
+    <PCHeader current="box" />
+    <view class="pc-placeholder"></view>
 
-    <view class="content-wrapper">
-      <view class="header-title fade-in-down">我的盒子</view>
+    <view class="mobile-header">
+      <view class="header-content">
+        <text class="title">📦 我的宝箱库</text>
+        <text class="subtitle">管理你的 {{ list.length }} 个收纳空间</text>
+      </view>
+    </view>
 
-      <view class="list-container fade-in-up">
+    <scroll-view scroll-y class="list-scroll" :show-scrollbar="false">
+      <view class="list-body">
         <view 
-          v-for="box in list" 
-          :key="box.id" 
+          v-for="box in list" :key="box.id" 
           class="box-card" 
           @click="goDetail(box.id)"
           hover-class="card-hover"
         >
-          <view class="card-header">
-            <view class="icon-wrapper">
-              <text class="box-icon">📦</text>
-            </view>
-            <view class="info">
-              <text class="name">{{ box.boxName }}</text>
-              <text class="code">ID: {{ box.boxCode }}</text>
-            </view>
-            <view :class="['status-badge', box.status === 1 ? 'online' : 'offline']">
-              <text class="dot"></text>
-              {{ box.status === 1 ? '在线' : '离线' }}
-            </view>
+          <view class="card-icon">
+            <text>📦</text>
           </view>
           
-          <view class="card-footer">
-            <text class="sub-info">最后连接: {{ formatDate(box.lastHeartbeatTime) }}</text>
-            <text class="arrow">→</text>
+          <view class="card-info">
+            <view class="top-row">
+              <text class="name">{{ box.boxName }}</text>
+              <view class="status-badge" :class="box.status===1?'online':'offline'">
+                {{ box.status===1 ? '在线' : '离线' }}
+              </view>
+            </view>
+            <text class="desc">编码: {{ box.boxCode }}</text>
           </view>
+          
+          <view class="arrow-btn">→</view>
+        </view>
+        
+        <view v-if="list.length === 0" class="empty-state">
+          <text>还没有盒子，点击右下角添加一个吧~</text>
         </view>
       </view>
-    </view>
+    </scroll-view>
 
-    <view class="fab-btn fade-in-up" @click="goEdit()">
-      <text class="plus">+</text>
-    </view>
+    <view class="fab" @click="goEdit()" hover-class="fab-hover">+</view>
   </view>
 </template>
 
@@ -47,140 +50,122 @@ import { ref } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
 import { getBoxList } from '@/api/index';
 import type { BoxDTO } from '@/common/types';
+import PCHeader from '@/components/PCHeader.vue';
 
 const list = ref<BoxDTO[]>([]);
 
 onShow(async () => {
-  const res = await getBoxList({ userId: 1001 }); // 假设当前用户ID
+  const res = await getBoxList({ userId: 1001 });
   if (res.code === 200) list.value = res.data;
 });
 
 const goDetail = (id: number) => uni.navigateTo({ url: `/pages/box/boxdetail?id=${id}` });
 const goEdit = () => uni.navigateTo({ url: '/pages/box/boxedit' });
-
-const formatDate = (str?: string) => str ? str.split(' ')[0] : '刚刚';
 </script>
 
 <style lang="scss" scoped>
-/* 引用 user.vue 风格变量 */
-$glass-bg: rgba(255, 255, 255, 0.85);
-$primary-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+/* 暖色主题变量 */
+$bg-color: #FFF9F0;
+$header-gradient: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); /* 香芋紫渐变 */
+$fab-gradient: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);
+$shadow-soft: 0 8rpx 20rpx rgba(161, 140, 209, 0.2);
 
-.page-container {
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f6f9fc 0%, #eef2f3 100%);
-  position: relative;
-  padding: 30rpx;
-  overflow: hidden;
+.page-root { 
+  min-height: 100vh; 
+  background-color: $bg-color; 
 }
 
-/* 装饰球 */
-.bg-shape {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  z-index: 0;
+/* PC 占位 */
+.pc-placeholder {
+  display: none; height: 80px;
+  @media screen and (min-width: 768px) { display: block; }
 }
-.shape-1 { width: 300px; height: 300px; background: rgba(79, 172, 254, 0.15); top: -100px; left: -50px; }
-.shape-2 { width: 250px; height: 250px; background: rgba(255, 154, 158, 0.15); bottom: 100px; right: -80px; }
 
-.content-wrapper { position: relative; z-index: 10; padding-bottom: 150rpx; }
-
-.header-title {
-  font-size: 40rpx;
-  font-weight: 800;
-  color: #333;
-  margin-bottom: 30rpx;
-  margin-left: 10rpx;
+/* 手机头部 */
+.mobile-header {
+  background: $header-gradient;
+  margin-bottom: 80rpx;
+  padding: 30rpx 30rpx 20rpx; /* 底部加高，为了圆弧效果 */
+  border-bottom-left-radius: 60rpx;
+  border-bottom-right-radius: 60rpx;
+  box-shadow: $shadow-soft;
+  
+  @media screen and (min-width: 768px) { display: none; }
+  
+  .header-content {
+    margin-top: 20rpx;
+    .title { font-size: 44rpx; font-weight: 800; color: #fff; display: block; margin-bottom: 8rpx; text-shadow: 2rpx 2rpx 4rpx rgba(0,0,0,0.1); }
+    .subtitle { font-size: 26rpx; color: rgba(255,255,255,0.9); }
+  }
 }
+
+/* 列表区域 */
+.list-scroll { 
+  height: 100%;
+  margin-top: -40rpx; /* 向上重叠 Header */
+  @media screen and (min-width: 768px) { margin-top: 20rpx; }
+}
+
+.list-body { padding: 0 30rpx 200rpx; }
 
 .box-card {
-  background: $glass-bg;
-  backdrop-filter: blur(20px);
-  border-radius: 30rpx;
+  background: #fff;
+  border-radius: 32rpx;
   padding: 30rpx;
   margin-bottom: 24rpx;
-  box-shadow: 0 10rpx 30rpx rgba(0,0,0,0.04);
-  border: 1px solid rgba(255,255,255,0.6);
+  display: flex; align-items: center;
+  box-shadow: 0 4rpx 15rpx rgba(0,0,0,0.03);
+  border: 1px solid rgba(255,255,255,1);
+  transition: transform 0.1s;
+  
+  &.card-hover { transform: scale(0.98); background: #fafafa; }
+  
+  .card-icon {
+    width: 100rpx; height: 100rpx; 
+    background: #F3E5F5; color: #BA68C8; /* 浅紫底色 */
+    border-radius: 28rpx; display: flex; align-items: center; justify-content: center;
+    font-size: 44rpx; margin-right: 24rpx;
+  }
+  
+  .card-info {
+    flex: 1;
+    .top-row { display: flex; align-items: center; margin-bottom: 6rpx; }
+    .name { font-size: 32rpx; font-weight: bold; color: #333; margin-right: 15rpx; }
+    
+    .status-badge {
+      font-size: 20rpx; padding: 2rpx 10rpx; border-radius: 10rpx;
+      &.online { background: #E8F5E9; color: #4CAF50; }
+      &.offline { background: #eee; color: #999; }
+    }
+    
+    .desc { font-size: 24rpx; color: #999; font-family: monospace; }
+  }
+  
+  .arrow-btn {
+    width: 60rpx; height: 60rpx; border-radius: 50%;
+    background: #f8f8f8; color: #ccc;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold;
+  }
+}
+
+.empty-state { text-align: center; color: #ccc; margin-top: 100rpx; font-size: 28rpx; }
+
+/* 悬浮按钮 FAB */
+.fab {
+  position: fixed; bottom: 100rpx; right: 40rpx;
+  width: 110rpx; height: 110rpx; border-radius: 50%;
+  background: $fab-gradient;
+  color: #fff; font-size: 60rpx; font-weight: 300;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 10rpx 25rpx rgba(255, 154, 158, 0.4);
+  z-index: 100;
   transition: transform 0.2s;
-}
-
-.card-hover { transform: scale(0.98); }
-
-.card-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20rpx;
-}
-
-.icon-wrapper {
-  width: 90rpx;
-  height: 90rpx;
-  background: #f0f7ff;
-  border-radius: 25rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 24rpx;
-  .box-icon { font-size: 44rpx; }
-}
-
-.info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  .name { font-size: 32rpx; font-weight: bold; color: #333; margin-bottom: 4rpx; }
-  .code { font-size: 22rpx; color: #999; font-family: monospace; }
-}
-
-.status-badge {
-  padding: 8rpx 16rpx;
-  border-radius: 30rpx;
-  font-size: 22rpx;
-  display: flex;
-  align-items: center;
-  font-weight: 500;
   
-  .dot { width: 10rpx; height: 10rpx; border-radius: 50%; margin-right: 8rpx; }
+  &.fab-hover { transform: scale(0.9); }
   
-  &.online { background: rgba(76, 217, 100, 0.15); color: #2ecc71; .dot { background: #2ecc71; } }
-  &.offline { background: rgba(144, 147, 153, 0.15); color: #909399; .dot { background: #909399; } }
+  @media screen and (min-width: 768px) {
+    right: 80rpx; bottom: 80rpx;
+  }
 }
-
-.card-footer {
-  border-top: 1px solid rgba(0,0,0,0.03);
-  padding-top: 20rpx;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  
-  .sub-info { font-size: 22rpx; color: #aaa; }
-  .arrow { color: #ccc; font-size: 28rpx; }
-}
-
-/* 悬浮按钮 */
-.fab-btn {
-  position: fixed;
-  bottom: 160rpx;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 110rpx;
-  height: 110rpx;
-  background: $primary-gradient;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 10rpx 30rpx rgba(79, 172, 254, 0.4);
-  z-index: 99;
-  
-  .plus { color: #fff; font-size: 60rpx; font-weight: 300; margin-top: -6rpx; }
-  &:active { transform: translateX(-50%) scale(0.95); }
-}
-
-/* 动画 */
-.fade-in-down { animation: fadeInDown 0.6s ease-out; }
-.fade-in-up { animation: fadeInUp 0.6s ease-out; }
-@keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 </style>

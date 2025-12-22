@@ -1,6 +1,7 @@
 <template>
   <view class="page-container">
-    <view class="bg-shape shape-1"></view>
+    <PCHeader current="item" />
+    <view class="pc-placeholder"></view>
 
     <view class="search-section fade-in-down">
       <view class="search-bar">
@@ -9,168 +10,207 @@
           class="search-input"
           v-model="keyword" 
           placeholder="搜索物品名称 / 标签..." 
-          placeholder-style="color: #bbb"
+          placeholder-style="color: #bbb; font-size: 28rpx;"
           confirm-type="search" 
           @confirm="search" 
         />
-        <view class="search-btn" @click="search">GO</view>
+        <view class="search-btn" @click="search" hover-class="btn-hover">搜索</view>
       </view>
     </view>
 
-    <scroll-view scroll-y class="result-list fade-in-up">
-      <view v-for="item in list" :key="item.id" class="item-card" @click="goDetail(item.id)" hover-class="card-hover">
-        <view class="icon-box">🏷️</view>
-        <view class="content">
-          <view class="top-row">
-            <text class="name">{{ item.itemName }}</text>
-            <text class="price">¥{{ item.price }}</text>
+    <scroll-view scroll-y class="result-list fade-in-up" :show-scrollbar="false">
+      <view class="list-padding">
+        <view v-for="item in list" :key="item.id" class="item-card" @click="goDetail(item.id)" hover-class="card-hover">
+          <view class="icon-box">
+            <text>{{ getItemIcon(item.itemTag) }}</text>
           </view>
-          <view class="btm-row">
-            <view class="tags" v-if="item.itemTag">
-              <text class="tag">{{ item.itemTag }}</text>
+          
+          <view class="content">
+            <view class="top-row">
+              <text class="name">{{ item.itemName }}</text>
+              <text class="price" v-if="item.price > 0">¥{{ item.price }}</text>
             </view>
-            <text class="loc">📍 {{ item.boxId }}号箱</text>
+            <view class="btm-row">
+              <view class="tags" v-if="item.itemTag">
+                <text class="tag">{{ item.itemTag }}</text>
+              </view>
+              <text class="loc">📍 {{ item.boxId }}号箱</text>
+            </view>
           </view>
+          
+          <view class="arrow">→</view>
+        </view>
+        
+        <view v-if="list.length === 0" class="empty-state">
+          <text v-if="keyword">没有找到 "{{ keyword }}" 相关的物品</text>
+          <text v-else>暂时没有物品，点击右下角添加</text>
         </view>
       </view>
-      
-      <view v-if="list.length === 0 && keyword" class="empty-state">
-        <text>未找到相关物品</text>
-      </view>
     </scroll-view>
+
+    <view class="fab" @click="goAdd" hover-class="fab-hover">+</view>
   </view>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { onShow } from '@dcloudio/uni-app';
 import { getItemList } from '@/api/index';
 import type { ItemDTO } from '@/common/types';
+import PCHeader from '@/components/PCHeader.vue';
 
 const keyword = ref('');
 const list = ref<ItemDTO[]>([]);
 
-// 初始化加载部分数据
-onMounted(() => search());
+// 每次显示页面都刷新数据
+onShow(() => search());
 
 const search = async () => {
-  const res = await getItemList({ itemTag: keyword.value });
+  // 调用 API 获取所有物品
+  const res = await getItemList({});
   if (res.code === 200) {
-    // 简单的前端过滤模拟
-    const kw = keyword.value.toLowerCase();
-    list.value = res.data.filter(i => 
-      !kw || 
-      i.itemName.toLowerCase().includes(kw) || 
-      (i.itemTag && i.itemTag.toLowerCase().includes(kw))
-    );
+    // 前端过滤实现搜索 (Mock模式下常用)
+    const kw = keyword.value.toLowerCase().trim();
+    if (!kw) {
+      list.value = res.data;
+    } else {
+      list.value = res.data.filter(i => 
+        i.itemName.toLowerCase().includes(kw) || 
+        (i.itemTag && i.itemTag.toLowerCase().includes(kw))
+      );
+    }
   }
 };
 
 const goDetail = (id: number) => uni.navigateTo({ url: `/pages/item/itemedit?id=${id}` });
+const goAdd = () => uni.navigateTo({ url: '/pages/item/itemedit' }); // 复用 edit 页做新增
+
+// 根据标签简单返回 Emoji
+const getItemIcon = (tag?: string) => {
+  if (!tag) return '📦';
+  if (tag.includes('衣')) return '👕';
+  if (tag.includes('数码') || tag.includes('电子')) return '📱';
+  if (tag.includes('书')) return '📚';
+  if (tag.includes('药')) return '💊';
+  return '🧸';
+};
 </script>
 
 <style lang="scss" scoped>
-$primary-color: #4facfe;
+/* 暖色主题 */
+$bg-color: #FFF9F0;
+$primary-pink: #FF9A9E;
+$search-btn-gradient: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);
 
 .page-container {
   height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: linear-gradient(135deg, #f6f9fc 0%, #eef2f3 100%);
+  display: flex; flex-direction: column;
+  background-color: $bg-color;
   position: relative;
-  overflow: hidden;
 }
 
-.bg-shape {
-  position: absolute;
-  width: 300rpx; height: 300rpx;
-  background: rgba(79, 172, 254, 0.1);
-  border-radius: 50%;
-  top: -50rpx; left: -50rpx;
-  filter: blur(80px);
+.pc-placeholder {
+  display: none; height: 80px;
+  @media screen and (min-width: 768px) { display: block; }
 }
 
 .search-section {
-  padding: 30rpx;
+  padding: 20rpx 30rpx;
+  background: $bg-color; /* 与背景同色 */
   z-index: 10;
 }
 
 .search-bar {
   background: #fff;
   border-radius: 50rpx;
-  height: 100rpx;
-  display: flex;
-  align-items: center;
-  padding: 0 20rpx 0 40rpx;
-  box-shadow: 0 10rpx 30rpx rgba(0,0,0,0.06);
+  height: 90rpx;
+  display: flex; align-items: center;
+  padding: 0 10rpx 0 30rpx;
+  box-shadow: 0 8rpx 20rpx rgba(161, 140, 209, 0.1);
+  border: 2px solid #fff;
   
-  .search-icon { font-size: 32rpx; margin-right: 20rpx; }
+  .search-icon { font-size: 32rpx; margin-right: 20rpx; opacity: 0.5; }
   
   .search-input {
-    flex: 1;
-    height: 100%;
-    font-size: 30rpx;
-    color: #333;
+    flex: 1; height: 100%; font-size: 30rpx; color: #333;
   }
   
   .search-btn {
-    background: linear-gradient(90deg, #a18cd1, #fbc2eb);
-    color: #fff;
-    font-size: 26rpx;
-    font-weight: bold;
-    padding: 12rpx 30rpx;
-    border-radius: 40rpx;
-    box-shadow: 0 4rpx 10rpx rgba(161, 140, 209, 0.3);
+    background: $search-btn-gradient;
+    color: #fff; font-size: 28rpx; font-weight: bold;
+    padding: 12rpx 34rpx; border-radius: 40rpx;
+    box-shadow: 0 4rpx 10rpx rgba(255, 154, 158, 0.3);
+    transition: transform 0.1s;
   }
+  .btn-hover { transform: scale(0.95); opacity: 0.9; }
 }
 
 .result-list {
   flex: 1;
-  padding: 0 30rpx;
-  box-sizing: border-box;
+  /* 解决滚动条问题 */
+  overflow: hidden; 
 }
 
+.list-padding { padding: 10rpx 30rpx 150rpx; }
+
 .item-card {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(10px);
-  border-radius: 30rpx;
+  background: #fff;
+  border-radius: 32rpx;
   padding: 30rpx;
-  margin-bottom: 20rpx;
-  display: flex;
-  align-items: center;
-  box-shadow: 0 5rpx 20rpx rgba(0,0,0,0.03);
-  transition: all 0.2s;
+  margin-bottom: 24rpx;
+  display: flex; align-items: center;
+  box-shadow: 0 4rpx 15rpx rgba(0,0,0,0.02);
+  border: 1px solid rgba(255,255,255,0.6);
+  transition: all 0.1s;
   
-  &.card-hover { transform: translateY(2rpx); box-shadow: none; }
+  &.card-hover { transform: scale(0.98); background: #fafafa; }
   
   .icon-box {
-    width: 80rpx; height: 80rpx;
-    background: #f0f2f5;
-    border-radius: 20rpx;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 40rpx;
-    margin-right: 24rpx;
+    width: 90rpx; height: 90rpx;
+    background: #FFF0F5; color: #333;
+    border-radius: 24rpx; display: flex; align-items: center; justify-content: center;
+    font-size: 44rpx; margin-right: 24rpx;
   }
   
   .content { flex: 1; }
   
   .top-row {
-    display: flex; justify-content: space-between; margin-bottom: 10rpx;
+    display: flex; justify-content: space-between; margin-bottom: 8rpx;
     .name { font-size: 32rpx; font-weight: bold; color: #333; }
-    .price { font-size: 30rpx; color: #ff9800; font-weight: 500; }
+    .price { font-size: 30rpx; color: #FF9A9E; font-weight: bold; }
   }
   
   .btm-row {
     display: flex; justify-content: space-between; align-items: center;
     .tag { 
-      font-size: 20rpx; color: #4facfe; 
-      background: rgba(79, 172, 254, 0.1); 
+      font-size: 20rpx; color: #a18cd1; 
+      background: #F3E5F5; 
       padding: 4rpx 12rpx; border-radius: 8rpx;
     }
     .loc { font-size: 22rpx; color: #999; }
   }
+
+  .arrow { color: #eee; font-weight: bold; margin-left: 20rpx; }
 }
 
 .empty-state { text-align: center; color: #ccc; margin-top: 100rpx; font-size: 28rpx; }
+
+/* 悬浮按钮 FAB */
+.fab {
+  position: fixed; bottom: 100rpx; right: 40rpx;
+  width: 110rpx; height: 110rpx; border-radius: 50%;
+  background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+  color: #fff; font-size: 60rpx; font-weight: 300;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 10rpx 25rpx rgba(161, 140, 209, 0.4);
+  z-index: 100;
+  
+  &.fab-hover { transform: scale(0.9); }
+  
+  @media screen and (min-width: 768px) {
+    right: 80rpx; bottom: 80rpx;
+  }
+}
 
 .fade-in-down { animation: fadeInDown 0.6s ease-out; }
 .fade-in-up { animation: fadeInUp 0.6s ease-out; }

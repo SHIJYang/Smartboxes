@@ -1,6 +1,9 @@
 <template>
   <view class="chat-container">
-    <view class="chat-header">
+    <PCHeader current="chat" />
+    <view class="pc-placeholder"></view>
+
+    <view class="mobile-header">
       <view class="header-content">
         <text class="header-icon">✨</text>
         <view>
@@ -10,7 +13,13 @@
       </view>
     </view>
 
-    <scroll-view scroll-y class="msg-box" :scroll-top="scrollTop" :scroll-with-animation="true">
+    <scroll-view 
+      scroll-y 
+      class="msg-box" 
+      :scroll-top="scrollTop" 
+      :scroll-with-animation="true"
+      :show-scrollbar="false"
+    >
       <view class="msg-padding">
         <view v-for="(m, i) in list" :key="i" :class="['row', m.role]">
           
@@ -31,19 +40,21 @@
           </view>
         </view>
       </view>
-      <view style="height: 180rpx;"></view>
+      
+      <view class="bottom-spacer"></view>
     </scroll-view>
 
     <view class="input-area">
       <view class="input-shell">
         <input 
+          class="chat-input"
           v-model="txt" 
           placeholder="例如：我的 Switch 藏哪啦？" 
           placeholder-style="color: #bbb; font-size: 28rpx;"
           confirm-type="send" 
           @confirm="send" 
         />
-        <button class="send-btn" @click="send" :loading="sending">
+        <button class="send-btn" @click="send" :loading="sending" :disabled="sending">
           <text v-if="!sending">发送</text>
         </button>
       </view>
@@ -53,8 +64,8 @@
 
 <script setup lang="ts">
 import { ref, nextTick } from 'vue';
-import { onShow, onLoad } from '@dcloudio/uni-app';
 import { sendChat } from '@/api/index';
+import PCHeader from '@/components/PCHeader.vue';
 
 const list = ref([
   { role: 'ai', text: '主人您好！我是收纳酱 (｡♥‿♥｡)' },
@@ -68,15 +79,18 @@ const scrollTop = ref(0);
 const send = async () => {
   if (!txt.value.trim() || sending.value) return;
   
+  // 1. 推入用户消息
   list.value.push({ role: 'user', text: txt.value });
   const q = txt.value;
   txt.value = '';
   sending.value = true;
-  
   scrollToBottom();
   
   try {
+    // 2. 发送请求
+    // 注意：userId 实际项目中应从 UserStore 获取
     const res = await sendChat({ userId: 1001, message: q });
+    
     if (res.code === 200) {
       list.value.push({ role: 'ai', text: res.data.reply });
     } else {
@@ -92,142 +106,125 @@ const send = async () => {
 
 const scrollToBottom = () => {
   nextTick(() => {
-    scrollTop.value = scrollTop.value + 10000; 
+    scrollTop.value = 9999999; 
   });
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 /* 页面背景：奶油色 */
 .chat-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
   background-color: #FFF9F0; 
+  position: relative;
+  
+  /* PC端居中并限制最大宽度，防止大屏拉伸 */
+  @media screen and (min-width: 768px) {
+    max-width: 100%;
+    margin: 0 auto;
+  }
 }
 
-/* 头部设计 - 尺寸已转 rpx */
-.chat-header {
+/* PC 占位符 */
+.pc-placeholder {
+  display: none; height: 60px; flex-shrink: 0;
+  @media screen and (min-width: 768px) { display: block; }
+}
+
+/* 手机端头部 (PC隐藏) */
+.mobile-header {
   background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);
-  /* 顶部留白增加，适应刘海屏 */
   padding: 48rpx 40rpx 40rpx; 
   border-bottom-left-radius: 60rpx;
   border-bottom-right-radius: 60rpx;
   box-shadow: 0 8rpx 30rpx rgba(255, 154, 158, 0.3);
   z-index: 10;
+  flex-shrink: 0;
+  
+  @media screen and (min-width: 768px) { display: none; }
 }
 
-.header-content {
-  display: flex;
-  align-items: center;
-}
-
-.header-icon {
-  font-size: 56rpx;
-  margin-right: 20rpx;
-}
-
+.header-content { display: flex; align-items: center; }
+.header-icon { font-size: 56rpx; margin-right: 20rpx; }
 .header-title {
-  font-size: 40rpx;
-  font-weight: 800;
-  color: #fff;
-  display: block;
+  font-size: 40rpx; font-weight: 800; color: #fff; display: block;
   text-shadow: 2rpx 2rpx 4rpx rgba(0,0,0,0.1);
 }
-
 .header-subtitle {
-  font-size: 26rpx;
-  color: rgba(255,255,255, 0.9);
-  margin-top: 4rpx;
-  display: block;
+  font-size: 26rpx; color: rgba(255,255,255, 0.9); margin-top: 4rpx; display: block;
 }
 
 /* 消息区域 */
 .msg-box {
   flex: 1;
   background-color: #FFF9F0;
+  height: 0; /* 配合 flex:1 */
+  
+  /* PC端滚动条优化 */
+  @media screen and (min-width: 768px) {
+    & ::-webkit-scrollbar { width: 6px; }
+    & ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 3px; }
+    & ::-webkit-scrollbar-track { background: transparent; }
+  }
 }
 
-.msg-padding {
-  padding: 40rpx 30rpx;
+.msg-padding { 
+  padding: 40rpx 30rpx; 
+  
+  /* PC端内容区限制宽度，居中显示，阅读体验更好 */
+  @media screen and (min-width: 768px) {
+    max-width: 900px;
+    margin: 0 auto;
+  }
 }
 
 .row {
-  display: flex;
-  margin-bottom: 50rpx;
-  align-items: flex-start;
+  display: flex; margin-bottom: 50rpx; align-items: flex-start;
 }
+.row.user { flex-direction: row-reverse; }
 
-.row.user {
-  flex-direction: row-reverse;
-}
-
-/* 头像样式 - 88rpx 约等于 44px */
-.avatar-wrapper {
-  flex-shrink: 0;
-  margin: 0 20rpx;
-}
+/* 头像 */
+.avatar-wrapper { flex-shrink: 0; margin: 0 20rpx; }
 
 .avatar {
-  width: 88rpx;
-  height: 88rpx;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 88rpx; height: 88rpx; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
   border: 6rpx solid #fff;
   box-shadow: 0 8rpx 16rpx rgba(0,0,0,0.08);
   overflow: hidden;
+  
+  &.ai { background: #A18CD1; }
+  &.user { background: #FBC2EB; }
 }
 
-.avatar.ai {
-  background: #A18CD1;
-}
+.avatar-emoji { font-size: 48rpx; }
+.avatar-img { width: 100%; height: 100%; }
 
-.avatar.user {
-  background: #FBC2EB;
-}
-
-.avatar-emoji {
-  font-size: 48rpx;
-}
-
-/* 气泡外壳 */
+/* 气泡 */
 .bubble-wrapper {
-  display: flex;
-  flex-direction: column;
-  max-width: 70%;
+  display: flex; flex-direction: column; max-width: 70%;
+  
+  /* PC端气泡稍微宽一点点，但不要太宽 */
+  @media screen and (min-width: 768px) { max-width: 60%; }
 }
-
-.row.user .bubble-wrapper {
-  align-items: flex-end;
-}
+.row.user .bubble-wrapper { align-items: flex-end; }
 
 .name-tag {
-  font-size: 20rpx;
-  color: #999;
-  margin-bottom: 8rpx;
-  margin-left: 10rpx;
+  font-size: 20rpx; color: #999; margin-bottom: 8rpx; margin-left: 10rpx;
 }
+.row.user .name-tag { margin-right: 10rpx; }
 
-.row.user .name-tag {
-  margin-right: 10rpx;
-}
-
-/* 气泡本体 */
 .bubble {
-  padding: 28rpx 36rpx;
-  border-radius: 40rpx;
-  font-size: 30rpx;
-  line-height: 1.5;
-  position: relative;
+  padding: 28rpx 36rpx; border-radius: 40rpx;
+  font-size: 30rpx; line-height: 1.5; position: relative;
   box-shadow: 4rpx 4rpx 20rpx rgba(0,0,0,0.05);
   word-break: break-all;
 }
 
 .row.ai .bubble {
-  background: #fff;
-  color: #555;
+  background: #fff; color: #555;
   border-top-left-radius: 8rpx; 
 }
 
@@ -238,52 +235,75 @@ const scrollToBottom = () => {
   font-weight: 500;
 }
 
-/* 输入区 */
+/* 底部留白 (防止被输入框遮挡) */
+.bottom-spacer {
+  height: 180rpx;
+}
+
+/* --- 输入区核心优化 --- */
 .input-area {
-  position: fixed;
-  bottom: 80rpx;
-  left: 0;
-  right: 0;
+  position: fixed; 
+  bottom: 66rpx; left: 0; right: 0;
+  z-index: 20;
+  
+  /* Mobile 样式 */
   background: rgba(255,249,240, 0.95);
-  /* 底部留白适配 iPhone Home 条：20rpx padding + constant(safe-area) */
   padding: 20rpx 30rpx calc(20rpx + constant(safe-area-inset-bottom)) 30rpx;
   padding-bottom: calc(20rpx + env(safe-area-inset-bottom)); 
   backdrop-filter: blur(10rpx);
-  z-index: 20;
+
+  /* PC 样式：悬浮、限宽、提高位置 */
+  @media screen and (min-width: 768px) {
+    background: transparent;
+    backdrop-filter: none;
+    padding: 0;
+    
+    /* 核心定位 */
+    left: 50%;
+    transform: translateX(-50%); /* 绝对居中 */
+    bottom: 50px; /* 距离底部 50px，不再紧贴 */
+    
+    width: 90%; 
+    max-width: 800px; /* 限制最大宽度 */
+  }
 }
 
 .input-shell {
   background: #fff;
   padding: 12rpx 12rpx 12rpx 40rpx;
+
   border-radius: 60rpx;
-  display: flex;
-  align-items: center;
+  display: flex; align-items: center;
   box-shadow: 0 10rpx 30rpx rgba(0,0,0,0.08);
   border: 4rpx solid #fff;
+  
+  /* PC端输入框阴影加深，更有悬浮感 */
+  @media screen and (min-width: 768px) {
+    box-shadow: 0 15rpx 40rpx rgba(0,0,0,0.12);
+    border: 1px solid rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.95); /* 玻璃质感 */
+    backdrop-filter: blur(10px);
+  }
 }
 
-.input-shell input {
-  flex: 1;
-  height: 72rpx;
-  font-size: 30rpx;
-  color: #333;
+.chat-input {
+  flex: 1; height: 72rpx; font-size: 30rpx; color: #333;
 }
 
 .send-btn {
   border-radius: 40rpx;
   background: linear-gradient(to right, #FF9A9E, #FECFEF);
-  color: #fff;
-  font-size: 28rpx;
-  padding: 0 40rpx;
-  height: 72rpx;
-  line-height: 72rpx;
-  border: none;
-  font-weight: bold;
-  margin-left: 20rpx;
+  color: #fff; font-size: 28rpx;
+  padding: 0 40rpx; height: 72rpx; line-height: 72rpx;
+  border: none; font-weight: bold; margin-left: 20rpx;
   box-shadow: 0 4rpx 10rpx rgba(255, 154, 158, 0.4);
-}
-
-.send-btn:active {
-  transform: scale(0.95);
+  cursor: pointer;
+  
+  &[disabled] { opacity: 0.6; filter: grayscale(0.5); cursor: not-allowed; }
+  
+  &:active { transform: scale(0.95); }
+  @media screen and (min-width: 768px) {
+    &:hover { filter: brightness(1.05); }
+  }
 }
 </style>

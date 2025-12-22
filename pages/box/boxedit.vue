@@ -1,18 +1,20 @@
 <template>
   <view class="page-container">
+    <PCHeader current="box" />
+    <view class="pc-placeholder"></view>
+
     <view class="bg-shape shape-1"></view>
-    <view class="bg-shape shape-2"></view>
 
     <view class="content-wrapper">
       <view class="header fade-in-down">
         <text class="title">{{ form.id ? '编辑盒子' : '新建盒子' }}</text>
-        <text class="subtitle">{{ form.id ? '修改盒子信息与状态' : '添加一个新的收纳容器' }}</text>
+        <text class="subtitle">{{ form.id ? '修改属性' : 'Create New Box' }}</text>
       </view>
 
       <view class="form-card fade-in-up">
         <view class="input-group">
           <view class="label">盒子名称</view>
-          <view class="input-wrapper">
+          <view class="input-shell">
             <text class="icon">📦</text>
             <input 
               class="inp" 
@@ -24,13 +26,13 @@
         </view>
 
         <view class="input-group">
-          <view class="label">设备编号 (Code)</view>
-          <view class="input-wrapper">
+          <view class="label">唯一编码 (Code)</view>
+          <view class="input-shell">
             <text class="icon">🔢</text>
             <input 
               class="inp" 
               v-model="form.boxCode" 
-              placeholder="请输入设备唯一编码" 
+              placeholder="设备背面的 ID" 
               placeholder-class="placeholder"
             />
           </view>
@@ -38,9 +40,14 @@
         
         <view class="input-group" v-if="form.id">
           <view class="label">状态模拟</view>
-          <view class="switch-wrapper">
-             <text>是否在线</text>
-             <switch :checked="form.status === 1" @change="e => form.status = e.detail.value ? 1 : 0" color="#4facfe" style="transform:scale(0.8)"/>
+          <view class="switch-row">
+             <text>设备在线</text>
+             <switch 
+               :checked="form.status === 1" 
+               @change="e => form.status = e.detail.value ? 1 : 0" 
+               color="#FF9A9E" 
+               style="transform:scale(0.8)"
+             />
           </view>
         </view>
       </view>
@@ -51,7 +58,7 @@
         </button>
         
         <button v-if="form.id" class="btn-del" hover-class="btn-hover" @click="remove">
-          删除此盒子
+          删除
         </button>
       </view>
     </view>
@@ -63,6 +70,7 @@ import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { getBoxDetail, saveBox, deleteBox } from '@/api/index';
 import type { BoxDTO } from '@/common/types';
+import PCHeader from '@/components/PCHeader.vue';
 
 const form = ref<BoxDTO>({ id: 0, boxName: '', boxCode: '', userId: 1001, status: 0, boxType: 1 });
 const submitting = ref(false);
@@ -94,7 +102,7 @@ const remove = async () => {
   uni.showModal({
     title: '确认删除',
     content: '删除后无法恢复，确定吗？',
-    confirmColor: '#ff6b81',
+    confirmColor: '#FF9A9E',
     success: async (res) => {
       if (res.confirm) {
         await deleteBox(form.value.id);
@@ -106,68 +114,72 @@ const remove = async () => {
 </script>
 
 <style lang="scss" scoped>
-/* 引入公共变量 (建议放在 uni.scss 中，这里直接写) */
-$primary-color: #4facfe;
-$glass-bg: rgba(255, 255, 255, 0.85);
+/* 统一暖色变量 */
+$bg-color: #FFF9F0;
+$primary-gradient: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);
 
 .page-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f6f9fc 0%, #eef2f3 100%);
-  position: relative;
+  background-color: $bg-color;
   padding: 40rpx;
+  position: relative;
   overflow: hidden;
 }
 
-/* 背景装饰 */
+.pc-placeholder {
+  display: none; height: 80px;
+  @media screen and (min-width: 768px) { display: block; }
+}
+
 .bg-shape {
   position: absolute;
+  width: 400rpx; height: 400rpx;
+  background: radial-gradient(circle, rgba(251, 194, 235, 0.2) 0%, rgba(255,255,255,0) 70%);
   border-radius: 50%;
-  filter: blur(80px);
-  z-index: 0;
+  top: -50rpx; right: -80rpx;
+  z-index: 0; pointer-events: none;
 }
-.shape-1 { width: 300rpx; height: 300rpx; background: rgba(79, 172, 254, 0.15); top: -60rpx; left: -60rpx; }
-.shape-2 { width: 200rpx; height: 200rpx; background: rgba(255, 154, 158, 0.15); bottom: 100rpx; right: -50rpx; }
 
 .content-wrapper { position: relative; z-index: 10; }
 
 .header {
   margin-bottom: 50rpx;
-  .title { font-size: 48rpx; font-weight: 800; color: #333; display: block; margin-bottom: 10rpx; }
+  .title { font-size: 56rpx; font-weight: 800; color: #333; display: block; margin-bottom: 10rpx; }
   .subtitle { font-size: 26rpx; color: #999; }
 }
 
 .form-card {
-  background: $glass-bg;
-  backdrop-filter: blur(20px);
+  background: #fff;
   border-radius: 40rpx;
   padding: 40rpx;
-  box-shadow: 0 20rpx 40rpx rgba(0,0,0,0.05);
-  border: 1px solid rgba(255,255,255,0.6);
+  box-shadow: 0 10rpx 40rpx rgba(161, 140, 209, 0.1);
 }
 
 .input-group {
   margin-bottom: 40rpx;
   &:last-child { margin-bottom: 0; }
   
-  .label { font-size: 28rpx; color: #666; margin-bottom: 16rpx; font-weight: 500; }
+  .label { font-size: 28rpx; color: #666; margin-bottom: 16rpx; font-weight: bold; padding-left: 10rpx;}
   
-  .input-wrapper {
-    display: flex;
-    align-items: center;
-    border-bottom: 2rpx solid #eee;
-    padding-bottom: 10rpx;
-    transition: border-color 0.3s;
+  /* 奶油风输入框：浅灰色胶囊背景 */
+  .input-shell {
+    background: #F8F8F8;
+    border-radius: 24rpx;
+    padding: 20rpx 30rpx;
+    display: flex; align-items: center;
+    border: 2rpx solid transparent;
+    transition: all 0.3s;
     
     .icon { font-size: 36rpx; margin-right: 20rpx; }
-    .inp { flex: 1; font-size: 32rpx; color: #333; height: 60rpx; }
-    .placeholder { color: #ccc; font-size: 28rpx; }
+    .inp { flex: 1; font-size: 30rpx; color: #333; height: 40rpx; }
+    .placeholder { color: #ccc; }
     
-    &:focus-within { border-bottom-color: $primary-color; }
+    &:focus-within { background: #fff; border-color: #FF9A9E; box-shadow: 0 4rpx 10rpx rgba(255, 154, 158, 0.2); }
   }
   
-  .switch-wrapper {
+  .switch-row {
     display: flex; justify-content: space-between; align-items: center;
-    font-size: 30rpx; color: #333;
+    padding: 0 10rpx; font-size: 30rpx; font-weight: bold; color: #555;
   }
 }
 
@@ -175,25 +187,24 @@ $glass-bg: rgba(255, 255, 255, 0.85);
   margin-top: 60rpx;
   
   .btn-save {
-    background: linear-gradient(90deg, #4facfe, #00f2fe);
+    background: $primary-gradient;
     color: #fff;
     border-radius: 50rpx;
-    font-size: 32rpx;
-    font-weight: bold;
-    box-shadow: 0 10rpx 20rpx rgba(79, 172, 254, 0.3);
+    font-size: 34rpx; font-weight: bold;
+    box-shadow: 0 10rpx 20rpx rgba(255, 154, 158, 0.3);
     margin-bottom: 30rpx;
     border: none;
-    
+    height: 100rpx; line-height: 100rpx;
     &::after { border: none; }
   }
   
   .btn-del {
-    background: rgba(255, 255, 255, 0.6);
+    background: #fff;
     color: #ff6b81;
-    border: 2rpx solid rgba(255, 107, 129, 0.3);
+    border: 2rpx solid #ffebee;
     border-radius: 50rpx;
-    font-size: 30rpx;
-    
+    font-size: 30rpx; font-weight: bold;
+    height: 90rpx; line-height: 90rpx;
     &::after { border: none; }
   }
   

@@ -1,49 +1,91 @@
 <template>
   <view class="page-container">
-    <view class="bg-shape shape-1"></view>
+    <PCHeader current="item" />
+    <view class="pc-placeholder"></view>
 
     <view class="content-wrapper">
       <view class="header fade-in-down">
-        <text class="title">{{ form.id ? '编辑物品' : '添加物品' }}</text>
-        <text class="subtitle">记录每一件心爱之物</text>
+        <text class="title">{{ form.id ? '编辑物品' : '新物品入库' }}</text>
+        <text class="subtitle">{{ form.id ? '修改物品信息' : '记录每一件心爱之物' }}</text>
       </view>
 
       <view class="form-card fade-in-up">
         <view class="input-group">
           <view class="label">物品名称</view>
-          <view class="input-wrapper">
+          <view class="input-shell">
             <text class="icon">✨</text>
-            <input class="inp" v-model="form.itemName" placeholder="例如：Switch 游戏机" placeholder-class="placeholder" />
+            <input 
+              class="inp" 
+              v-model="form.itemName" 
+              placeholder="例如：Switch 游戏机" 
+              placeholder-class="placeholder" 
+            />
+          </view>
+        </view>
+
+        <view class="input-group">
+          <view class="label">放入哪个盒子 (ID)</view>
+          <view class="input-shell">
+            <text class="icon">📦</text>
+            <input 
+              class="inp" 
+              type="number"
+              v-model.number="form.boxId" 
+              placeholder="输入盒子 ID (如: 1)" 
+              placeholder-class="placeholder" 
+            />
           </view>
         </view>
 
         <view class="input-group">
           <view class="label">分类标签</view>
-          <view class="input-wrapper">
+          <view class="input-shell">
             <text class="icon">🏷️</text>
-            <input class="inp" v-model="form.itemTag" placeholder="例如：数码 / 衣物" placeholder-class="placeholder" />
+            <input 
+              class="inp" 
+              v-model="form.itemTag" 
+              placeholder="例如：数码 / 衣物" 
+              placeholder-class="placeholder" 
+            />
           </view>
         </view>
         
         <view class="input-group">
           <view class="label">价值 (元)</view>
-          <view class="input-wrapper">
+          <view class="input-shell">
             <text class="icon">💰</text>
-            <input class="inp" type="digit" v-model.number="form.price" placeholder="0.00" placeholder-class="placeholder" />
+            <input 
+              class="inp" 
+              type="digit" 
+              v-model.number="form.price" 
+              placeholder="0.00" 
+              placeholder-class="placeholder" 
+            />
           </view>
         </view>
 
         <view class="input-group">
           <view class="label">备注信息</view>
-          <view class="textarea-wrapper">
-            <textarea class="area" v-model="form.itemDesc" placeholder="写点什么..." placeholder-class="placeholder" auto-height />
+          <view class="textarea-shell">
+            <textarea 
+              class="area" 
+              v-model="form.itemDesc" 
+              placeholder="写点什么..." 
+              placeholder-class="placeholder" 
+              auto-height 
+            />
           </view>
         </view>
       </view>
 
       <view class="action-area fade-in-up">
-        <button class="btn-save" hover-class="btn-hover" @click="submit" :loading="submitting">保 存</button>
-        <button v-if="form.id" class="btn-del" hover-class="btn-hover" @click="remove">删除物品</button>
+        <button class="btn-save" hover-class="btn-hover" @click="submit" :loading="submitting">
+          {{ submitting ? '保存中...' : '保 存' }}
+        </button>
+        
+        <button v-if="form.id" class="btn-del" hover-class="btn-hover" @click="remove">
+          删除物品
+        </button>
       </view>
     </view>
   </view>
@@ -54,12 +96,23 @@ import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { saveItem, getItemDetail, deleteItem } from '@/api/index';
 import type { ItemDTO } from '@/common/types';
+import PCHeader from '@/components/PCHeader.vue';
 
-const form = ref<ItemDTO>({ id: 0, boxId: 0, itemName: '', price: 0, itemTag: '', itemDesc: '' });
+// 默认数据
+const form = ref<ItemDTO>({ 
+  id: 0, 
+  boxId: 1, 
+  itemName: '', 
+  price: undefined, 
+  itemTag: '', 
+  itemDesc: '' 
+});
 const submitting = ref(false);
 
 onLoad(async (opt: any) => {
+  // 如果 URL 带了 boxId，说明是从盒子详情页点进来的，自动填好
   if (opt.boxId) form.value.boxId = parseInt(opt.boxId);
+  
   if (opt.id) {
     uni.setNavigationBarTitle({ title: '编辑物品' });
     const res = await getItemDetail(parseInt(opt.id));
@@ -70,7 +123,8 @@ onLoad(async (opt: any) => {
 });
 
 const submit = async () => {
-  if (!form.value.itemName) return uni.showToast({ title: '请输入名称', icon: 'none' });
+  if (!form.value.itemName) return uni.showToast({ title: '名字是必填的哦', icon: 'none' });
+  if (!form.value.boxId) return uni.showToast({ title: '请指定一个盒子', icon: 'none' });
   
   submitting.value = true;
   try {
@@ -84,9 +138,9 @@ const submit = async () => {
 
 const remove = async () => {
   uni.showModal({
-    title: '确认删除',
-    content: '确定要移除这个物品吗？',
-    confirmColor: '#ff6b81',
+    title: '删除确认',
+    content: '确定要丢弃这个物品记录吗？',
+    confirmColor: '#FF9A9E',
     success: async (res) => {
       if (res.confirm) {
         await deleteItem(form.value.id);
@@ -98,89 +152,81 @@ const remove = async () => {
 </script>
 
 <style lang="scss" scoped>
-/* 保持与 boxedit.vue 一致的样式变量 */
-$primary-color: #4facfe;
-$glass-bg: rgba(255, 255, 255, 0.85);
+/* 暖色主题 */
+$bg-color: #FFF9F0;
+$primary-gradient: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
 
 .page-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f6f9fc 0%, #eef2f3 100%);
+  background-color: $bg-color;
   padding: 40rpx;
   position: relative;
+  overflow: hidden;
 }
 
-.bg-shape {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  z-index: 0;
+.pc-placeholder {
+  display: none; height: 80px;
+  @media screen and (min-width: 768px) { display: block; }
 }
-.shape-1 { width: 300rpx; height: 300rpx; background: rgba(161, 140, 209, 0.15); top: -50rpx; right: -50rpx; }
 
 .content-wrapper { position: relative; z-index: 10; }
 
 .header {
   margin-bottom: 50rpx;
-  .title { font-size: 48rpx; font-weight: 800; color: #333; margin-bottom: 10rpx; display: block; }
+  .title { font-size: 56rpx; font-weight: 800; color: #333; margin-bottom: 10rpx; display: block; }
   .subtitle { font-size: 26rpx; color: #999; }
 }
 
 .form-card {
-  background: $glass-bg;
-  backdrop-filter: blur(20px);
+  background: #fff;
   border-radius: 40rpx;
   padding: 40rpx;
-  box-shadow: 0 20rpx 40rpx rgba(0,0,0,0.05);
-  border: 1px solid rgba(255,255,255,0.6);
+  box-shadow: 0 10rpx 40rpx rgba(161, 140, 209, 0.1);
 }
 
 .input-group {
   margin-bottom: 40rpx;
-  .label { font-size: 28rpx; color: #666; margin-bottom: 16rpx; font-weight: 500; }
+  &:last-child { margin-bottom: 0; }
   
-  .input-wrapper {
-    display: flex;
-    align-items: center;
-    border-bottom: 2rpx solid #eee;
-    padding-bottom: 10rpx;
-    transition: border-color 0.3s;
+  .label { font-size: 28rpx; color: #666; margin-bottom: 16rpx; font-weight: bold; padding-left: 10rpx; }
+  
+  /* 统一输入框样式 */
+  .input-shell, .textarea-shell {
+    background: #F8F8F8;
+    border-radius: 24rpx;
+    padding: 20rpx 30rpx;
+    display: flex; align-items: center;
+    border: 2rpx solid transparent;
+    transition: all 0.3s;
     
-    .icon { font-size: 34rpx; margin-right: 20rpx; }
-    .inp { flex: 1; font-size: 32rpx; color: #333; height: 60rpx; }
-    
-    &:focus-within { border-bottom-color: $primary-color; }
+    &:focus-within { background: #fff; border-color: #a18cd1; box-shadow: 0 4rpx 10rpx rgba(161, 140, 209, 0.2); }
   }
   
-  .textarea-wrapper {
-    background: #f9f9f9;
-    border-radius: 20rpx;
-    padding: 20rpx;
-    .area { width: 100%; min-height: 100rpx; font-size: 30rpx; color: #333; }
-  }
+  .icon { font-size: 36rpx; margin-right: 20rpx; }
+  .inp { flex: 1; font-size: 30rpx; color: #333; height: 40rpx; }
+  .area { width: 100%; min-height: 100rpx; font-size: 30rpx; color: #333; }
+  .placeholder { color: #ccc; }
 }
-
-.placeholder { color: #ccc; font-size: 28rpx; }
 
 .action-area {
   margin-top: 60rpx;
   .btn-save {
-    background: linear-gradient(90deg, #a18cd1, #fbc2eb); /* 使用稍微不同的柔和渐变 */
+    background: $primary-gradient;
     color: #fff;
     border-radius: 50rpx;
-    font-size: 32rpx;
-    font-weight: bold;
+    font-size: 34rpx; font-weight: bold;
     box-shadow: 0 10rpx 20rpx rgba(161, 140, 209, 0.3);
     margin-bottom: 30rpx;
     border: none;
+    height: 100rpx; line-height: 100rpx;
     &::after { border: none; }
   }
   
   .btn-del {
-    background: rgba(255,255,255,0.6);
-    color: #ff6b81;
-    border: 2rpx solid rgba(255, 107, 129, 0.3);
-    border-radius: 50rpx;
-    font-size: 30rpx;
+    background: #fff; color: #ff6b81;
+    border: 2rpx solid #ffebee; border-radius: 50rpx;
+    font-size: 30rpx; font-weight: bold;
+    height: 90rpx; line-height: 90rpx;
     &::after { border: none; }
   }
   .btn-hover { transform: scale(0.98); opacity: 0.9; }

@@ -3,6 +3,8 @@
 		"path": "pages/index/index",
 		"style": {
 			"navigationBarTitleText": "收纳概览"
+            // 【改动1】首页通常元素比较多，建议用自定义导航，方便放“扫一扫”大按钮
+            // "navigationStyle": "custom" 
 		}
 	}, {
 		"path": "pages/box/boxlist",
@@ -26,19 +28,9 @@
 			"navigationBarTitleText": "物品查找"
 		}
 	}, {
-		"path": "pages/item/search",
-		"style": {
-			"navigationBarTitleText": "物品搜索"
-		}
-	}, {
 		"path": "pages/item/itemedit",
 		"style": {
 			"navigationBarTitleText": "编辑物品"
-		}
-	}, {
-		"path": "pages/item/itemadd",
-		"style": {
-			"navigationBarTitleText": "添加物品"
 		}
 	}, {
 		"path": "pages/chat/chat",
@@ -48,7 +40,9 @@
 	}, {
 		"path": "pages/user/user",
 		"style": {
-			"navigationBarTitleText": "个人中心"
+			"navigationBarTitleText": "个人中心",
+             // 【改动2】个人中心通常有大背景图，强烈建议开启自定义
+            "navigationStyle": "custom"
 		}
 	}, {
 		"path": "pages/user/login",
@@ -57,36 +51,41 @@
 		}
 	},
 	{
-	      "path": "pages/user/register",
-	      "style": {
-	        "navigationBarTitleText": "用户注册",
-	        "navigationStyle": "custom"
-	      }
-	    }],
+		"path": "pages/user/register",
+		"style": {
+			"navigationBarTitleText": "用户注册",
+			"navigationStyle": "custom"
+		}
+	}],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "收纳管理",
-		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8"
+		"navigationBarTitleText": "魔法收纳盒",
+        // 【改动3】全局背景色改为“羊皮纸白”，保护眼睛且复古
+		"navigationBarBackgroundColor": "#FDF6E3",
+		"backgroundColor": "#FDF6E3"
+        // 【重要】如果你想让所有页面都用自己写的卡通 Header，就把下面这行取消注释
+        // "navigationStyle": "custom"
 	},
 	"tabBar": {
-		"color": "#909399",
-		"selectedColor": "#007aff",
-		"backgroundColor": "#fff",
+        // 【改动4】TabBar 文字颜色：未选中是深灰，选中是我们的“活力橙”或“黑”
+		"color": "#7f8c8d",
+		"selectedColor": "#2D3436", 
+		"backgroundColor": "#ffffff",
+        // 【改动5】上边框设为黑色，增加卡通硬边框的感觉 (仅部分平台支持，不支持的会自动变细线)
 		"borderStyle": "black",
 		"list": [{
 			"pagePath": "pages/index/index",
-			"text": "首页",
+			"text": "大厅",
 			"iconPath": "static/shouye.png",
 			"selectedIconPath": "static/shouye-a.png"
 		}, {
 			"pagePath": "pages/box/boxlist",
-			"text": "盒子",
+			"text": "宝箱",
 			"iconPath": "static/box.png",
 			"selectedIconPath": "static/box-a.png"
 		}, {
 			"pagePath": "pages/chat/chat",
-			"text": "助手",
+			"text": "精灵",
 			"iconPath": "static/chat.png",
 			"selectedIconPath": "static/chat-a.png"
 		}, {

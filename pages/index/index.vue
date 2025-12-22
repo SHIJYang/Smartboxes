@@ -1,30 +1,29 @@
 <template>
   <view class="home-container">
-    <view class="bg-layer">
-      <view class="bg-shape shape-1"></view>
-      <view class="bg-shape shape-2"></view>
+    <PCHeader current="index" />
+    <view class="pc-placeholder"></view>
+
+    <view class="mobile-header">
+      
+      
+      <view class="header-content">
+        <view class="text-group">
+          <text class="date">{{ currentDate }}</text>
+          <text class="greet">Hi, {{ user?.username || '收纳达人' }} ✨</text>
+        </view>
+        <view class="avatar-box" @click="go('/pages/user/user')">
+          <image v-if="user?.avatar" :src="user.avatar" class="avatar-img" mode="aspectFill" />
+          <view v-else class="avatar-placeholder">{{ user?.username?.charAt(0).toUpperCase() || 'U' }}</view>
+        </view>
+      </view>
     </view>
 
     <scroll-view scroll-y class="scroll-content" :show-scrollbar="false">
       
-      <view :style="{ height: statusBarHeight + 'px' }"></view>
-      
       <view class="main-wrapper">
         
-        <view class="welcome-section fade-in-down">
-          <view class="text-group">
-            <text class="date">{{ currentDate }}</text>
-            <text class="greet">Hi, {{ user?.username || '收纳达人' }}</text>
-            <text class="sub-greet">你的物品管家已就绪 ✨</text>
-          </view>
-          <view class="avatar-box" @click="go('/pages/user/user')">
-            <image v-if="user?.avatar" :src="user.avatar" class="avatar-img" mode="aspectFill" />
-            <view v-else class="avatar-placeholder">{{ user?.username?.charAt(0).toUpperCase() || 'U' }}</view>
-          </view>
-        </view>
-
         <view class="stats-panel fade-in-up">
-          <view class="stat-big-card blue" @click="go('/pages/box/boxlist')">
+          <view class="stat-big-card warm-orange" @click="go('/pages/box/boxlist')">
             <view class="inner">
               <view class="icon-circle">📦</view>
               <view class="data">
@@ -35,7 +34,7 @@
             <text class="bg-text">BOX</text>
           </view>
           
-          <view class="stat-big-card pink" @click="go('/pages/item/itemlist')">
+          <view class="stat-big-card warm-pink" @click="go('/pages/item/itemlist')">
             <view class="inner">
               <view class="icon-circle">🏷️</view>
               <view class="data">
@@ -52,7 +51,7 @@
           
           <view class="menu-grid">
             <view class="menu-card" hover-class="card-hover" @click="go('/pages/box/boxlist')">
-              <view class="icon-bg c-blue">📦</view>
+              <view class="icon-bg c-orange">📦</view>
               <view class="menu-info">
                 <text class="title">盒子管理</text>
                 <text class="desc">录入与编辑</text>
@@ -61,7 +60,7 @@
             </view>
 
             <view class="menu-card" hover-class="card-hover" @click="go('/pages/item/itemlist')">
-              <view class="icon-bg c-green">🔍</view>
+              <view class="icon-bg c-pink">🔍</view>
               <view class="menu-info">
                 <text class="title">查找物品</text>
                 <text class="desc">快速定位</text>
@@ -79,7 +78,7 @@
             </view>
 
             <view class="menu-card" hover-class="card-hover" @click="go('/pages/user/user')">
-              <view class="icon-bg c-orange">⚙️</view>
+              <view class="icon-bg c-blue">⚙️</view>
               <view class="menu-info">
                 <text class="title">系统设置</text>
                 <text class="desc">账号与偏好</text>
@@ -89,7 +88,7 @@
           </view>
         </view>
         
-        <view style="height: 40rpx;"></view>
+        <view style="height: 100rpx;"></view>
       </view>
     </scroll-view>
   </view>
@@ -101,21 +100,21 @@ import { onShow, onLoad } from '@dcloudio/uni-app';
 import type { UserDTO } from '@/common/types';
 import { getBoxList, getItemList } from '@/api/index';
 import { useUserStore } from '@/stores/user';
+// 引入你新建的 PC 导航栏组件
+import PCHeader from '@/components/PCHeader.vue';
 
 const user = ref<UserDTO | null>(null);
 const stats = ref({ boxes: 0, items: 0 });
 const userStore = useUserStore();
-const statusBarHeight = ref(20); // 默认高度
+const statusBarHeight = ref(20); 
 const currentDate = ref('');
 
 onLoad(() => {
-  // 1. 获取系统状态栏高度，实现沉浸式适配
   const sysInfo = uni.getSystemInfoSync();
   if (sysInfo.statusBarHeight) {
     statusBarHeight.value = sysInfo.statusBarHeight;
   }
   
-  // 2. 设置日期
   const now = new Date();
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   currentDate.value = `${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
@@ -127,6 +126,11 @@ onShow(async () => {
     user.value = u;
     await loadStats(u.id);
   }
+  
+  // 检查设备逻辑（可选，如果 App.vue 已经做了可以省略，但加上更保险）
+  const sys = uni.getSystemInfoSync();
+  if (sys.windowWidth > 768) uni.hideTabBar();
+  else uni.showTabBar();
 });
 
 const loadStats = async (userId: number) => {
@@ -152,82 +156,145 @@ const go = (url: string) => {
 </script>
 
 <style lang="scss" scoped>
-/* 变量定义 */
-$glass-bg: rgba(255, 255, 255, 0.85);
-$shadow-sm: 0 10rpx 20rpx rgba(0,0,0,0.03);
-$shadow-md: 0 15rpx 30rpx rgba(0,0,0,0.06);
+/* --- 变量定义 (Warm Theme) --- */
+$bg-color: #FFF9F0;         /* 奶油白背景 */
+$glass-bg: #FFFFFF;         /* 卡片背景改为纯白 */
+$shadow-sm: 0 8rpx 20rpx rgba(255, 154, 158, 0.15); /* 柔和粉色阴影 */
+$shadow-md: 0 12rpx 30rpx rgba(255, 154, 158, 0.25);
+$shadow-lg: 0 15rpx 40rpx rgba(255, 154, 158, 0.35); /* PC端悬浮阴影 */
+$primary-gradient: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%); /* 糖果粉渐变 */
 
 .home-container {
   height: 100vh;
   width: 100vw;
   position: relative;
   overflow: hidden;
-  background: #f6f9fc;
+  background: $bg-color;
+  display: flex;
+  flex-direction: column;
 }
 
-/* 1. 背景层 (绝对定位) */
-.bg-layer {
-  position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
-  pointer-events: none; /* 允许点击穿透 */
-  
-  .bg-shape {
-    position: absolute; border-radius: 50%; filter: blur(80px);
+/* 1. PC 占位符 */
+.pc-placeholder {
+  display: none;
+  /* 假设 PC Header 高度约 60px - 80px */
+  height: 60px; 
+  flex-shrink: 0;
+  @media screen and (min-width: 768px) {
+    display: block;
   }
-  .shape-1 { width: 400rpx; height: 400rpx; background: rgba(79, 172, 254, 0.12); top: -100rpx; right: -100rpx; }
-  .shape-2 { width: 300rpx; height: 300rpx; background: rgba(251, 194, 235, 0.15); top: 30%; left: -100rpx; }
 }
 
-/* 2. 滚动容器 */
-.scroll-content {
-  height: 100%;
-  width: 100%;
-  position: relative;
-  z-index: 10;
-}
+/* 2. 手机端 Header */
+.mobile-header {
+  background: $primary-gradient;
+  margin-bottom: 60rpx; /* 底部留白给圆弧 */
+  border-bottom-left-radius: 60rpx;
+  border-bottom-right-radius: 60rpx;
+  box-shadow: $shadow-md;
+  flex-shrink: 0;
+  
+  @media screen and (min-width: 768px) {
+    display: none; /* 电脑端隐藏 */
+  }
 
-.main-wrapper {
-  padding: 20rpx 30rpx 40rpx;
-}
-
-/* A. 欢迎区 */
-.welcome-section {
-  display: flex; justify-content: space-between; align-items: flex-start;
-  margin-top: 20rpx; margin-bottom: 50rpx;
+  .header-content {
+    padding: 20rpx 40rpx;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
   
   .text-group {
-    .date { font-size: 24rpx; color: #999; margin-bottom: 6rpx; letter-spacing: 1rpx; text-transform: uppercase; }
-    .greet { font-size: 44rpx; font-weight: 800; color: #333; margin-bottom: 8rpx; }
-    .sub-greet { font-size: 26rpx; color: #666; }
+    .date { 
+      font-size: 24rpx; color: rgba(255,255,255,0.8); 
+      margin-bottom: 6rpx; letter-spacing: 1rpx; text-transform: uppercase; 
+    }
+    .greet { 
+      font-size: 44rpx; font-weight: 800; color: #fff; 
+      text-shadow: 2rpx 2rpx 4rpx rgba(0,0,0,0.1);
+    }
   }
   
   .avatar-box {
-    width: 100rpx; height: 100rpx;
-    border-radius: 30rpx;
-    background: #fff;
-    box-shadow: $shadow-md;
+    width: 90rpx; height: 90rpx;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    border: 4rpx solid #fff;
     display: flex; align-items: center; justify-content: center;
     overflow: hidden;
-    border: 4rpx solid #fff;
+    cursor: pointer;
     
     .avatar-img { width: 100%; height: 100%; }
-    .avatar-placeholder { font-size: 40rpx; font-weight: bold; color: #4facfe; }
+    .avatar-placeholder { font-size: 36rpx; font-weight: bold; color: #fff; }
   }
 }
 
-/* B. 核心数据看板 */
-.stats-panel {
-  display: flex; justify-content: space-between; margin-bottom: 50rpx;
+/* 3. 滚动容器 */
+.scroll-content {
+  flex: 1;
+  height: 0; /* 配合 flex: 1 确保滚动正常 */
+  width: 100%;
+  position: relative;
   
+  /* 移动端：让内容稍微向上浮动，盖住 Header 的底部圆弧 */
+  margin-top: -30rpx; 
+  padding-top: 0;
+  
+  @media screen and (min-width: 768px) {
+    margin-top: 0;
+    /* PC端优化滚动条 */
+    & ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    & ::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+    }
+  }
+}
+
+/* 核心布局容器 */
+.main-wrapper {
+  padding: 0 30rpx 40rpx;
+
+  /* --- PC端响应式布局优化 --- */
+  @media screen and (min-width: 768px) {
+    max-width: 1200px; /* 限制最大宽度，防止大屏拉伸 */
+    margin: 0 auto;    /* 居中显示 */
+    padding: 40px 20px; /* 增加内边距 */
+  }
+}
+
+/* A. 统计看板 */
+.stats-panel {
+  display: flex; 
+  justify-content: space-between; 
+  margin-bottom: 40rpx;
+  gap: 40rpx;
   .stat-big-card {
-    width: 48%; height: 240rpx;
+    width: 48%; 
+    height: 240rpx;
     border-radius: 36rpx;
     padding: 30rpx;
     position: relative;
     overflow: hidden;
-    box-shadow: $shadow-md;
-    transition: transform 0.2s;
+    box-shadow: $shadow-sm;
+    transition: all 0.3s ease; /* 平滑过渡 */
+    cursor: pointer;
     
+    /* 移动端点击效果 */
     &:active { transform: scale(0.98); }
+
+    /* PC端 Hover 效果 */
+    @media screen and (min-width: 768px) {
+      height: 200px; /* PC端稍微加高 */
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: $shadow-lg;
+      }
+    }
     
     .inner {
       position: relative; z-index: 2; height: 100%;
@@ -236,53 +303,68 @@ $shadow-md: 0 15rpx 30rpx rgba(0,0,0,0.06);
     
     .icon-circle {
       width: 70rpx; height: 70rpx; border-radius: 50%;
-      background: rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.3);
       backdrop-filter: blur(5px);
       display: flex; align-items: center; justify-content: center;
       font-size: 34rpx;
     }
     
     .data {
-      .num { font-size: 56rpx; font-weight: 800; color: #fff; line-height: 1; display: block; margin-bottom: 10rpx; }
-      .lbl { font-size: 24rpx; color: rgba(255,255,255,0.9); }
+      .num { font-size: 56rpx; font-weight: 900; color: #fff; line-height: 1; display: block; margin-bottom: 10rpx; }
+      .lbl { font-size: 24rpx; color: rgba(255,255,255,0.95); font-weight: bold;}
     }
     
     .bg-text {
       position: absolute; bottom: -20rpx; right: -10rpx;
       font-size: 80rpx; font-weight: 900;
-      color: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.15);
       transform: rotate(-15deg);
       z-index: 1;
+      pointer-events: none; /* 防止遮挡点击 */
     }
     
-    &.blue { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-    &.pink { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    /* 暖色渐变修改 */
+    &.warm-orange { background: linear-gradient(135deg, #fad0c4 0%, #ffd1ff 100%); .icon-circle { color: #fff; } }
+    &.warm-pink { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); .icon-circle { color: #fff; } }
   }
 }
 
-/* C. 菜单宫格 */
+/* B. 菜单宫格 */
 .menu-section {
   .section-header {
-    font-size: 34rpx; font-weight: bold; color: #333;
-    margin-bottom: 30rpx; display: block; padding-left: 10rpx;
+    font-size: 32rpx; font-weight: 800; color: #333;
+    margin-bottom: 24rpx; display: block; padding-left: 10rpx;
+    
+    @media screen and (min-width: 768px) {
+      font-size: 24px;
+      margin-bottom: 30rpx;
+    }
   }
   
   .menu-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    /* 移动端保持两列 */
+    grid-template-columns: 1fr 1fr; 
     gap: 24rpx;
+
+    /* PC端改为四列 */
+    @media screen and (min-width: 768px) {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 30rpx;
+    }
   }
   
   .menu-card {
     background: $glass-bg;
-    backdrop-filter: blur(15px);
     border-radius: 32rpx;
     padding: 30rpx;
     display: flex; align-items: center;
-    border: 1px solid rgba(255,255,255,0.6);
+    border: 1px solid rgba(255,255,255,1); /* 纯白边框 */
     box-shadow: $shadow-sm;
     position: relative;
     overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
     
     .icon-bg {
       width: 80rpx; height: 80rpx; border-radius: 24rpx;
@@ -290,10 +372,11 @@ $shadow-md: 0 15rpx 30rpx rgba(0,0,0,0.06);
       font-size: 36rpx; margin-right: 20rpx;
       flex-shrink: 0;
       
-      &.c-blue { background: rgba(79, 172, 254, 0.1); color: #4facfe; }
-      &.c-green { background: rgba(66, 211, 146, 0.1); color: #42d392; }
-      &.c-purple { background: rgba(161, 140, 209, 0.1); color: #a18cd1; }
-      &.c-orange { background: rgba(255, 154, 158, 0.1); color: #ff9a9e; }
+      /* 暖色系背景 */
+      &.c-orange { background: #FFF3E0; color: #FFB74D; }
+      &.c-pink { background: #FCE4EC; color: #F48FB1; }
+      &.c-purple { background: #F3E5F5; color: #BA68C8; }
+      &.c-blue { background: #E3F2FD; color: #64B5F6; }
     }
     
     .menu-info {
@@ -302,15 +385,26 @@ $shadow-md: 0 15rpx 30rpx rgba(0,0,0,0.06);
       .desc { font-size: 20rpx; color: #999; }
     }
     
-    .arrow { color: #ddd; font-size: 24rpx; font-weight: 300; }
+    .arrow { color: #eee; font-size: 24rpx; font-weight: 300; }
     
-    &.card-hover { transform: scale(0.98); background: #fff; }
+    /* 交互效果 */
+    &.card-hover { transform: scale(0.98); background: #fafafa; }
+    
+    @media screen and (min-width: 768px) {
+      padding: 40rpx 30rpx;
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: $shadow-lg;
+        background: #fff;
+      }
+      /* PC端箭头隐藏或调整 */
+      .arrow { opacity: 0; transition: opacity 0.3s; }
+      &:hover .arrow { opacity: 1; color: #FF9A9E; }
+    }
   }
 }
 
 /* 动画 */
-.fade-in-down { animation: fadeInDown 0.6s ease-out; }
 .fade-in-up { animation: fadeInUp 0.6s ease-out; }
-@keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 </style>
