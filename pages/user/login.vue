@@ -14,10 +14,7 @@
       </view>
 
       <view class="card fade-in-up">
-        <view class="welcome-row">
-          <text class="h1">欢迎回家</text>
-          <text class="h2">开启你的整理魔法 ✨</text>
-        </view>
+       
 
         <view class="input-group" :class="{ 'input-focus': focusField === 'account' }">
           <view class="icon-wrapper">👤</view>
@@ -25,7 +22,7 @@
             class="inp" 
             v-model="formData.userAccount" 
             type="text" 
-            placeholder="账号 / 魔法ID" 
+            placeholder="账号" 
             placeholder-class="placeholder-style"
             @focus="focusField = 'account'"
             @blur="focusField = ''"
@@ -39,7 +36,7 @@
             v-model="formData.userPassword" 
             type="safe-password" 
             password
-            placeholder="输入咒语 (密码)" 
+            placeholder="密码" 
             placeholder-class="placeholder-style"
             @focus="focusField = 'password'"
             @blur="focusField = ''"
@@ -54,13 +51,13 @@
           :loading="loggingIn"
           :disabled="loggingIn"
         >
-          {{ loggingIn ? '咏唱中...' : '开 启 宝 箱' }}
+          {{ loggingIn ? '登录中...' : '登录' }}
         </button>
 
         <view class="footer-links">
           <text class="link-text" @click="toRegister">注册新账号</text>
           <text class="divider">|</text>
-          <text class="link-text">忘记咒语?</text>
+          <text class="link-text">忘记密码?</text>
         </view>
       </view>
     </view>
@@ -146,7 +143,7 @@ $primary-pink: #FF9A9E;
   
   .logo-box {
     width: 140rpx; height: 140rpx; background: #fff; border-radius: 40rpx;
-    margin: 0 auto 30rpx; display: flex; align-items: center; justify-content: center;
+    margin: 0rpx auto 60rpx; display: flex; align-items: center; justify-content: center;
     box-shadow: 0 15rpx 35rpx rgba(161, 140, 209, 0.15);
     animation: float 6s infinite ease-in-out;
     .logo-icon { font-size: 70rpx; }

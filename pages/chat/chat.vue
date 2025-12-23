@@ -243,7 +243,7 @@ const scrollToBottom = () => {
 /* --- 输入区核心优化 --- */
 .input-area {
   position: fixed; 
-  bottom: 66rpx; left: 0; right: 0;
+  bottom: 126rpx; left: 0; right: 0;
   z-index: 20;
   
   /* Mobile 样式 */

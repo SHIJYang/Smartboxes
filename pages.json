@@ -2,14 +2,13 @@
 	"pages": [{
 		"path": "pages/index/index",
 		"style": {
-			"navigationBarTitleText": "收纳概览"
-            // 【改动1】首页通常元素比较多，建议用自定义导航，方便放“扫一扫”大按钮
-            // "navigationStyle": "custom" 
+			"navigationStyle": "custom"
+            
 		}
 	}, {
 		"path": "pages/box/boxlist",
 		"style": {
-			"navigationBarTitleText": "我的盒子",
+			"navigationStyle": "custom"
 			"enablePullDownRefresh": true
 		}
 	}, {
@@ -35,7 +34,7 @@
 	}, {
 		"path": "pages/chat/chat",
 		"style": {
-			"navigationBarTitleText": "AI 助手"
+			"navigationStyle": "custom"
 		}
 	}, {
 		"path": "pages/user/user",
@@ -47,6 +46,7 @@
 	}, {
 		"path": "pages/user/login",
 		"style": {
+			"navigationStyle": "custom"
 			"navigationBarTitleText": "登录"
 		}
 	},

@@ -4,8 +4,6 @@
     <view class="pc-placeholder"></view>
 
     <view class="mobile-header">
-      
-      
       <view class="header-content">
         <view class="text-group">
           <text class="date">{{ currentDate }}</text>
