@@ -9,7 +9,7 @@
         <input 
           class="search-input"
           v-model="keyword" 
-          placeholder="搜索物品名称 / 标签..." 
+          placeholder="搜索物品编码 / 标签..." 
           placeholder-style="color: #bbb; font-size: 28rpx;"
           confirm-type="search" 
           @confirm="search" 
@@ -27,8 +27,8 @@
           
           <view class="content">
             <view class="top-row">
-              <text class="name">{{ item.itemName }}</text>
-              <text class="price" v-if="item.price > 0">¥{{ item.price }}</text>
+              <text class="name">{{ getDisplayName(item) }}</text>
+              <text class="code" v-if="item.itemCode">#{{ item.itemCode }}</text>
             </view>
             <view class="btm-row">
               <view class="tags" v-if="item.itemTag">
@@ -75,8 +75,10 @@ const search = async () => {
       list.value = res.data;
     } else {
       list.value = res.data.filter(i => 
-        i.itemName.toLowerCase().includes(kw) || 
-        (i.itemTag && i.itemTag.toLowerCase().includes(kw))
+        (i.itemCode && i.itemCode.toLowerCase().includes(kw)) || 
+        (i.itemTag && i.itemTag.toLowerCase().includes(kw)) ||
+        (i.autoRecognizeName && i.autoRecognizeName.toLowerCase().includes(kw)) ||
+        (i.manualEditName && i.manualEditName.toLowerCase().includes(kw))
       );
     }
   }
@@ -84,6 +86,13 @@ const search = async () => {
 
 const goDetail = (id: number) => uni.navigateTo({ url: `/pages/item/itemedit?id=${id}` });
 const goAdd = () => uni.navigateTo({ url: '/pages/item/itemedit' }); // 复用 edit 页做新增
+
+// 获取显示名称（优先显示手动编辑的名称，其次自动识别的名称）
+const getDisplayName = (item: ItemDTO) => {
+  if (item.manualEditName) return item.manualEditName;
+  if (item.autoRecognizeName) return item.autoRecognizeName;
+  return item.itemCode || '未命名物品';
+};
 
 // 根据标签简单返回 Emoji
 const getItemIcon = (tag?: string) => {
@@ -95,7 +104,6 @@ const getItemIcon = (tag?: string) => {
   return '🧸';
 };
 </script>
-
 <style lang="scss" scoped>
 /* 暖色主题 */
 $bg-color: #FFF9F0;

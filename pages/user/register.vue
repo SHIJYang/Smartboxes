@@ -89,8 +89,10 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import { registerUser } from '@/api/index';
 import type { UserDO } from '@/common/types';
+import { useStores } from '@/stores';
+
+const { userStore } = useStores();
 
 const formData = reactive<UserDO>({ userAccount: '', userPassword: '', username: '', phone: '' });
 const confirmPassword = ref('');
@@ -109,15 +111,17 @@ const handleRegister = async () => {
   
   submitting.value = true;
   try {
-    const res = await registerUser(formData);
-    if (res.code === 200) {
+    const result = await userStore.register(formData);
+    
+    if (result.success) {
       uni.showToast({ title: '注册成功!', icon: 'success' });
       setTimeout(() => uni.navigateBack(), 1500);
     } else {
-      uni.showToast({ title: res.msg || '失败了', icon: 'none' });
+      uni.showToast({ title: result.message || '注册失败', icon: 'none' });
     }
   } catch (error) {
     uni.showToast({ title: '网络开小差了', icon: 'none' });
+    console.error('注册错误:', error);
   } finally {
     submitting.value = false;
   }
@@ -138,6 +142,7 @@ $primary-pink: #FF9A9E;
   position: relative;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   overflow: hidden;
+  padding: 40rpx 0;
 }
 
 .bubble {
@@ -172,4 +177,114 @@ $primary-pink: #FF9A9E;
   display: flex; align-items: center;
   background: #FFF5F7;
   border-radius: 30rpx; padding: 0 30rpx; margin-bottom: 30rpx;
-  height: 100rpx; border: 2rpx solid transparent; transition: all 0.3s
+  height: 100rpx; border: 2rpx solid transparent; transition: all 0.3s ease;
+  
+  &.input-focus {
+    background: #fff;
+    border-color: $primary-pink;
+    box-shadow: 0 6rpx 20rpx rgba(255, 154, 158, 0.2);
+  }
+  
+  .icon-box {
+    font-size: 38rpx; color: $primary-pink; margin-right: 20rpx;
+    width: 50rpx; text-align: center;
+  }
+  
+  .inp {
+    flex: 1; font-size: 30rpx; color: #333; height: 100rpx; line-height: 100rpx;
+    background: transparent; border: none; outline: none;
+    
+    &::placeholder { color: #ccc; font-size: 28rpx; }
+  }
+}
+
+.btn-login {
+  width: 100%; height: 100rpx; line-height: 100rpx; border-radius: 50rpx;
+  background: $btn-gradient; color: #fff; font-size: 34rpx; font-weight: 800;
+  margin-top: 20rpx; margin-bottom: 40rpx; border: none; position: relative;
+  overflow: hidden; z-index: 1;
+  
+  &::after { border: none; }
+  
+  &::before {
+    content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(120deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.3));
+    transition: all 0.6s ease; z-index: -1;
+  }
+  
+  &:hover::before, &.btn-hover::before {
+    left: 100%;
+  }
+  
+  &:disabled, &[loading] {
+    opacity: 0.7;
+  }
+}
+
+.footer-links {
+  text-align: center; margin-top: 30rpx;
+  .link-text {
+    color: $primary-pink; font-size: 28rpx; text-decoration: none;
+    position: relative; display: inline-block; padding: 10rpx 0;
+    
+    &::after {
+      content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 0; height: 2rpx; background: $primary-pink; transition: all 0.3s ease;
+    }
+    
+    &:hover::after, &:active::after {
+      width: 100%;
+    }
+  }
+}
+
+.copyright {
+  position: absolute; bottom: 40rpx; left: 0; right: 0; text-align: center;
+  font-size: 24rpx; color: #ccc; z-index: 10;
+}
+
+/* 动画效果 */
+.fade-in-down {
+  animation: fadeInDown 0.6s ease-out;
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.placeholder-style {
+  color: #ccc; font-size: 28rpx;
+}
+
+@media screen and (min-width: 768px) {
+  .content-box {
+    width: 600rpx; margin: 0 auto;
+  }
+  
+  .card {
+    padding: 60rpx 50rpx;
+  }
+}
+</style>

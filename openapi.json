@@ -1,1087 +1,1163 @@
 {
-	"openapi": "3.0.1",
-	"info": {
-		"title": "智能收纳盒系统 API 文档",
-		"description": "智能收纳盒系统的RESTful API接口文档",
-		"contact": {
-			"name": "14577",
-			"email": ""
-		},
-		"license": {
-			"name": "Apache 2.0",
-			"url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-		},
-		"version": "v1.0.0"
-	},
-	"servers": [{
-		"url": "http://localhost:8080",
-		"description": "Generated server url"
-	}],
-	"tags": [{
-		"name": "盒子管理",
-		"description": "盒子相关API"
-	}, {
-		"name": "商品管理",
-		"description": "商品相关API"
-	}, {
-		"name": "用户管理",
-		"description": "用户相关API"
-	}, {
-		"name": "AI聊天",
-		"description": "AI聊天相关接口"
-	}, {
-		"name": "错误修复管理",
-		"description": "错误日志和降级管理API"
-	}, {
-		"name": "情感标签管理",
-		"description": "情感标签相关API"
-	}],
-	"paths": {
-		"/api/users/{id}": {
-			"get": {
-				"tags": ["用户管理"],
-				"summary": "根据ID获取用户",
-				"description": "根据用户ID获取用户详细信息",
-				"operationId": "getUserById",
-				"parameters": [{
-					"name": "id",
-					"in": "path",
-					"required": true,
-					"schema": {
-						"type": "integer",
-						"format": "int64"
-					}
-				}],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/UserDTO"
-								}
-							}
-						}
-					}
-				}
-			},
-			"put": {
-				"tags": ["用户管理"],
-				"summary": "更新用户",
-				"description": "更新用户基本信息",
-				"operationId": "updateUser",
-				"parameters": [{
-					"name": "id",
-					"in": "path",
-					"required": true,
-					"schema": {
-						"type": "integer",
-						"format": "int64"
-					}
-				}],
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/UserDO"
-							}
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/UserDTO"
-								}
-							}
-						}
-					}
-				}
-			},
-			"delete": {
-				"tags": ["用户管理"],
-				"summary": "删除用户",
-				"description": "删除指定的用户账户",
-				"operationId": "deleteUser",
-				"parameters": [{
-					"name": "id",
-					"in": "path",
-					"required": true,
-					"schema": {
-						"type": "integer",
-						"format": "int64"
-					}
-				}],
-				"responses": {
-					"200": {
-						"description": "OK"
-					}
-				}
-			}
-		},
-		"/api/items/update": {
-			"put": {
-				"tags": ["商品管理"],
-				"summary": "更新商品信息",
-				"description": "更新商品的基本信息",
-				"operationId": "updateItem",
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/ItemDTO"
-							}
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/RestResultVoid"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/emotions/update": {
-			"put": {
-				"tags": ["情感标签管理"],
-				"summary": "更新情感标签",
-				"description": "更新情感标签信息",
-				"operationId": "updateEmotion",
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/EmotionDTO"
-							}
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/RestResultVoid"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/boxes/update": {
-			"put": {
-				"tags": ["盒子管理"],
-				"summary": "修改盒子",
-				"operationId": "updateBox",
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/BoxDTO"
-							}
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/RestResultVoid"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/users": {
-			"get": {
-				"tags": ["用户管理"],
-				"summary": "获取所有用户",
-				"description": "获取系统中所有用户列表",
-				"operationId": "getAllUsers",
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"*/*": {
-								"schema": {
-									"type": "array",
-									"items": {
-										"$ref": "#/components/schemas/UserDTO"
-									}
-								}
-							}
-						}
-					}
-				}
-			},
-			"post": {
-				"tags": ["用户管理"],
-				"summary": "创建用户",
-				"description": "创建新的用户账户",
-				"operationId": "createUser",
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/UserDO"
-							}
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/UserDTO"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/users/login": {
-			"post": {
-				"tags": ["用户管理"],
-				"summary": "用户登录",
-				"description": "通过账号密码登录，返回Token",
-				"operationId": "login",
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/LoginRequest"
-							}
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"*/*": {
-								"schema": {
-									"type": "object",
-									"additionalProperties": {
-										"type": "object"
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/items/add": {
-			"post": {
-				"tags": ["商品管理"],
-				"summary": "添加新商品",
-				"description": "创建新的商品记录",
-				"operationId": "addItem",
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/ItemDTO"
-							}
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/RestResultVoid"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/error-recovery/trigger-fallback": {
-			"post": {
-				"tags": ["错误修复管理"],
-				"summary": "触发优雅降级策略",
-				"description": "在服务异常时触发降级策略",
-				"operationId": "triggerGracefulFallback",
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/FallbackRequestDTO"
-							}
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/RestResultObject"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/error-recovery/record-error": {
-			"post": {
-				"tags": ["错误修复管理"],
-				"summary": "记录运行时错误",
-				"description": "记录系统运行时错误日志",
-				"operationId": "recordRuntimeError",
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/ErrorLogDTO"
-							}
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/RestResultVoid"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/emotions/add": {
-			"post": {
-				"tags": ["情感标签管理"],
-				"summary": "添加情感标签",
-				"description": "为物品添加情感标签",
-				"operationId": "addEmotion",
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/EmotionDTO"
-							}
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/RestResultVoid"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/chat": {
-			"post": {
-				"tags": ["AI聊天"],
-				"summary": "AI聊天",
-				"description": "处理用户的AI聊天请求",
-				"operationId": "chat",
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/AiChatRequestDTO"
-							}
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/RestResultObject"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/boxes/add": {
-			"post": {
-				"tags": ["盒子管理"],
-				"summary": "新增盒子",
-				"operationId": "addBox",
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/BoxDTO"
-							}
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/RestResultVoid"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/users/page": {
-			"get": {
-				"tags": ["用户管理"],
-				"summary": "分页查询用户",
-				"description": "分页查询用户信息",
-				"operationId": "getUsersByPage",
-				"parameters": [{
-					"name": "query",
-					"in": "query",
-					"required": true,
-					"schema": {
-						"$ref": "#/components/schemas/UserQuery"
-					}
-				}],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"*/*": {
-								"schema": {
-									"type": "array",
-									"items": {
-										"$ref": "#/components/schemas/UserDTO"
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/items/list": {
-			"get": {
-				"tags": ["商品管理"],
-				"summary": "查询商品列表",
-				"description": "根据条件查询商品列表",
-				"operationId": "listItem",
-				"parameters": [{
-					"name": "queryItemDTO",
-					"in": "query",
-					"required": true,
-					"schema": {
-						"$ref": "#/components/schemas/QueryItemDTO"
-					}
-				}],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/RestResultListItemDTO"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/emotions/list": {
-			"get": {
-				"tags": ["情感标签管理"],
-				"summary": "查询情感标签列表",
-				"description": "根据条件查询情感标签列表",
-				"operationId": "listEmotions",
-				"parameters": [{
-					"name": "queryEmotionDTO",
-					"in": "query",
-					"required": true,
-					"schema": {
-						"$ref": "#/components/schemas/QueryEmotionDTO"
-					}
-				}],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/RestResultListEmotionDTO"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/boxes/list": {
-			"get": {
-				"tags": ["盒子管理"],
-				"summary": "查询盒子列表",
-				"operationId": "listBoxes",
-				"parameters": [{
-					"name": "queryBoxDTO",
-					"in": "query",
-					"required": true,
-					"schema": {
-						"$ref": "#/components/schemas/QueryBoxDTO"
-					}
-				}],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/RestResultListBoxDTO"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/items/delete/{id}": {
-			"delete": {
-				"tags": ["商品管理"],
-				"summary": "删除商品",
-				"description": "删除指定的商品记录",
-				"operationId": "deleteItem",
-				"parameters": [{
-					"name": "id",
-					"in": "path",
-					"required": true,
-					"schema": {
-						"type": "integer",
-						"format": "int64"
-					}
-				}],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/RestResultVoid"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/emotions/delete/{id}": {
-			"delete": {
-				"tags": ["情感标签管理"],
-				"summary": "删除情感标签",
-				"description": "删除指定的情感标签",
-				"operationId": "deleteEmotion",
-				"parameters": [{
-					"name": "id",
-					"in": "path",
-					"required": true,
-					"schema": {
-						"type": "integer",
-						"format": "int64"
-					}
-				}],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/RestResultVoid"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/boxes/delete/{id}": {
-			"delete": {
-				"tags": ["盒子管理"],
-				"summary": "删除盒子",
-				"operationId": "deleteBox",
-				"parameters": [{
-					"name": "id",
-					"in": "path",
-					"required": true,
-					"schema": {
-						"type": "integer",
-						"format": "int64"
-					}
-				}],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/RestResultVoid"
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	},
-	"components": {
-		"schemas": {
-			"UserDO": {
-				"type": "object",
-				"properties": {
-					"id": {
-						"type": "integer",
-						"format": "int64"
-					},
-					"userAccount": {
-						"type": "string"
-					},
-					"userPassword": {
-						"type": "string"
-					},
-					"username": {
-						"type": "string"
-					},
-					"phone": {
-						"type": "string"
-					},
-					"createTime": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"updateTime": {
-						"type": "string",
-						"format": "date-time"
-					}
-				}
-			},
-			"UserDTO": {
-				"type": "object",
-				"properties": {
-					"id": {
-						"type": "integer",
-						"format": "int64"
-					},
-					"username": {
-						"type": "string"
-					},
-					"email": {
-						"type": "string"
-					},
-					"createdAt": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"updatedAt": {
-						"type": "string",
-						"format": "date-time"
-					}
-				}
-			},
-			"ItemDTO": {
-				"required": ["boxId", "itemCode", "itemName", "price"],
-				"type": "object",
-				"properties": {
-					"id": {
-						"type": "integer",
-						"format": "int64"
-					},
-					"itemCode": {
-						"maxLength": 255,
-						"minLength": 0,
-						"type": "string"
-					},
-					"itemName": {
-						"maxLength": 100,
-						"minLength": 0,
-						"type": "string"
-					},
-					"itemDesc": {
-						"maxLength": 500,
-						"minLength": 0,
-						"type": "string"
-					},
-					"boxId": {
-						"type": "integer",
-						"format": "int64"
-					},
-					"price": {
-						"minimum": 0.01,
-						"exclusiveMinimum": false,
-						"type": "number",
-						"format": "double"
-					},
-					"autoRecognizeName": {
-						"type": "string"
-					},
-					"manualEditName": {
-						"type": "string"
-					},
-					"itemTag": {
-						"type": "string"
-					},
-					"putInTime": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"expireTime": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"isValid": {
-						"type": "integer",
-						"format": "int32"
-					},
-					"createTime": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"updateTime": {
-						"type": "string",
-						"format": "date-time"
-					}
-				}
-			},
-			"RestResultVoid": {
-				"type": "object",
-				"properties": {
-					"code": {
-						"type": "integer",
-						"format": "int32"
-					},
-					"msg": {
-						"type": "string"
-					},
-					"data": {
-						"type": "object"
-					}
-				}
-			},
-			"EmotionDTO": {
-				"required": ["emotionTag", "itemId"],
-				"type": "object",
-				"properties": {
-					"id": {
-						"type": "integer",
-						"format": "int64"
-					},
-					"itemId": {
-						"type": "integer",
-						"format": "int64"
-					},
-					"emotionTag": {
-						"type": "integer",
-						"format": "int32"
-					},
-					"emotionRemark": {
-						"maxLength": 500,
-						"minLength": 0,
-						"type": "string"
-					}
-				}
-			},
-			"BoxDTO": {
-				"required": ["boxCode", "boxName", "boxType", "status", "userId"],
-				"type": "object",
-				"properties": {
-					"id": {
-						"type": "integer",
-						"format": "int64"
-					},
-					"boxCode": {
-						"maxLength": 32,
-						"minLength": 0,
-						"type": "string"
-					},
-					"userId": {
-						"type": "integer",
-						"format": "int64"
-					},
-					"boxName": {
-						"maxLength": 50,
-						"minLength": 0,
-						"type": "string"
-					},
-					"boxType": {
-						"maximum": 1,
-						"minimum": 0,
-						"type": "integer",
-						"format": "int32"
-					},
-					"status": {
-						"maximum": 3,
-						"minimum": 0,
-						"type": "integer",
-						"format": "int32"
-					},
-					"rssi": {
-						"maximum": 0,
-						"minimum": -100,
-						"type": "integer",
-						"format": "int32"
-					},
-					"battery": {
-						"maximum": 100,
-						"minimum": 0,
-						"type": "integer",
-						"format": "int32"
-					},
-					"lastHeartbeatTime": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"createTime": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"updateTime": {
-						"type": "string",
-						"format": "date-time"
-					}
-				}
-			},
-			"LoginRequest": {
-				"type": "object",
-				"properties": {
-					"userAccount": {
-						"type": "string"
-					},
-					"userPassword": {
-						"type": "string"
-					}
-				}
-			},
-			"FallbackRequestDTO": {
-				"required": ["fallbackReason", "serviceId"],
-				"type": "object",
-				"properties": {
-					"serviceId": {
-						"type": "string"
-					},
-					"fallbackReason": {
-						"type": "string"
-					}
-				}
-			},
-			"RestResultObject": {
-				"type": "object",
-				"properties": {
-					"code": {
-						"type": "integer",
-						"format": "int32"
-					},
-					"msg": {
-						"type": "string"
-					},
-					"data": {
-						"type": "object"
-					}
-				}
-			},
-			"ErrorLogDTO": {
-				"required": ["errorCode", "errorMessage", "errorTime"],
-				"type": "object",
-				"properties": {
-					"errorCode": {
-						"type": "string"
-					},
-					"errorMessage": {
-						"type": "string"
-					},
-					"errorTime": {
-						"type": "string",
-						"format": "date-time"
-					}
-				}
-			},
-			"AiChatRequestDTO": {
-				"required": ["message", "userId"],
-				"type": "object",
-				"properties": {
-					"userId": {
-						"type": "integer",
-						"format": "int64"
-					},
-					"message": {
-						"maxLength": 1000,
-						"minLength": 0,
-						"type": "string"
-					}
-				}
-			},
-			"UserQuery": {
-				"type": "object",
-				"properties": {
-					"keyword": {
-						"type": "string"
-					},
-					"pageSize": {
-						"type": "integer",
-						"format": "int32"
-					},
-					"currentPage": {
-						"type": "integer",
-						"format": "int32"
-					}
-				}
-			},
-			"QueryItemDTO": {
-				"type": "object",
-				"properties": {
-					"boxId": {
-						"type": "integer",
-						"format": "int64"
-					},
-					"itemCode": {
-						"type": "string"
-					},
-					"itemTag": {
-						"type": "string"
-					},
-					"isValid": {
-						"type": "integer",
-						"format": "int32"
-					}
-				}
-			},
-			"RestResultListItemDTO": {
-				"type": "object",
-				"properties": {
-					"code": {
-						"type": "integer",
-						"format": "int32"
-					},
-					"msg": {
-						"type": "string"
-					},
-					"data": {
-						"type": "array",
-						"items": {
-							"$ref": "#/components/schemas/ItemDTO"
-						}
-					}
-				}
-			},
-			"QueryEmotionDTO": {
-				"type": "object",
-				"properties": {
-					"itemId": {
-						"type": "integer",
-						"format": "int64"
-					}
-				}
-			},
-			"RestResultListEmotionDTO": {
-				"type": "object",
-				"properties": {
-					"code": {
-						"type": "integer",
-						"format": "int32"
-					},
-					"msg": {
-						"type": "string"
-					},
-					"data": {
-						"type": "array",
-						"items": {
-							"$ref": "#/components/schemas/EmotionDTO"
-						}
-					}
-				}
-			},
-			"QueryBoxDTO": {
-				"type": "object",
-				"properties": {
-					"userId": {
-						"type": "integer",
-						"format": "int64"
-					},
-					"boxCode": {
-						"type": "string"
-					},
-					"boxName": {
-						"type": "string"
-					},
-					"boxType": {
-						"type": "integer",
-						"format": "int32"
-					},
-					"status": {
-						"type": "integer",
-						"format": "int32"
-					}
-				}
-			},
-			"RestResultListBoxDTO": {
-				"type": "object",
-				"properties": {
-					"code": {
-						"type": "integer",
-						"format": "int32"
-					},
-					"msg": {
-						"type": "string"
-					},
-					"data": {
-						"type": "array",
-						"items": {
-							"$ref": "#/components/schemas/BoxDTO"
-						}
-					}
-				}
-			}
-		}
-	}
+  "openapi": "3.0.1",
+  "info": {
+    "title": "智能收纳盒系统 API 文档",
+    "description": "智能收纳盒系统的RESTful API接口文档",
+    "contact": {
+      "name": "14577",
+      "email": ""
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "v1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "tags": [
+    {
+      "name": "盒子管理",
+      "description": "盒子相关API"
+    },
+    {
+      "name": "商品管理",
+      "description": "商品相关API"
+    },
+    {
+      "name": "用户管理",
+      "description": "用户相关API"
+    },
+    {
+      "name": "AI聊天",
+      "description": "AI聊天相关接口"
+    },
+    {
+      "name": "错误修复管理",
+      "description": "错误日志和降级管理API"
+    },
+    {
+      "name": "情感标签管理",
+      "description": "情感标签相关API"
+    }
+  ],
+  "paths": {
+    "/api/users/{id}": {
+      "get": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "根据ID获取用户",
+        "description": "根据用户ID获取用户详细信息",
+        "operationId": "getUserById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "更新用户",
+        "description": "更新用户基本信息",
+        "operationId": "updateUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDTO"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "删除用户",
+        "description": "删除指定的用户账户",
+        "operationId": "deleteUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/items/update": {
+      "put": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "更新商品信息",
+        "description": "更新商品的基本信息",
+        "operationId": "updateItem",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/emotions/update": {
+      "put": {
+        "tags": [
+          "情感标签管理"
+        ],
+        "summary": "更新情感标签",
+        "description": "更新情感标签信息",
+        "operationId": "updateEmotion",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmotionDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/boxes/update": {
+      "put": {
+        "tags": [
+          "盒子管理"
+        ],
+        "summary": "修改盒子",
+        "operationId": "updateBox",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BoxDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users": {
+      "get": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "获取所有用户",
+        "description": "获取系统中所有用户列表",
+        "operationId": "getAllUsers",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "创建用户",
+        "description": "创建新的用户账户",
+        "operationId": "createUser",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/login": {
+      "post": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "用户登录",
+        "description": "通过账号密码登录，返回Token",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/items/add": {
+      "post": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "添加新商品",
+        "description": "创建新的商品记录",
+        "operationId": "addItem",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/error-recovery/trigger-fallback": {
+      "post": {
+        "tags": [
+          "错误修复管理"
+        ],
+        "summary": "触发优雅降级策略",
+        "description": "在服务异常时触发降级策略",
+        "operationId": "triggerGracefulFallback",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FallbackRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestResultObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/error-recovery/record-error": {
+      "post": {
+        "tags": [
+          "错误修复管理"
+        ],
+        "summary": "记录运行时错误",
+        "description": "记录系统运行时错误日志",
+        "operationId": "recordRuntimeError",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ErrorLogDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/emotions/add": {
+      "post": {
+        "tags": [
+          "情感标签管理"
+        ],
+        "summary": "添加情感标签",
+        "description": "为物品添加情感标签",
+        "operationId": "addEmotion",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmotionDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/chat": {
+      "post": {
+        "tags": [
+          "AI聊天"
+        ],
+        "summary": "AI聊天",
+        "description": "处理用户的AI聊天请求",
+        "operationId": "chat",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AiChatRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestResultObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/boxes/add": {
+      "post": {
+        "tags": [
+          "盒子管理"
+        ],
+        "summary": "新增盒子",
+        "operationId": "addBox",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BoxDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/page": {
+      "get": {
+        "tags": [
+          "用户管理"
+        ],
+        "summary": "分页查询用户",
+        "description": "分页查询用户信息",
+        "operationId": "getUsersByPage",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/UserQuery"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/items/list": {
+      "get": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "查询商品列表",
+        "description": "根据条件查询商品列表",
+        "operationId": "listItem",
+        "parameters": [
+          {
+            "name": "queryItemDTO",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/QueryItemDTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestResultListItemDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/emotions/list": {
+      "get": {
+        "tags": [
+          "情感标签管理"
+        ],
+        "summary": "查询情感标签列表",
+        "description": "根据条件查询情感标签列表",
+        "operationId": "listEmotions",
+        "parameters": [
+          {
+            "name": "queryEmotionDTO",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/QueryEmotionDTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestResultListEmotionDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/boxes/list": {
+      "get": {
+        "tags": [
+          "盒子管理"
+        ],
+        "summary": "查询盒子列表",
+        "operationId": "listBoxes",
+        "parameters": [
+          {
+            "name": "queryBoxDTO",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/QueryBoxDTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestResultListBoxDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/items/delete/{id}": {
+      "delete": {
+        "tags": [
+          "商品管理"
+        ],
+        "summary": "删除商品",
+        "description": "删除指定的商品记录",
+        "operationId": "deleteItem",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/emotions/delete/{id}": {
+      "delete": {
+        "tags": [
+          "情感标签管理"
+        ],
+        "summary": "删除情感标签",
+        "description": "删除指定的情感标签",
+        "operationId": "deleteEmotion",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/boxes/delete/{id}": {
+      "delete": {
+        "tags": [
+          "盒子管理"
+        ],
+        "summary": "删除盒子",
+        "operationId": "deleteBox",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestResultVoid"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserDO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "userAccount": {
+            "type": "string"
+          },
+          "userPassword": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "createTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updateTime": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UserDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ItemDTO": {
+        "required": [
+          "boxId",
+          "itemCode"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "itemCode": {
+            "maxLength": 255,
+            "minLength": 0,
+            "type": "string"
+          },
+          "boxId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "autoRecognizeName": {
+            "type": "string"
+          },
+          "manualEditName": {
+            "type": "string"
+          },
+          "itemTag": {
+            "type": "string"
+          },
+          "itemDesc": {
+            "maxLength": 500,
+            "minLength": 0,
+            "type": "string"
+          },
+          "putInTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expireTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isValid": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "RestResultVoid": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "msg": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      },
+      "EmotionDTO": {
+        "required": [
+          "emotionTag",
+          "itemId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "itemId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "emotionTag": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "emotionRemark": {
+            "maxLength": 500,
+            "minLength": 0,
+            "type": "string"
+          }
+        }
+      },
+      "BoxDTO": {
+        "required": [
+          "boxCode",
+          "boxName",
+          "boxType",
+          "status",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "boxCode": {
+            "maxLength": 32,
+            "minLength": 0,
+            "type": "string"
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "boxName": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string"
+          },
+          "boxType": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
+          },
+          "status": {
+            "maximum": 3,
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
+          },
+          "rssi": {
+            "maximum": 0,
+            "minimum": -100,
+            "type": "integer",
+            "format": "int32"
+          },
+          "battery": {
+            "maximum": 100,
+            "minimum": 0,
+            "type": "integer",
+            "format": "int32"
+          },
+          "lastHeartbeatTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updateTime": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "userAccount": {
+            "type": "string"
+          },
+          "userPassword": {
+            "type": "string"
+          }
+        }
+      },
+      "FallbackRequestDTO": {
+        "required": [
+          "fallbackReason",
+          "serviceId"
+        ],
+        "type": "object",
+        "properties": {
+          "serviceId": {
+            "type": "string"
+          },
+          "fallbackReason": {
+            "type": "string"
+          }
+        }
+      },
+      "RestResultObject": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "msg": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      },
+      "ErrorLogDTO": {
+        "required": [
+          "errorCode",
+          "errorMessage",
+          "errorTime"
+        ],
+        "type": "object",
+        "properties": {
+          "errorCode": {
+            "type": "string"
+          },
+          "errorMessage": {
+            "type": "string"
+          },
+          "errorTime": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AiChatRequestDTO": {
+        "required": [
+          "message",
+          "userId"
+        ],
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "message": {
+            "maxLength": 1000,
+            "minLength": 0,
+            "type": "string"
+          }
+        }
+      },
+      "UserQuery": {
+        "type": "object",
+        "properties": {
+          "keyword": {
+            "type": "string"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "currentPage": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "QueryItemDTO": {
+        "type": "object",
+        "properties": {
+          "boxId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "itemCode": {
+            "type": "string"
+          },
+          "itemTag": {
+            "type": "string"
+          },
+          "isValid": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "RestResultListItemDTO": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "msg": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemDTO"
+            }
+          }
+        }
+      },
+      "QueryEmotionDTO": {
+        "type": "object",
+        "properties": {
+          "itemId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "RestResultListEmotionDTO": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "msg": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmotionDTO"
+            }
+          }
+        }
+      },
+      "QueryBoxDTO": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "boxCode": {
+            "type": "string"
+          },
+          "boxName": {
+            "type": "string"
+          },
+          "boxType": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "RestResultListBoxDTO": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "msg": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BoxDTO"
+            }
+          }
+        }
+      }
+    }
+  }
 }

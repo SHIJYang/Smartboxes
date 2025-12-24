@@ -8,7 +8,7 @@
 	}, {
 		"path": "pages/box/boxlist",
 		"style": {
-			"navigationStyle": "custom"
+			"navigationStyle": "custom",
 			"enablePullDownRefresh": true
 		}
 	}, {
@@ -46,7 +46,7 @@
 	}, {
 		"path": "pages/user/login",
 		"style": {
-			"navigationStyle": "custom"
+			"navigationStyle": "custom",
 			"navigationBarTitleText": "登录"
 		}
 	},

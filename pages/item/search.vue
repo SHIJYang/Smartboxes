@@ -4,7 +4,7 @@
       <input 
         class="search-input" 
         v-model="searchKeyword" 
-        placeholder="输入标签或名称搜索" 
+        placeholder="输入标签或编码搜索" 
         confirm-type="search"
         @confirm="doSearch"
       />
@@ -14,12 +14,13 @@
     <scroll-view scroll-y class="result-list">
       <view v-for="item in resultList" :key="item.id" class="item-card">
         <view class="item-main">
-          <text class="name">{{ item.itemName }}</text>
+          <text class="name">{{ getDisplayName(item) }}</text>
+          <text class="code" v-if="item.itemCode">#{{ item.itemCode }}</text>
           <text class="tag" v-if="item.itemTag">{{ item.itemTag }}</text>
         </view>
         <view class="item-sub">
           <text>位置: {{ item.boxId }}号箱</text>
-          <text>价格: ¥{{ item.price }}</text>
+          <text v-if="item.autoRecognizeName">自动识别: {{ item.autoRecognizeName }}</text>
         </view>
       </view>
       
@@ -44,19 +45,16 @@ const doSearch = async () => {
   hasSearched.value = true;
   
   try {
-    // 调用 GET /api/items/list，这里简单地将关键词作为 itemTag 传递
-    // 实际业务中可能需要后端支持模糊搜索或前端过滤 Mock 数据
-    const res = await getItemList({ 
-      itemTag: searchKeyword.value 
-    });
-
+    const res = await getItemList({});
+    
     if (res.code === 200) {
-      // **重要**：如果是 Mock 模式，前端做一个简单的过滤模拟真实搜索
-      // 如果是真实后端，这步由后端 SQL 完成
+      // 前端过滤实现搜索
       const keyword = searchKeyword.value.toLowerCase();
       resultList.value = res.data.filter(item => 
-        (item.itemName && item.itemName.includes(keyword)) ||
-        (item.itemTag && item.itemTag.includes(keyword))
+        (item.itemCode && item.itemCode.toLowerCase().includes(keyword)) ||
+        (item.itemTag && item.itemTag.toLowerCase().includes(keyword)) ||
+        (item.autoRecognizeName && item.autoRecognizeName.toLowerCase().includes(keyword)) ||
+        (item.manualEditName && item.manualEditName.toLowerCase().includes(keyword))
       );
     }
   } catch (e) {
@@ -64,6 +62,13 @@ const doSearch = async () => {
   } finally {
     uni.hideLoading();
   }
+};
+
+// 获取显示名称
+const getDisplayName = (item: ItemDTO) => {
+  if (item.manualEditName) return item.manualEditName;
+  if (item.autoRecognizeName) return item.autoRecognizeName;
+  return item.itemCode || '未命名物品';
 };
 </script>
 
@@ -81,8 +86,9 @@ const doSearch = async () => {
 .item-card {
   background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 10px;
   .item-main {
-    display: flex; justify-content: space-between; margin-bottom: 8px;
-    .name { font-size: 16px; font-weight: bold; }
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
+    .name { font-size: 16px; font-weight: bold; flex: 1; margin-right: 10px; }
+    .code { font-size: 12px; color: #666; background: #f2f2f2; padding: 2px 6px; border-radius: 4px; margin-right: 8px; }
     .tag { font-size: 12px; background: #e1f3d8; color: #67c23a; padding: 2px 6px; border-radius: 4px; }
   }
   .item-sub { font-size: 13px; color: #999; display: flex; gap: 15px; }

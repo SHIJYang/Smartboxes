@@ -97,8 +97,8 @@ import { ref } from 'vue';
 import { onShow, onLoad } from '@dcloudio/uni-app';
 import type { UserDTO } from '@/common/types';
 import { getBoxList, getItemList } from '@/api/index';
-import { useUserStore } from '@/stores/user';
-// 引入你新建的 PC 导航栏组件
+import { useUserStore } from '@/stores';
+
 import PCHeader from '@/components/PCHeader.vue';
 
 const user = ref<UserDTO | null>(null);
@@ -119,7 +119,7 @@ onLoad(() => {
 });
 
 onShow(async () => {
-  const u = userStore.userInfo || uni.getStorageSync('userInfo');
+  const u = userStore.currentUser || uni.getStorageSync('userInfo');
   if (u) {
     user.value = u;
     await loadStats(u.id);

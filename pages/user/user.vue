@@ -6,24 +6,24 @@
     <view class="bg-shape shape-1"></view>
     <view class="bg-shape shape-2"></view>
 
-    <view class="content-wrapper" v-if="userStore.userInfo || userStore.token">
+    <view class="content-wrapper" v-if="userStore.currentUser && userStore.isLoggedIn">
       
       <view class="user-card fade-in-down">
         <view class="avatar-box">
           <image 
-            v-if="userStore.userInfo?.avatar" 
-            :src="userStore.userInfo.avatar" 
+            v-if="userStore.currentUser?.avatar" 
+            :src="userStore.currentUser.avatar" 
             mode="aspectFill" 
             class="avatar-img"
           />
           <view v-else class="avatar-placeholder">
-            {{ userStore.userInfo?.username?.charAt(0).toUpperCase() || 'U' }}
+            {{ userStore.currentUser?.username?.charAt(0).toUpperCase() || 'U' }}
           </view>
         </view>
         
         <view class="info-box">
-          <text class="username">{{ userStore.userName || '魔法学徒' }}</text>
-          <text class="email">{{ userStore.userInfo?.email || '点击绑定魔法信箱' }}</text>
+          <text class="username">{{ userStore.currentUser?.username || '魔法学徒' }}</text>
+          <text class="email">{{ userStore.currentUser?.email || '点击绑定魔法信箱' }}</text>
           <view class="badge">✨ Lv.1 见习收纳师</view>
         </view>
       </view>
@@ -67,15 +67,17 @@
 
 <script setup lang="ts">
 import { onShow } from '@dcloudio/uni-app';
-import { useUserStore } from '@/stores/user';
 import PCHeader from '@/components/PCHeader.vue';
+import { useStores } from '@/stores';
 
-const userStore = useUserStore();
+const { userStore } = useStores();
 
 onShow(() => {
   if (!userStore.isLoggedIn) {
-    const token = uni.getStorageSync('token');
-    if (!token) {
+    // 检查是否有token
+    userStore.checkLoginStatus();
+    
+    if (!userStore.isLoggedIn) {
       uni.redirectTo({ url: '/pages/user/login' });
     }
   }
@@ -88,8 +90,7 @@ const handleLogout = () => {
     confirmColor: '#FF9A9E',
     success: (res) => {
       if (res.confirm) {
-        userStore.logout(); 
-        uni.reLaunch({ url: '/pages/user/login' });
+        userStore.logout();
       }
     }
   });

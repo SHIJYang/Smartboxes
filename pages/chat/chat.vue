@@ -44,7 +44,17 @@
       <view class="bottom-spacer"></view>
     </scroll-view>
 
-    <view class="input-area">
+    <!-- 添加登录提示 -->
+    <view v-if="!userStore.isLoggedIn" class="login-prompt">
+      <view class="prompt-content">
+        <text class="prompt-icon">🔐</text>
+        <text class="prompt-text">请先登录以使用 AI 对话功能</text>
+        <button class="login-btn" @click="goToLogin">去登录</button>
+      </view>
+    </view>
+
+    <!-- 输入区域只在登录后显示 -->
+    <view v-if="userStore.isLoggedIn" class="input-area">
       <view class="input-shell">
         <input 
           class="chat-input"
@@ -53,9 +63,11 @@
           placeholder-style="color: #bbb; font-size: 28rpx;"
           confirm-type="send" 
           @confirm="send" 
+          :disabled="sending"
         />
-        <button class="send-btn" @click="send" :loading="sending" :disabled="sending">
+        <button class="send-btn" @click="send" :loading="sending" :disabled="sending || !txt.trim()">
           <text v-if="!sending">发送</text>
+          <text v-else>发送中...</text>
         </button>
       </view>
     </view>
@@ -63,41 +75,63 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick } from 'vue';
+import { ref, nextTick, onMounted, computed, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { sendChat } from '@/api/index';
 import PCHeader from '@/components/PCHeader.vue';
+import { useStores } from '@/stores'; // 导入组合函数
 
-const list = ref([
-  { role: 'ai', text: '主人您好！我是收纳酱 (｡♥‿♥｡)' },
-  { role: 'ai', text: '找不到东西了吗？快告诉我，比如："我的 Switch 游戏机放在哪里了？"' }
-]);
+// 使用组合函数获取store实例
+const { userStore, chatStore } = useStores();
+const router = useRouter();
+
+// 使用chatStore中的消息列表
+const list = computed(() => {
+  // 将chatStore中的消息格式转换为组件需要的格式
+  return chatStore.messages.map(msg => ({
+    role: msg.role,
+    text: msg.content
+  }));
+});
 
 const txt = ref('');
 const sending = ref(false);
 const scrollTop = ref(0);
 
+// 检查是否需要显示引导消息
+const checkInitialMessages = () => {
+  if (chatStore.isEmptyChat && userStore.isLoggedIn) {
+    // 添加初始引导消息
+    chatStore.messages = [
+      { 
+        id: Date.now(), 
+        role: 'assistant', 
+        content: '主人您好！我是收纳酱 (｡♥‿♥｡)', 
+        timestamp: new Date().toISOString() 
+      },
+      { 
+        id: Date.now() + 1, 
+        role: 'assistant', 
+        content: '找不到东西了吗？快告诉我，比如："我的 Switch 游戏机放在哪里了？"', 
+        timestamp: new Date().toISOString() 
+      }
+    ];
+  }
+};
+
 const send = async () => {
-  if (!txt.value.trim() || sending.value) return;
+  if (!txt.value.trim() || sending.value || !userStore.isLoggedIn) return;
   
-  // 1. 推入用户消息
-  list.value.push({ role: 'user', text: txt.value });
-  const q = txt.value;
+  const message = txt.value;
   txt.value = '';
   sending.value = true;
-  scrollToBottom();
   
   try {
-    // 2. 发送请求
-    // 注意：userId 实际项目中应从 UserStore 获取
-    const res = await sendChat({ userId: 1001, message: q });
-    
-    if (res.code === 200) {
-      list.value.push({ role: 'ai', text: res.data.reply });
-    } else {
-      list.value.push({ role: 'ai', text: '呜呜，大脑短路了，稍后再试一下吧~' });
-    }
+    // 使用chatStore发送消息，它会自动更新消息列表
+    await chatStore.sendMessage(message, userStore.userId);
+    scrollToBottom();
   } catch (error) {
-    list.value.push({ role: 'ai', text: '网络开小差了，检查一下信号哦。' });
+    console.error('发送消息失败:', error);
   } finally {
     sending.value = false;
     scrollToBottom();
@@ -109,6 +143,42 @@ const scrollToBottom = () => {
     scrollTop.value = 9999999; 
   });
 };
+
+// 跳转到登录页
+const goToLogin = () => {
+  router.push('/login');
+};
+
+// 监听登录状态变化
+watch(() => userStore.isLoggedIn, (isLoggedIn) => {
+  if (isLoggedIn) {
+    checkInitialMessages();
+    scrollToBottom();
+  } else {
+    // 用户登出时清空聊天记录
+    chatStore.clearMessages();
+  }
+});
+
+// 组件挂载时检查登录状态
+onMounted(() => {
+  // 检查登录状态
+  userStore.checkLoginStatus();
+  
+  if (userStore.isLoggedIn) {
+    // 如果已登录但未获取用户信息，尝试获取
+    if (!userStore.currentUser && userStore.token) {
+      // 这里可以调用API获取用户信息，或者从token中解析用户ID
+    }
+    
+    // 加载历史聊天记录（如果有）
+    if (chatStore.isEmptyChat) {
+      checkInitialMessages();
+    }
+  }
+  
+  scrollToBottom();
+});
 </script>
 
 <style lang="scss" scoped>
@@ -240,6 +310,69 @@ const scrollToBottom = () => {
   height: 180rpx;
 }
 
+/* 登录提示 */
+.login-prompt {
+  position: fixed;
+  bottom: 126rpx;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  background: rgba(255, 249, 240, 0.95);
+  padding: 40rpx 30rpx;
+  backdrop-filter: blur(10rpx);
+  text-align: center;
+  
+  @media screen and (min-width: 768px) {
+    background: transparent;
+    backdrop-filter: none;
+    padding: 0;
+    position: relative;
+    bottom: auto;
+    margin-top: auto;
+    margin-bottom: 50px;
+  }
+}
+
+.prompt-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.prompt-icon {
+  font-size: 64rpx;
+  margin-bottom: 10rpx;
+}
+
+.prompt-text {
+  font-size: 32rpx;
+  color: #666;
+  font-weight: 500;
+}
+
+.login-btn {
+  background: linear-gradient(to right, #FF9A9E, #FECFEF);
+  color: #fff;
+  border: none;
+  border-radius: 40rpx;
+  padding: 20rpx 60rpx;
+  font-size: 28rpx;
+  font-weight: bold;
+  box-shadow: 0 4rpx 10rpx rgba(255, 154, 158, 0.4);
+  margin-top: 20rpx;
+  
+  &:active {
+    transform: scale(0.95);
+  }
+  
+  @media screen and (min-width: 768px) {
+    &:hover {
+      filter: brightness(1.05);
+    }
+  }
+}
+
 /* --- 输入区核心优化 --- */
 .input-area {
   position: fixed; 
@@ -288,6 +421,11 @@ const scrollToBottom = () => {
 
 .chat-input {
   flex: 1; height: 72rpx; font-size: 30rpx; color: #333;
+  
+  &:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+  }
 }
 
 .send-btn {
@@ -299,11 +437,15 @@ const scrollToBottom = () => {
   box-shadow: 0 4rpx 10rpx rgba(255, 154, 158, 0.4);
   cursor: pointer;
   
-  &[disabled] { opacity: 0.6; filter: grayscale(0.5); cursor: not-allowed; }
+  &[disabled] { 
+    opacity: 0.6; 
+    filter: grayscale(0.5); 
+    cursor: not-allowed; 
+  }
   
-  &:active { transform: scale(0.95); }
+  &:active:not([disabled]) { transform: scale(0.95); }
   @media screen and (min-width: 768px) {
-    &:hover { filter: brightness(1.05); }
+    &:hover:not([disabled]) { filter: brightness(1.05); }
   }
 }
 </style>

@@ -11,13 +11,27 @@
 
       <view class="form-card fade-in-up">
         <view class="input-group">
-          <view class="label">物品名称</view>
+          <view class="label">物品编码</view>
           <view class="input-shell">
-            <text class="icon">✨</text>
+            <text class="icon">🔢</text>
             <input 
               class="inp" 
-              v-model="form.itemName" 
-              placeholder="例如：Switch 游戏机" 
+              v-model="form.itemCode" 
+              placeholder="唯一编码，如: ITM001" 
+              placeholder-class="placeholder" 
+              required
+            />
+          </view>
+        </view>
+
+        <view class="input-group">
+          <view class="label">手动编辑名称 (可选)</view>
+          <view class="input-shell">
+            <text class="icon">✏️</text>
+            <input 
+              class="inp" 
+              v-model="form.manualEditName" 
+              placeholder="自定义名称，如：Switch 游戏机" 
               placeholder-class="placeholder" 
             />
           </view>
@@ -33,6 +47,7 @@
               v-model.number="form.boxId" 
               placeholder="输入盒子 ID (如: 1)" 
               placeholder-class="placeholder" 
+              required
             />
           </view>
         </view>
@@ -44,36 +59,84 @@
             <input 
               class="inp" 
               v-model="form.itemTag" 
-              placeholder="例如：数码 / 衣物" 
-              placeholder-class="placeholder" 
-            />
-          </view>
-        </view>
-        
-        <view class="input-group">
-          <view class="label">价值 (元)</view>
-          <view class="input-shell">
-            <text class="icon">💰</text>
-            <input 
-              class="inp" 
-              type="digit" 
-              v-model.number="form.price" 
-              placeholder="0.00" 
+              placeholder="例如：数码 / 衣物 / 书籍" 
               placeholder-class="placeholder" 
             />
           </view>
         </view>
 
         <view class="input-group">
-          <view class="label">备注信息</view>
+          <view class="label">备注描述</view>
           <view class="textarea-shell">
             <textarea 
               class="area" 
               v-model="form.itemDesc" 
-              placeholder="写点什么..." 
+              placeholder="写点描述信息..." 
               placeholder-class="placeholder" 
               auto-height 
             />
+          </view>
+        </view>
+
+        <view class="input-group">
+          <view class="label">自动识别名称 (可选)</view>
+          <view class="input-shell">
+            <text class="icon">🤖</text>
+            <input 
+              class="inp" 
+              v-model="form.autoRecognizeName" 
+              placeholder="AI自动识别的名称" 
+              placeholder-class="placeholder" 
+              readonly
+            />
+          </view>
+        </view>
+
+        <view class="input-group">
+          <view class="label">放入时间</view>
+          <view class="input-shell">
+            <text class="icon">⏰</text>
+            <input 
+              class="inp" 
+              v-model="form.putInTime" 
+              placeholder="格式: YYYY-MM-DD HH:mm:ss" 
+              placeholder-class="placeholder" 
+            />
+          </view>
+        </view>
+
+        <view class="input-group">
+          <view class="label">过期时间 (可选)</view>
+          <view class="input-shell">
+            <text class="icon">📅</text>
+            <input 
+              class="inp" 
+              v-model="form.expireTime" 
+              placeholder="格式: YYYY-MM-DD HH:mm:ss" 
+              placeholder-class="placeholder" 
+            />
+          </view>
+        </view>
+
+        <view class="input-group">
+          <view class="label">物品状态</view>
+          <view class="status-selector">
+            <view 
+              class="status-option" 
+              :class="{ active: form.isValid === 1 }"
+              @click="form.isValid = 1"
+            >
+              <text class="status-icon">✅</text>
+              <text class="status-text">在盒内</text>
+            </view>
+            <view 
+              class="status-option" 
+              :class="{ active: form.isValid === 0 }"
+              @click="form.isValid = 0"
+            >
+              <text class="status-icon">🚪</text>
+              <text class="status-text">已取出</text>
+            </view>
           </view>
         </view>
       </view>
@@ -92,7 +155,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
 import { saveItem, getItemDetail, deleteItem } from '@/api/index';
 import type { ItemDTO } from '@/common/types';
@@ -100,12 +163,16 @@ import PCHeader from '@/components/PCHeader.vue';
 
 // 默认数据
 const form = ref<ItemDTO>({ 
-  id: 0, 
+  id: undefined,
   boxId: 1, 
-  itemName: '', 
-  price: undefined, 
+  itemCode: '',
+  manualEditName: '',
+  autoRecognizeName: '',
   itemTag: '', 
-  itemDesc: '' 
+  itemDesc: '',
+  putInTime: undefined,
+  expireTime: undefined,
+  isValid: 1
 });
 const submitting = ref(false);
 
@@ -123,7 +190,7 @@ onLoad(async (opt: any) => {
 });
 
 const submit = async () => {
-  if (!form.value.itemName) return uni.showToast({ title: '名字是必填的哦', icon: 'none' });
+  if (!form.value.itemCode) return uni.showToast({ title: '物品编码是必填的哦', icon: 'none' });
   if (!form.value.boxId) return uni.showToast({ title: '请指定一个盒子', icon: 'none' });
   
   submitting.value = true;
@@ -142,7 +209,7 @@ const remove = async () => {
     content: '确定要丢弃这个物品记录吗？',
     confirmColor: '#FF9A9E',
     success: async (res) => {
-      if (res.confirm) {
+      if (res.confirm && form.value.id) {
         await deleteItem(form.value.id);
         uni.navigateBack();
       }
@@ -206,6 +273,31 @@ $primary-gradient: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
   .inp { flex: 1; font-size: 30rpx; color: #333; height: 40rpx; }
   .area { width: 100%; min-height: 100rpx; font-size: 30rpx; color: #333; }
   .placeholder { color: #ccc; }
+}
+
+/* 状态选择器 */
+.status-selector {
+  display: flex;
+  gap: 20rpx;
+  .status-option {
+    flex: 1;
+    background: #F8F8F8;
+    border-radius: 24rpx;
+    padding: 25rpx 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2rpx solid transparent;
+    transition: all 0.3s;
+    &.active {
+      background: #a18cd1;
+      color: white;
+      border-color: #8a6dc7;
+    }
+    .status-icon { font-size: 40rpx; margin-bottom: 10rpx; }
+    .status-text { font-size: 26rpx; font-weight: bold; }
+  }
 }
 
 .action-area {

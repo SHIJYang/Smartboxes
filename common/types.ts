@@ -28,11 +28,12 @@ export interface BoxDTO {
   boxCode: string;
   userId: number;
   boxName: string;
-  boxType: number; // 0-子箱，1-主箱
+  boxType: number; // 0-子盒，1-主盒
   status: number;  // 0-离线 1-在线 2-低电 3-故障
-  rssi?: number;   // 新增: 信号强度
-  battery?: number;
-  lastHeartbeatTime?: string; // 新增
+  rssi?: number;   // 信号强度
+  battery?: number; // 电量
+  networkDelay?: number; // 网络延迟（仅主盒记录）
+  lastHeartbeatTime?: string;
   createTime?: string;
   updateTime?: string;
 }
@@ -45,22 +46,18 @@ export interface QueryItemDTO {
   isValid?: number;
 }
 
-// 商品 (ItemDTO) (修复: 补全字段)
+// 商品 (ItemDTO) - 根据SQL表和代码清理后的结构
 export interface ItemDTO {
-  id: number;
+  id?: number;
   boxId: number;   
   itemCode: string;
-  itemName: string;
-  itemDesc?: string;
+  autoRecognizeName?: string;
+  manualEditName?: string;
   itemTag?: string; 
-  price?: number;
-  autoRecognizeName?: string; // 新增
-  manualEditName?: string;    // 新增
-  isValid: number; 
-  putInTime?: string;         // 新增
+  itemDesc?: string;
+  putInTime?: string;
   expireTime?: string;
-  createTime?: string;
-  updateTime?: string;
+  isValid?: number; // 0-已取出，1-在盒内
 }
 
 // 用户 (UserDTO) (修复: 字段匹配)
@@ -71,6 +68,7 @@ export interface UserDTO {
   createdAt?: string; // 对应 openapi: createdAt
   updatedAt?: string; // 对应 openapi: updatedAt
 }
+
 export interface UserDO {
   id?: number;
   userAccount: string;
@@ -80,12 +78,33 @@ export interface UserDO {
   createTime?: string;
   updateTime?: string;
 }
+
+// 情感标签查询参数
+export interface QueryEmotionDTO {
+  itemId?: number;
+}
+
 // 情感标签 (EmotionDTO)
 export interface EmotionDTO {
-  id: number;
+  id?: number;
   itemId: number;
-  emotionTag: number; 
+  emotionTag: number; // 1-开心，2-怀念，3-重要，4-其他
   emotionRemark?: string;
+  createTime?: string;
+  updateTime?: string;
+}
+
+// 错误日志 (ErrorLogDTO)
+export interface ErrorLogDTO {
+  errorCode: string;
+  errorMessage: string;
+  errorTime: string;
+}
+
+// 降级策略请求 (FallbackRequestDTO)
+export interface FallbackRequestDTO {
+  serviceId: string;
+  fallbackReason: string;
 }
 
 // AI 聊天请求
@@ -98,4 +117,11 @@ export interface AiChatRequestDTO {
 export interface AiChatResponse {
   reply: string;    
   action?: string;  
+}
+
+// 用户查询参数 (UserQuery)
+export interface UserQuery {
+  keyword?: string;
+  pageSize?: number;
+  currentPage?: number;
 }

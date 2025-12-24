@@ -45,7 +45,7 @@ export const getItemList = (params: QueryItemDTO) =>
 // [建议修复] 获取物品详情
 // 用于 itemedit.vue
 export const getItemDetail = (id: number) => 
-  request<ItemDTO>(`/api/items/${id}`, 'GET', {}, M.mockItemDetail);
+  request<ItemDTO>(`/api/items/detail/${id}`, 'GET', {}, M.mockItemDetail);
 
 // 新增或更新物品
 export const saveItem = (data: ItemDTO) => 
