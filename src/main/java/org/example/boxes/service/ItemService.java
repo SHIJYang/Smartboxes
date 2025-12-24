@@ -35,7 +35,13 @@ public interface ItemService {
      * @return RestResult 结果封装
      */
     RestResult<Void> updateItem(ItemDTO itemDTO);
-
+    /**
+     * 查询商品详细信息
+     *
+     * @param id 商品主键ID
+     * @return RestResult 结果封装
+     */
+    RestResult<ItemDTO> getItemDetail(Long id);
     /**
      * 查询商品列表
      *

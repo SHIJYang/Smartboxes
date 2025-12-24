@@ -63,6 +63,17 @@ public class ItemController {
     }
 
     /**
+     * 查询商品详细信息
+     *
+     * @param id 商品主键ID
+     * @return RestResult 结果封装
+     */
+    @GetMapping("/detail/{id}")
+    @Operation(summary = "查询商品详细信息", description = "查询指定商品的详细信息，包含关联数据")
+    public ResponseEntity<RestResult<ItemDTO>> getItemDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(itemService.getItemDetail(id));
+    }
+    /**
      * 查询商品列表
      *
      * @param queryItemDTO 查询参数

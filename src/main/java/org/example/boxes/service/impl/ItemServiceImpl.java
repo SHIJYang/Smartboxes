@@ -175,6 +175,39 @@ public class ItemServiceImpl implements ItemService {
     }
 
     /**
+     * 查询商品详细信息
+     *
+     * @param id 商品主键ID
+     * @return RestResult 结果封装
+     */
+    @Override
+    public RestResult<ItemDTO> getItemDetail(Long id) {
+        Optional<ItemDO> optionalItem = itemRepository.findById(id);
+        if (!optionalItem.isPresent()) {
+            log.warn("查询商品详细信息失败：找不到ID为 {} 的商品信息", id);
+            return RestResult.error("商品信息不存在");
+        }
+
+        try {
+            ItemDO itemDO = optionalItem.get();
+
+            // 如果需要关联查询，可以在这里处理
+            // 例如：如果需要查询关联的盒子信息
+            if (itemDO.getBox() != null) {
+                log.debug("商品ID: {} 关联盒子: {}", id, itemDO.getBox().getId());
+            }
+
+            // 转换DTO时，可以添加额外的逻辑
+            ItemDTO itemDTO = convertToDto(itemDO);
+            log.info("查询商品详细信息成功，ID: {}", id);
+            return RestResult.success(itemDTO);
+        } catch (Exception e) {
+            log.error("查询商品详细信息异常：{}", e.getMessage(), e);
+            return RestResult.error("系统错误");
+        }
+    }
+
+    /**
      * 将DTO转换为DO
      *
      * @param dto DTO对象

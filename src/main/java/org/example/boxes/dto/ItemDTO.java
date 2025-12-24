@@ -3,7 +3,6 @@ package org.example.boxes.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import jakarta.validation.constraints.DecimalMin;
 import lombok.Data;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -30,11 +29,25 @@ public class ItemDTO {
     private String itemCode;
 
     /**
-     * 商品名称
+     * 盒子ID
      */
-    @NotBlank(message = "商品名称不能为空")
-    @Size(max = 100, message = "商品名称长度不能超过100个字符")
-    private String itemName;
+    @NotNull(message = "盒子ID不能为空")
+    private Long boxId;
+
+    /**
+     * 自动识别名称
+     */
+    private String autoRecognizeName;
+
+    /**
+     * 手动编辑名称
+     */
+    private String manualEditName;
+
+    /**
+     * 商品标签
+     */
+    private String itemTag;
 
     /**
      * 商品描述 - 对应数据库的 item_desc 字段
@@ -43,25 +56,17 @@ public class ItemDTO {
     private String itemDesc;
 
     /**
-     * 盒子ID
+     * 放入时间
      */
-    @NotNull(message = "盒子ID不能为空")
-    private Long boxId;
+    private java.time.LocalDateTime putInTime;
 
     /**
-     * 商品价格
+     * 过期时间
      */
-    @NotNull(message = "商品价格不能为空")
-    @DecimalMin(value = "0.01", message = "商品价格必须大于0")
-    private Double price;
-
-    // 其他字段
-    private String autoRecognizeName;
-    private String manualEditName;
-    private String itemTag;
-    private java.time.LocalDateTime putInTime;
     private java.time.LocalDateTime expireTime;
+
+    /**
+     * 是否有效（0-已取出，1-在盒内）
+     */
     private Integer isValid;
-    private java.time.LocalDateTime createTime;
-    private java.time.LocalDateTime updateTime;
 }

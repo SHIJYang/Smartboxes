@@ -61,10 +61,10 @@ public class ItemDO {
      */
     @OneToOne(mappedBy = "item", fetch = FetchType.LAZY)
     private EmotionDO emotion;
+
     /**
      * 物品的操作日志列表
      */
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY)
     private List<ItemOperateLogDO> operateLogs;
 }
-
