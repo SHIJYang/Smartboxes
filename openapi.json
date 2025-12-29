@@ -2,8 +2,8 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Boxes System API",
-    "description": "基于 Spring Boot 的物资与盒子管理系统 API 文档",
-    "version": "1.0.0"
+    "description": "物资与盒子管理系统后端 API 文档",
+    "version": "1.0.1"
   },
   "servers": [
     {
@@ -12,19 +12,19 @@
     }
   ],
   "tags": [
-    { "name": "用户管理", "description": "用户登录与增删改查" },
-    { "name": "物品管理", "description": "物品全生命周期管理" },
-    { "name": "盒子管理", "description": "盒子设备与状态管理" },
-    { "name": "情感标签管理", "description": "物品情感备注管理" },
-    { "name": "错误修复管理", "description": "运行时错误记录与降级" },
-    { "name": "AI聊天", "description": "AI 助手交互" }
+    { "name": "用户管理", "description": "User Controller" },
+    { "name": "物品管理", "description": "Item Controller" },
+    { "name": "盒子管理", "description": "Box Controller" },
+    { "name": "情感标签管理", "description": "Emotion Controller" },
+    { "name": "AI聊天", "description": "Ai Chat Controller" },
+    { "name": "错误修复管理", "description": "Error Recovery Controller" }
   ],
   "paths": {
     "/api/users/login": {
       "post": {
         "tags": ["用户管理"],
         "summary": "用户登录",
-        "description": "验证账号密码并返回 Token",
+        "description": "通过账号密码登录，返回Token",
         "requestBody": {
           "required": true,
           "content": {
@@ -36,7 +36,11 @@
         "responses": {
           "200": {
             "description": "登录成功",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestResult_Map" } } }
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_Map" }
+              }
+            }
           }
         }
       }
@@ -45,19 +49,100 @@
       "post": {
         "tags": ["用户管理"],
         "summary": "创建用户",
+        "description": "创建新的用户账户",
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserDO" } } }
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserDO" }
+            }
+          }
         },
         "responses": {
-          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestResult_UserDTO" } } } }
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_UserDTO" }
+              }
+            }
+          }
         }
       },
       "get": {
         "tags": ["用户管理"],
         "summary": "获取所有用户",
+        "description": "获取系统中所有用户列表",
         "responses": {
-          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestResult_List_UserDTO" } } } }
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_List_UserDTO" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "tags": ["用户管理"],
+        "summary": "根据ID获取用户",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_UserDTO" }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["用户管理"],
+        "summary": "更新用户",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserDO" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_UserDTO" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["用户管理"],
+        "summary": "删除用户",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_Void" }
+              }
+            }
+          }
         }
       }
     },
@@ -65,14 +150,21 @@
       "get": {
         "tags": ["用户管理"],
         "summary": "分页查询用户",
+        "description": "分页查询用户信息，返回包含总条数的标准分页结果",
         "parameters": [
-          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 }, "description": "页码" },
-          { "name": "size", "in": "query", "schema": { "type": "integer", "default": 10 }, "description": "每页大小" },
-          { "name": "username", "in": "query", "schema": { "type": "string" }, "description": "用户名(模糊)" },
-          { "name": "phone", "in": "query", "schema": { "type": "string" }, "description": "手机号" }
+          { "name": "keyword", "in": "query", "description": "用户名或账号关键词(模糊匹配)", "schema": { "type": "string" } },
+          { "name": "pageSize", "in": "query", "description": "每页条数 (对应 UserQuery)", "schema": { "type": "integer", "default": 10 } },
+          { "name": "currentPage", "in": "query", "description": "当前页码 (对应 UserQuery)", "schema": { "type": "integer", "default": 1 } }
         ],
         "responses": {
-          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestResult_PageResult_UserDTO" } } } }
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_PageResult_UserDTO" }
+              }
+            }
+          }
         }
       }
     },
@@ -82,10 +174,21 @@
         "summary": "添加新物品",
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ItemDTO" } } }
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ItemDTO" }
+            }
+          }
         },
         "responses": {
-          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestResult_Void" } } } }
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_Void" }
+              }
+            }
+          }
         }
       }
     },
@@ -95,10 +198,40 @@
         "summary": "更新物品信息",
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ItemDTO" } } }
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ItemDTO" }
+            }
+          }
         },
         "responses": {
-          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestResult_Void" } } } }
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_Void" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/items/delete/{id}": {
+      "delete": {
+        "tags": ["物品管理"],
+        "summary": "删除物品",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_Void" }
+              }
+            }
+          }
         }
       }
     },
@@ -111,45 +244,143 @@
           { "name": "boxId", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
         ],
         "responses": {
-          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestResult_Void" } } } }
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_Void" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/items/status/{id}/{isValid}": {
+      "put": {
+        "tags": ["物品管理"],
+        "summary": "更新物品状态",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } },
+          { "name": "isValid", "in": "path", "required": true, "description": "1-有效 0-无效", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_Void" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/items/detail/{id}": {
+      "get": {
+        "tags": ["物品管理"],
+        "summary": "查询物品详细信息",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_ItemDTO" }
+              }
+            }
+          }
         }
       }
     },
     "/api/items/list": {
       "get": {
         "tags": ["物品管理"],
-        "summary": "查询物品列表(无分页)",
+        "summary": "查询物品列表 (无分页)",
         "parameters": [
           { "name": "userId", "in": "query", "schema": { "type": "integer", "format": "int64" } },
           { "name": "boxId", "in": "query", "schema": { "type": "integer", "format": "int64" } },
           { "name": "itemCode", "in": "query", "schema": { "type": "string" } },
-          { "name": "name", "in": "query", "schema": { "type": "string" }, "description": "匹配自动名称或手动名称" },
+          { "name": "name", "in": "query", "description": "自动或手动名称", "schema": { "type": "string" } },
           { "name": "itemTag", "in": "query", "schema": { "type": "string" } },
           { "name": "isValid", "in": "query", "schema": { "type": "integer" } }
         ],
         "responses": {
-          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestResult_List_ItemDTO" } } } }
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_List_ItemDTO" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/items/by-box/{boxId}": {
+      "get": {
+        "tags": ["物品管理"],
+        "summary": "根据盒子找物品",
+        "parameters": [
+          { "name": "boxId", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_List_ItemDTO" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/items/by-user/{userId}": {
+      "get": {
+        "tags": ["物品管理"],
+        "summary": "根据用户找物品",
+        "parameters": [
+          { "name": "userId", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_List_ItemDTO" }
+              }
+            }
+          }
         }
       }
     },
     "/api/items/page": {
       "get": {
         "tags": ["物品管理"],
-        "summary": "分页查询物品",
+        "summary": "综合分页查询物品",
         "parameters": [
-          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
-          { "name": "size", "in": "query", "schema": { "type": "integer", "default": 10 } },
-          { "name": "sortField", "in": "query", "schema": { "type": "string", "default": "createTime" } },
-          { "name": "sortOrder", "in": "query", "schema": { "type": "string", "default": "desc" } },
           { "name": "userId", "in": "query", "schema": { "type": "integer", "format": "int64" } },
           { "name": "boxId", "in": "query", "schema": { "type": "integer", "format": "int64" } },
           { "name": "itemCode", "in": "query", "schema": { "type": "string" } },
           { "name": "name", "in": "query", "schema": { "type": "string" } },
           { "name": "itemTag", "in": "query", "schema": { "type": "string" } },
-          { "name": "isValid", "in": "query", "schema": { "type": "integer" } }
+          { "name": "isValid", "in": "query", "schema": { "type": "integer" } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "size", "in": "query", "schema": { "type": "integer", "default": 10 } },
+          { "name": "sortField", "in": "query", "schema": { "type": "string", "default": "createTime" } },
+          { "name": "sortOrder", "in": "query", "schema": { "type": "string", "default": "desc" } }
         ],
         "responses": {
-          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestResult_PageResult_ItemDTO" } } } }
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_PageResult_ItemDTO" }
+              }
+            }
+          }
         }
       }
     },
@@ -159,10 +390,21 @@
         "summary": "新增盒子",
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BoxDTO" } } }
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/BoxDTO" }
+            }
+          }
         },
         "responses": {
-          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestResult_Void" } } } }
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_Void" }
+              }
+            }
+          }
         }
       }
     },
@@ -172,10 +414,21 @@
         "summary": "修改盒子信息",
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BoxDTO" } } }
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/BoxDTO" }
+            }
+          }
         },
         "responses": {
-          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestResult_Void" } } } }
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_Void" }
+              }
+            }
+          }
         }
       }
     },
@@ -185,10 +438,63 @@
         "summary": "上报盒子状态",
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BoxDTO" } } }
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/BoxDTO" }
+            }
+          }
         },
         "responses": {
-          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestResult_Void" } } } }
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_Void" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/boxes/delete/{id}": {
+      "delete": {
+        "tags": ["盒子管理"],
+        "summary": "删除盒子",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_Void" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/boxes/list": {
+      "get": {
+        "tags": ["盒子管理"],
+        "summary": "查询盒子列表(无分页)",
+        "parameters": [
+          { "name": "userId", "in": "query", "schema": { "type": "integer", "format": "int64" } },
+          { "name": "boxCode", "in": "query", "schema": { "type": "string" } },
+          { "name": "boxName", "in": "query", "schema": { "type": "string" } },
+          { "name": "boxType", "in": "query", "schema": { "type": "integer" } },
+          { "name": "status", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_List_BoxDTO" }
+              }
+            }
+          }
         }
       }
     },
@@ -197,18 +503,25 @@
         "tags": ["盒子管理"],
         "summary": "分页查询盒子",
         "parameters": [
-          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
-          { "name": "size", "in": "query", "schema": { "type": "integer", "default": 10 } },
-          { "name": "sortField", "in": "query", "schema": { "type": "string", "default": "createTime" } },
-          { "name": "sortOrder", "in": "query", "schema": { "type": "string", "default": "desc" } },
           { "name": "userId", "in": "query", "schema": { "type": "integer", "format": "int64" } },
           { "name": "boxCode", "in": "query", "schema": { "type": "string" } },
           { "name": "boxName", "in": "query", "schema": { "type": "string" } },
           { "name": "boxType", "in": "query", "schema": { "type": "integer" } },
-          { "name": "status", "in": "query", "schema": { "type": "integer" } }
+          { "name": "status", "in": "query", "schema": { "type": "integer" } },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
+          { "name": "size", "in": "query", "schema": { "type": "integer", "default": 10 } },
+          { "name": "sortField", "in": "query", "schema": { "type": "string", "default": "createTime" } },
+          { "name": "sortOrder", "in": "query", "schema": { "type": "string", "default": "desc" } }
         ],
         "responses": {
-          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestResult_PageResult_BoxDTO" } } } }
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_PageResult_BoxDTO" }
+              }
+            }
+          }
         }
       }
     },
@@ -218,10 +531,83 @@
         "summary": "添加情感标签",
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EmotionDTO" } } }
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EmotionDTO" }
+            }
+          }
         },
         "responses": {
-          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestResult_Void" } } } }
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_Void" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/emotions/update": {
+      "put": {
+        "tags": ["情感标签管理"],
+        "summary": "更新情感标签",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EmotionDTO" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_Void" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/emotions/delete/{id}": {
+      "delete": {
+        "tags": ["情感标签管理"],
+        "summary": "删除情感标签",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_Void" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/emotions/list": {
+      "get": {
+        "tags": ["情感标签管理"],
+        "summary": "查询情感标签列表(无分页)",
+        "parameters": [
+          { "name": "itemId", "in": "query", "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_List_EmotionDTO" }
+              }
+            }
+          }
         }
       }
     },
@@ -230,12 +616,21 @@
         "tags": ["情感标签管理"],
         "summary": "分页查询情感标签",
         "parameters": [
+          { "name": "itemId", "in": "query", "schema": { "type": "integer", "format": "int64" } },
           { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 } },
           { "name": "size", "in": "query", "schema": { "type": "integer", "default": 10 } },
-          { "name": "itemId", "in": "query", "schema": { "type": "integer", "format": "int64" } }
+          { "name": "sortField", "in": "query", "schema": { "type": "string" } },
+          { "name": "sortOrder", "in": "query", "schema": { "type": "string" } }
         ],
         "responses": {
-          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestResult_PageResult_EmotionDTO" } } } }
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_PageResult_EmotionDTO" }
+              }
+            }
+          }
         }
       }
     },
@@ -245,36 +640,69 @@
         "summary": "记录运行时错误",
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorLogDTO" } } }
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ErrorLogDTO" }
+            }
+          }
         },
         "responses": {
-          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestResult_Void" } } } }
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_Void" }
+              }
+            }
+          }
         }
       }
     },
     "/api/error-recovery/trigger-fallback": {
       "post": {
         "tags": ["错误修复管理"],
-        "summary": "触发优雅降级",
+        "summary": "触发优雅降级策略",
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/FallbackRequestDTO" } } }
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/FallbackRequestDTO" }
+            }
+          }
         },
         "responses": {
-          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestResult_Object" } } } }
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_Object" }
+              }
+            }
+          }
         }
       }
     },
     "/api/chat": {
       "post": {
         "tags": ["AI聊天"],
-        "summary": "发起对话",
+        "summary": "AI聊天",
         "requestBody": {
           "required": true,
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AiChatRequestDTO" } } }
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AiChatRequestDTO" }
+            }
+          }
         },
         "responses": {
-          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RestResult_Object" } } } }
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RestResult_Object" }
+              }
+            }
+          }
         }
       }
     }
@@ -308,56 +736,78 @@
       "RestResult_UserDTO": {
         "type": "object",
         "properties": {
-          "code": { "type": "integer" },
-          "msg": { "type": "string" },
+          "code": { "type": "integer", "example": 200 },
+          "msg": { "type": "string", "example": "Success" },
           "data": { "$ref": "#/components/schemas/UserDTO" }
+        }
+      },
+      "RestResult_ItemDTO": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "integer", "example": 200 },
+          "msg": { "type": "string", "example": "Success" },
+          "data": { "$ref": "#/components/schemas/ItemDTO" }
         }
       },
       "RestResult_List_UserDTO": {
         "type": "object",
         "properties": {
-          "code": { "type": "integer" },
-          "msg": { "type": "string" },
+          "code": { "type": "integer", "example": 200 },
+          "msg": { "type": "string", "example": "Success" },
           "data": { "type": "array", "items": { "$ref": "#/components/schemas/UserDTO" } }
-        }
-      },
-      "RestResult_PageResult_UserDTO": {
-        "type": "object",
-        "properties": {
-          "code": { "type": "integer" },
-          "msg": { "type": "string" },
-          "data": {
-            "type": "object",
-            "properties": {
-              "page": { "type": "integer" },
-              "size": { "type": "integer" },
-              "total": { "type": "integer", "format": "int64" },
-              "totalPages": { "type": "integer" },
-              "data": { "type": "array", "items": { "$ref": "#/components/schemas/UserDTO" } }
-            }
-          }
         }
       },
       "RestResult_List_ItemDTO": {
         "type": "object",
         "properties": {
-          "code": { "type": "integer" },
-          "msg": { "type": "string" },
+          "code": { "type": "integer", "example": 200 },
+          "msg": { "type": "string", "example": "Success" },
           "data": { "type": "array", "items": { "$ref": "#/components/schemas/ItemDTO" } }
         }
       },
-      "RestResult_PageResult_ItemDTO": {
+      "RestResult_List_BoxDTO": {
         "type": "object",
         "properties": {
-          "code": { "type": "integer" },
-          "msg": { "type": "string" },
+          "code": { "type": "integer", "example": 200 },
+          "msg": { "type": "string", "example": "Success" },
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/BoxDTO" } }
+        }
+      },
+      "RestResult_List_EmotionDTO": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "integer", "example": 200 },
+          "msg": { "type": "string", "example": "Success" },
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/EmotionDTO" } }
+        }
+      },
+      "RestResult_PageResult_UserDTO": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "integer", "example": 200 },
+          "msg": { "type": "string", "example": "Success" },
           "data": {
             "type": "object",
             "properties": {
               "page": { "type": "integer" },
               "size": { "type": "integer" },
               "total": { "type": "integer", "format": "int64" },
-              "totalPages": { "type": "integer" },
+              "data": { "type": "array", "items": { "$ref": "#/components/schemas/UserDTO" } }
+            }
+          }
+        }
+      },
+      "RestResult_PageResult_ItemDTO": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "integer", "example": 200 },
+          "msg": { "type": "string", "example": "Success" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "page": { "type": "integer" },
+              "size": { "type": "integer" },
+              "total": { "type": "integer", "format": "int64" },
               "data": { "type": "array", "items": { "$ref": "#/components/schemas/ItemDTO" } }
             }
           }
@@ -366,15 +816,14 @@
       "RestResult_PageResult_BoxDTO": {
         "type": "object",
         "properties": {
-          "code": { "type": "integer" },
-          "msg": { "type": "string" },
+          "code": { "type": "integer", "example": 200 },
+          "msg": { "type": "string", "example": "Success" },
           "data": {
             "type": "object",
             "properties": {
               "page": { "type": "integer" },
               "size": { "type": "integer" },
               "total": { "type": "integer", "format": "int64" },
-              "totalPages": { "type": "integer" },
               "data": { "type": "array", "items": { "$ref": "#/components/schemas/BoxDTO" } }
             }
           }
@@ -383,15 +832,14 @@
       "RestResult_PageResult_EmotionDTO": {
         "type": "object",
         "properties": {
-          "code": { "type": "integer" },
-          "msg": { "type": "string" },
+          "code": { "type": "integer", "example": 200 },
+          "msg": { "type": "string", "example": "Success" },
           "data": {
             "type": "object",
             "properties": {
               "page": { "type": "integer" },
               "size": { "type": "integer" },
               "total": { "type": "integer", "format": "int64" },
-              "totalPages": { "type": "integer" },
               "data": { "type": "array", "items": { "$ref": "#/components/schemas/EmotionDTO" } }
             }
           }
@@ -401,8 +849,8 @@
         "type": "object",
         "required": ["userAccount", "userPassword"],
         "properties": {
-          "userAccount": { "type": "string", "description": "登录账号" },
-          "userPassword": { "type": "string", "description": "登录密码" }
+          "userAccount": { "type": "string" },
+          "userPassword": { "type": "string" }
         }
       },
       "UserDO": {
@@ -419,10 +867,10 @@
         "type": "object",
         "properties": {
           "id": { "type": "integer", "format": "int64" },
-          "userAccount": { "type": "string" },
           "username": { "type": "string" },
-          "phone": { "type": "string" },
-          "token": { "type": "string" }
+          "email": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
         }
       },
       "ItemDTO": {
@@ -444,11 +892,11 @@
         "type": "object",
         "properties": {
           "id": { "type": "integer", "format": "int64" },
-          "boxCode": { "type": "string", "maxLength": 32 },
+          "boxCode": { "type": "string" },
           "userId": { "type": "integer", "format": "int64" },
-          "boxName": { "type": "string", "maxLength": 50 },
+          "boxName": { "type": "string" },
           "boxType": { "type": "integer", "description": "0-子盒，1-主盒" },
-          "status": { "type": "integer", "description": "0-离线 1-在线 2-低电量 3-故障" },
+          "status": { "type": "integer", "description": "0-离线 1-在线 2-低电 3-故障" },
           "rssi": { "type": "integer" },
           "battery": { "type": "integer" },
           "networkDelay": { "type": "integer" },
@@ -459,15 +907,25 @@
       },
       "EmotionDTO": {
         "type": "object",
+        "required": ["itemId", "emotionTag"],
         "properties": {
           "id": { "type": "integer", "format": "int64" },
           "itemId": { "type": "integer", "format": "int64" },
           "emotionTag": { "type": "integer", "description": "1-快乐 2-悲伤 3-愤怒 4-焦虑 5-平静" },
-          "emotionRemark": { "type": "string", "maxLength": 500 }
+          "emotionRemark": { "type": "string" }
+        }
+      },
+      "AiChatRequestDTO": {
+        "type": "object",
+        "required": ["userId", "message"],
+        "properties": {
+          "userId": { "type": "integer", "format": "int64" },
+          "message": { "type": "string" }
         }
       },
       "ErrorLogDTO": {
         "type": "object",
+        "required": ["errorCode", "errorMessage", "errorTime"],
         "properties": {
           "errorCode": { "type": "string" },
           "errorMessage": { "type": "string" },
@@ -476,17 +934,10 @@
       },
       "FallbackRequestDTO": {
         "type": "object",
+        "required": ["serviceId", "fallbackReason"],
         "properties": {
           "serviceId": { "type": "string" },
           "fallbackReason": { "type": "string" }
-        }
-      },
-      "AiChatRequestDTO": {
-        "type": "object",
-        "required": ["userId", "message"],
-        "properties": {
-          "userId": { "type": "integer", "format": "int64" },
-          "message": { "type": "string", "maxLength": 1000 }
         }
       }
     }
