@@ -18,5 +18,6 @@ public interface UserRepository extends JpaRepository<UserDO, Long>, JpaSpecific
      */
     UserDO findByUsername(String username);
 
-
+    // 根据账号查询用户 (用于登录)
+    UserDO findByUserAccount(String userAccount);
 }

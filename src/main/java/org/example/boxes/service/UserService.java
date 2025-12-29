@@ -3,9 +3,10 @@ package org.example.boxes.service;
 import org.example.boxes.dto.UserDTO;
 import org.example.boxes.entity.UserDO;
 import org.example.boxes.query.UserQuery;
+import org.example.boxes.result.RestResult;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 /**
  * 用户服务接口
@@ -16,46 +17,56 @@ public interface UserService {
      * 创建用户
      *
      * @param userDO 用户实体
-     * @return 用户DTO
+     * @return RestResult 封装用户DTO
      */
-    UserDTO createUser(UserDO userDO);
+    RestResult<UserDTO> createUser(UserDO userDO);
 
     /**
      * 根据ID获取用户
      *
      * @param id 用户ID
-     * @return 用户DTO
+     * @return RestResult 封装用户DTO
      */
-    Optional<UserDTO> getUserById(Long id);
+    RestResult<UserDTO> getUserById(Long id);
 
     /**
      * 获取所有用户
      *
-     * @return 用户列表
+     * @return RestResult 封装用户列表
      */
-    List<UserDTO> getAllUsers();
+    RestResult<List<UserDTO>> getAllUsers();
 
     /**
      * 分页查询用户
      *
      * @param query 查询参数
-     * @return 用户列表
+     * @return RestResult 封装用户列表
      */
-    List<UserDTO> getUsersByPage(UserQuery query);
+    RestResult<List<UserDTO>> getUsersByPage(UserQuery query);
 
     /**
      * 更新用户信息
      *
      * @param id 用户ID
      * @param userDO 用户实体
-     * @return 用户DTO
+     * @return RestResult 封装用户DTO
      */
-    UserDTO updateUser(Long id, UserDO userDO);
+    RestResult<UserDTO> updateUser(Long id, UserDO userDO);
 
     /**
      * 删除用户
      *
      * @param id 用户ID
+     * @return RestResult 封装操作结果
      */
-    void deleteUser(Long id);
+    RestResult<Void> deleteUser(Long id);
+
+    /**
+     * 用户登录（返回包含Token的Map）
+     *
+     * @param userAccount 用户账号
+     * @param password 密码
+     * @return RestResult 封装登录结果（包含Token和用户信息）
+     */
+    RestResult<Map<String, Object>> login(String userAccount, String password);
 }

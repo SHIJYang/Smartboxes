@@ -7,6 +7,13 @@
 
 ## 数据模型
 
+### LoginRequestDTO (用户登录请求对象)
+
+| 字段名 | 类型 | 必填 | 描述 |
+|--------|------|------|------|
+| userAccount | String | 是 | 登录账号 |
+| userPassword | String | 是 | 登录密码 |
+
 ### BoxDTO (盒子数据传输对象)
 
 | 字段名 | 类型 | 必填 | 描述 |
@@ -171,6 +178,13 @@
 - **描述**: 根据条件查询商品列表
 
 ### 用户管理
+
+#### 用户登录
+- **URL**: `/api/users/login`
+- **方法**: POST
+- **请求参数**: LoginRequestDTO
+- **响应**: Map<String, Object> (包含 `token` 和 `user`)
+- **描述**: 通过账号密码登录，返回认证Token和用户信息
 
 #### 创建用户
 - **URL**: `/api/users`
