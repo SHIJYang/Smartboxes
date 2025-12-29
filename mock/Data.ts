@@ -162,6 +162,23 @@ export const mockUser: RestResult<UserDTO> = {
     token: "abcdef-123456-token"
   }
 };
+// 模拟登录返回 (RestResult_Map)
+export const mockLoginResult: RestResult<any> = {
+  code: 200,
+  msg: "success",
+  data: {
+      token: "abcdef-123456-token",
+      user: {
+        id: 1001, 
+        userAccount: "admin001",
+        username: "Admin",
+        email: "admin@magicbox.com", // 新增
+        createdAt: "2023-01-01 12:00:00", // 新增
+        updatedAt: "2023-01-02 12:00:00"  // 新增
+      }
+  }
+};
+
 
 // 模拟用户列表
 export const mockUserList: RestResult<UserDTO[]> = {

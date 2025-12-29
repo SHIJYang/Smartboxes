@@ -1,3 +1,7 @@
+{
+type: uploaded file
+fileName: user.vue
+fullContent:
 <template>
   <view class="user-container">
     <PCHeader current="user" />
@@ -6,7 +10,7 @@
     <view class="bg-shape shape-1"></view>
     <view class="bg-shape shape-2"></view>
 
-    <view class="content-wrapper" v-if="userStore.currentUser && userStore.isLoggedIn">
+    <view class="content-wrapper" v-if="userStore.isLoggedIn">
       
       <view class="user-card fade-in-down">
         <view class="avatar-box">
@@ -29,7 +33,7 @@
       </view>
 
       <view class="menu-group fade-in-up">
-        <view class="menu-item" hover-class="item-hover">
+        <view class="menu-item" hover-class="item-hover" @click="notImplemented">
           <view class="left">
             <text class="icon">⚙️</text>
             <text class="label">设置</text>
@@ -37,7 +41,7 @@
           <text class="arrow">›</text>
         </view>
         
-        <view class="menu-item" hover-class="item-hover">
+        <view class="menu-item" hover-class="item-hover" @click="notImplemented">
           <view class="left">
             <text class="icon">🔔</text>
             <text class="label">通知</text>
@@ -45,7 +49,7 @@
           <text class="arrow">›</text>
         </view>
 
-        <view class="menu-item" hover-class="item-hover">
+        <view class="menu-item" hover-class="item-hover" @click="notImplemented">
           <view class="left">
             <text class="icon">🛡️</text>
             <text class="label">隐私</text>
@@ -60,7 +64,11 @@
     </view>
     
     <view v-else class="empty-state">
-      <text>正在召唤用户信息...</text>
+      <view class="login-card">
+          <text class="login-emoji">🚪</text>
+          <text class="login-tip">你还没有登录魔法世界哦</text>
+          <button class="btn-login-now" @click="goLogin">立即登录</button>
+      </view>
     </view>
   </view>
 </template>
@@ -68,19 +76,12 @@
 <script setup lang="ts">
 import { onShow } from '@dcloudio/uni-app';
 import PCHeader from '@/components/PCHeader.vue';
-import { useStores } from '@/stores';
+import { useUserStore } from '@/stores';
 
-const { userStore } = useStores();
+const userStore = useUserStore();
 
 onShow(() => {
-  if (!userStore.isLoggedIn) {
-    // 检查是否有token
     userStore.checkLoginStatus();
-    
-    if (!userStore.isLoggedIn) {
-      uni.redirectTo({ url: '/pages/user/login' });
-    }
-  }
 });
 
 const handleLogout = () => {
@@ -91,10 +92,15 @@ const handleLogout = () => {
     success: (res) => {
       if (res.confirm) {
         userStore.logout();
+        uni.reLaunch({ url: '/pages/user/login' });
       }
     }
   });
 };
+
+const goLogin = () => uni.navigateTo({ url: '/pages/user/login' });
+
+const notImplemented = () => uni.showToast({ title: '功能开发中 🚧', icon: 'none' });
 </script>
 
 <style lang="scss" scoped>
@@ -103,6 +109,7 @@ $bg-color: #FFF9F0;
 $glass-bg: rgba(255, 255, 255, 0.85);
 $shadow-soft: 0 10rpx 30rpx rgba(161, 140, 209, 0.15);
 $primary-pink: #FF9A9E;
+$gradient-btn: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
 
 .user-container {
   min-height: 100vh;
@@ -142,7 +149,7 @@ $primary-pink: #FF9A9E;
     .avatar-img { width: 100%; height: 100%; }
     .avatar-placeholder {
       width: 100%; height: 100%;
-      background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+      background: $gradient-btn;
       color: #fff; display: flex; align-items: center; justify-content: center;
       font-size: 50rpx; font-weight: bold;
     }
@@ -194,10 +201,26 @@ $primary-pink: #FF9A9E;
   }
 }
 
-.empty-state { display: flex; justify-content: center; align-items: center; height: 80vh; color: #ccc; font-size: 28rpx; }
+.empty-state { 
+    display: flex; justify-content: center; align-items: center; height: 80vh; 
+    
+    .login-card {
+        background: #fff; padding: 60rpx; border-radius: 40rpx;
+        display: flex; flex-direction: column; align-items: center;
+        box-shadow: $shadow-soft;
+        .login-emoji { font-size: 80rpx; margin-bottom: 30rpx; }
+        .login-tip { color: #999; margin-bottom: 40rpx; font-size: 30rpx; }
+        .btn-login-now {
+            background: $gradient-btn; color: white; border-radius: 40rpx;
+            padding: 0 60rpx; font-size: 30rpx; font-weight: bold;
+            &::after { border: none; }
+        }
+    }
+}
 
 .fade-in-down { animation: fadeInDown 0.8s ease-out; }
 .fade-in-up { animation: fadeInUp 0.8s ease-out; }
 @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 </style>
+}

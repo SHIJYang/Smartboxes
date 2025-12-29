@@ -1,3 +1,7 @@
+{
+type: uploaded file
+fileName: login.vue
+fullContent:
 <template>
   <view class="login-container">
     <view class="bubble bubble-1"></view>
@@ -69,10 +73,11 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 import type { LoginRequest } from '@/common/types';
-import { useStores } from '@/stores';
+import { useUserStore } from '@/stores';
 
-const { userStore } = useStores();
+const userStore = useUserStore();
 
+// Reactive form data matching LoginRequest interface
 const formData = reactive<LoginRequest>({ userAccount: '', userPassword: '' });
 const loggingIn = ref(false);
 const focusField = ref('');
@@ -90,10 +95,10 @@ const handleLogin = async () => {
   try {
     const result = await userStore.login(formData);
     
+    // Check strict success status from store action
     if (result.success) {
       uni.showToast({ title: '欢迎回家~', icon: 'success' });
       
-      // 延迟跳转到首页
       setTimeout(() => {
         uni.switchTab({ url: '/pages/index/index' });
       }, 800);
@@ -101,7 +106,7 @@ const handleLogin = async () => {
       uni.showToast({ title: result.message || '登录失败', icon: 'none' });
     }
   } catch (error) {
-    console.error('登录错误:', error);
+    console.error('Login error:', error);
     uni.showToast({ title: '网络连接失败', icon: 'none' });
   } finally {
     loggingIn.value = false;
@@ -111,20 +116,19 @@ const handleLogin = async () => {
 
 <style lang="scss" scoped>
 /* 暖色渐变主题 */
-$bg-gradient: linear-gradient(to top, #fff1eb 0%, #ace0f9 100%); /* 温暖的晨曦色 */
+$bg-gradient: linear-gradient(to top, #fff1eb 0%, #ace0f9 100%);
 $card-bg: rgba(255, 255, 255, 0.85);
-$btn-gradient: linear-gradient(120deg, #a18cd1 0%, #fbc2eb 100%); /* 香芋紫渐变 */
+$btn-gradient: linear-gradient(120deg, #a18cd1 0%, #fbc2eb 100%); 
 $primary-pink: #FF9A9E;
 
 .login-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #FFF9F0 0%, #FFF0F5 100%); /* 奶油白 -> 浅粉 */
+  background: linear-gradient(135deg, #FFF9F0 0%, #FFF0F5 100%); 
   position: relative;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   overflow: hidden;
 }
 
-/* 气泡动画 - 糖果色 */
 .bubble {
   position: absolute; border-radius: 50%; filter: blur(60px); z-index: 0;
   animation: float 8s infinite ease-in-out;
@@ -164,7 +168,7 @@ $primary-pink: #FF9A9E;
 
 .input-group {
   display: flex; align-items: center;
-  background: #FFF5F7; /* 极淡的粉色背景 */
+  background: #FFF5F7; 
   border-radius: 30rpx; padding: 0 30rpx; margin-bottom: 30rpx;
   height: 100rpx; border: 2rpx solid transparent; transition: all 0.3s;
   
@@ -215,10 +219,7 @@ $primary-pink: #FF9A9E;
   .link-text { 
     font-size: 26rpx; color: #888; padding: 10rpx 20rpx; font-weight: bold;
     transition: all 0.3s;
-    
-    &:hover, &:active {
-      color: $primary-pink;
-    }
+    &:hover, &:active { color: $primary-pink; }
   }
   .divider { color: #eee; margin: 0 10rpx; }
 }
@@ -241,17 +242,11 @@ $primary-pink: #FF9A9E;
   to { opacity: 1; transform: translateY(0); } 
 }
 
-.placeholder-style {
-  color: #ccc; font-size: 28rpx;
-}
+.placeholder-style { color: #ccc; font-size: 28rpx; }
 
 @media screen and (min-width: 768px) {
-  .content-box {
-    width: 600rpx; margin: 0 auto;
-  }
-  
-  .card {
-    padding: 60rpx 50rpx;
-  }
+  .content-box { width: 600rpx; margin: 0 auto; }
+  .card { padding: 60rpx 50rpx; }
 }
 </style>
+}

@@ -7,32 +7,37 @@ export interface RestResult<T> {
   data: T;
 }
 
-// 分页数据结构 (新增，对应 RestResult_PageResult_*)
+// 分页数据结构
 export interface PageResult<T> {
   page: number;
   size: number;
   total: number;
-  totalPages: number;
+  totalPages?: number; // OpenAPI Schema 定义中未明确包含但通常会有，前端计算也行
   data: T[];
 }
 
 // 登录请求参数
 export interface LoginRequest {
   userAccount: string;
-  userPassword?: string; // OpenAPI中未强制，但在请求体中通常必填，这里设为可选兼容UserDO
+  userPassword?: string; 
 }
 
-// 用户 (UserDTO) - 对应 openapi schemas/UserDTO
+// 用户 (UserDTO) - 聚合 OpenAPI 定义与前端需求
 export interface UserDTO {
   id: number;
-  userAccount: string;
   username: string;
+  email?: string;        // OpenAPI 定义字段
+  createdAt?: string;    // OpenAPI 定义字段
+  updatedAt?: string;    // OpenAPI 定义字段
+  
+  // --- 前端兼容扩展字段 ---
+  userAccount?: string;  // UserDO 中有，DTO 中可能不返回，前端需注意判空
   phone?: string;
-  token?: string; // 登录成功后返回
-  // email?: string; // OpenAPI 中无此字段，已移除
+  token?: string;        // 登录接口返回时附加
+  avatar?: string;       // 前端UI展示用
 }
 
-// 用户实体 (UserDO) - 用于注册
+// 用户实体 (UserDO) - 用于注册/更新
 export interface UserDO {
   id?: number;
   userAccount: string;
@@ -57,20 +62,18 @@ export interface BoxDTO {
   updateTime?: string;
 }
 
-// 物品 (ItemDTO) - 修正字段以匹配 OpenAPI
+// 物品 (ItemDTO)
 export interface ItemDTO {
   id?: number;
-  boxId: number;   
   itemCode: string;
-  autoRecognizeName?: string; // 自动识别名称
-  manualEditName?: string;    // 手动编辑名称
+  boxId: number;   
+  autoRecognizeName?: string; 
+  manualEditName?: string;    
   itemTag?: string; 
   itemDesc?: string;
   putInTime?: string;
   expireTime?: string;
-  isValid?: number; // 0-已取出，1-在盒内
-  // price?: number; // OpenAPI 中无此字段，已移除
-  // itemName?: string; // OpenAPI 中无此字段，需使用 autoRecognizeName 或 manualEditName
+  isValid?: number; // 0-无效/已取出，1-有效/在盒内
 }
 
 // 情感标签 (EmotionDTO)
@@ -81,14 +84,14 @@ export interface EmotionDTO {
   emotionRemark?: string;
 }
 
-// 错误日志 (ErrorLogDTO)
+// 错误日志
 export interface ErrorLogDTO {
   errorCode: string;
   errorMessage: string;
   errorTime: string;
 }
 
-// 降级策略请求 (FallbackRequestDTO)
+// 降级策略请求
 export interface FallbackRequestDTO {
   serviceId: string;
   fallbackReason: string;
@@ -106,9 +109,8 @@ export interface AiChatResponse {
   action?: string;  
 }
 
-// --- 查询参数接口 ---
+// --- 查询参数 ---
 
-// 盒子查询参数
 export interface QueryBoxDTO {
   page?: number;
   size?: number;
@@ -121,21 +123,19 @@ export interface QueryBoxDTO {
   status?: number;
 }
 
-// 物品查询参数
 export interface QueryItemDTO {
   page?: number;
   size?: number;
   userId?: number;
   boxId?: number;
   itemCode?: string;
-  name?: string; // 匹配自动名称或手动名称
+  name?: string; 
   itemTag?: string;
   isValid?: number;
 }
 
-// 情感标签查询参数
-export interface QueryEmotionDTO {
-  page?: number;
-  size?: number;
-  itemId?: number;
+export interface QueryUserDTO {
+  currentPage?: number;
+  pageSize?: number;
+  keyword?: string;
 }

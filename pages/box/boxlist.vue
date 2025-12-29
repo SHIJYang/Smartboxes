@@ -2,67 +2,51 @@
   <view class="page-root">
     <PCHeader current="box" />
     <view class="pc-placeholder"></view>
-
     <view class="mobile-header">
       <view class="header-content">
         <text class="title">📦 我的宝箱库</text>
-        <text class="subtitle">管理你的 {{ list.length }} 个收纳空间</text>
+        <text class="subtitle">管理你的 {{ store.boxList.length }} 个收纳空间</text>
       </view>
     </view>
-
     <scroll-view scroll-y class="list-scroll" :show-scrollbar="false">
       <view class="list-body">
-        <view 
-          v-for="box in list" :key="box.id" 
-          class="box-card" 
-          @click="goDetail(box.id)"
-          hover-class="card-hover"
-        >
-          <view class="card-icon">
-            <text>📦</text>
+        <view v-for="box in store.boxList" :key="box.id" class="box-card" @click="goDetail(box.id)" hover-class="card-hover">
+          <view class="card-top">
+            <view class="box-name">{{ box.boxName }}</view>
+            <view class="box-code">ID: {{ box.boxCode }}</view>
           </view>
-          
-          <view class="card-info">
-            <view class="top-row">
-              <text class="name">{{ box.boxName }}</text>
-              <view class="status-badge" :class="box.status===1?'online':'offline'">
-                {{ box.status===1 ? '在线' : '离线' }}
-              </view>
+          <view class="card-btm">
+            <view class="status-tag" :class="{ active: box.status === 1 }">
+              {{ box.status === 1 ? '启用中' : '已停用' }}
             </view>
-            <text class="desc">编码: {{ box.boxCode }}</text>
+            <view class="type-tag">
+              {{ box.boxType === 1 ? '普通箱' : '冷藏箱' }}
+            </view>
           </view>
-          
-          <view class="arrow-btn">→</view>
         </view>
-        
-        <view v-if="list.length === 0" class="empty-state">
+        <view v-if="store.boxList.length === 0" class="empty-state">
           <text>还没有盒子，点击右下角添加一个吧~</text>
         </view>
       </view>
     </scroll-view>
-
     <view class="fab" @click="goEdit()" hover-class="fab-hover">+</view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
-import { getBoxList } from '@/api/index';
-import type { BoxDTO } from '@/common/types';
+import { useBoxStore } from '@/stores/boxStore';
 import PCHeader from '@/components/PCHeader.vue';
 
-const list = ref<BoxDTO[]>([]);
+const store = useBoxStore();
 
 onShow(async () => {
-  const res = await getBoxList({ userId: 1001 });
-  if (res.code === 200) list.value = res.data;
+  await store.fetchBoxList({ userId: 1001, page: 1, size: 999 });
 });
 
 const goDetail = (id: number) => uni.navigateTo({ url: `/pages/box/boxdetail?id=${id}` });
 const goEdit = () => uni.navigateTo({ url: '/pages/box/boxedit' });
 </script>
-
 <style lang="scss" scoped>
 /* 暖色主题变量 */
 $bg-color: #FFF9F0;

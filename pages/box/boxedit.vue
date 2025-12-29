@@ -1,66 +1,36 @@
+{
+type: uploaded file
+fileName: boxedit.vue
+fullContent:
 <template>
-  <view class="page-container">
+  <view class="form-page">
     <PCHeader current="box" />
     <view class="pc-placeholder"></view>
-
-    <view class="bg-shape shape-1"></view>
-
-    <view class="content-wrapper">
-      <view class="header fade-in-down">
-        <text class="title">{{ form.id ? '编辑盒子' : '新建盒子' }}</text>
-        <text class="subtitle">{{ form.id ? '修改属性' : 'Create New Box' }}</text>
+    <view class="form-body">
+      <view class="form-group">
+        <text class="label">📦 盒子名称 *</text>
+        <input v-model="form.boxName" class="input" placeholder="如：冬季衣物箱" />
       </view>
-
-      <view class="form-card fade-in-up">
-        <view class="input-group">
-          <view class="label">盒子名称</view>
-          <view class="input-shell">
-            <text class="icon">📦</text>
-            <input 
-              class="inp" 
-              v-model="form.boxName" 
-              placeholder="例如：客厅杂物箱" 
-              placeholder-class="placeholder"
-            />
-          </view>
-        </view>
-
-        <view class="input-group">
-          <view class="label">唯一编码 (Code)</view>
-          <view class="input-shell">
-            <text class="icon">🔢</text>
-            <input 
-              class="inp" 
-              v-model="form.boxCode" 
-              placeholder="设备背面的 ID" 
-              placeholder-class="placeholder"
-            />
-          </view>
-        </view>
-        
-        <view class="input-group" v-if="form.id">
-          <view class="label">状态模拟</view>
-          <view class="switch-row">
-             <text>设备在线</text>
-             <switch 
-               :checked="form.status === 1" 
-               @change="e => form.status = e.detail.value ? 1 : 0" 
-               color="#FF9A9E" 
-               style="transform:scale(0.8)"
-             />
-          </view>
-        </view>
+      <view class="form-group">
+        <text class="label">🔢 盒子编码 *</text>
+        <input v-model="form.boxCode" class="input" placeholder="唯一标识，如 BOX2025XXXX" />
       </view>
-
-      <view class="action-area fade-in-up">
-        <button class="btn-save" hover-class="btn-hover" @click="submit">
-          {{ submitting ? '保存中...' : '保 存' }}
-        </button>
-        
-        <button v-if="form.id" class="btn-del" hover-class="btn-hover" @click="remove">
-          删除
-        </button>
+      <view class="form-group">
+        <text class="label">⚙️ 状态</text>
+        <switch :checked="form.status === 1" @change="onStatusChange" color="#FF9A9E" />
+        <text class="switch-label">{{ form.status === 1 ? '启用' : '停用' }}</text>
       </view>
+      <view class="form-group">
+        <text class="label">❄️ 类型</text>
+        <radio-group @change="onTypeChange" class="radio-grp">
+          <label class="radio-label"><radio :value="'1'" :checked="form.boxType === 1" color="#FF9A9E" /> 普通箱</label>
+          <label class="radio-label"><radio :value="'2'" :checked="form.boxType === 2" color="#FF9A9E" /> 冷藏箱</label>
+        </radio-group>
+      </view>
+    </view>
+    <view class="action-bar">
+      <view v-if="form.id" class="delete-btn" @click="remove">🗑️ 删除</view>
+      <button class="submit-btn" :loading="submitting" @click="submit">保存盒子</button>
     </view>
   </view>
 </template>
@@ -68,31 +38,59 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
-import { getBoxDetail, saveBox, deleteBox } from '@/api/index';
+import { useBoxStore } from '@/stores/boxStore';
 import type { BoxDTO } from '@/common/types';
 import PCHeader from '@/components/PCHeader.vue';
 
-const form = ref<BoxDTO>({ id: 0, boxName: '', boxCode: '', userId: 1001, status: 0, boxType: 1 });
+const store = useBoxStore();
+
+const form = ref<BoxDTO>({
+  id: undefined,
+  boxName: '',
+  boxCode: '',
+  userId: 1001,
+  status: 0,
+  boxType: 1
+});
+
 const submitting = ref(false);
 
-onLoad(async (opt: any) => {
+onLoad(async (opt: Record<string, any>) => {
   if (opt.id) {
     uni.setNavigationBarTitle({ title: '编辑盒子' });
-    const res = await getBoxDetail(parseInt(opt.id));
-    if (res.code === 200) form.value = res.data;
+    const id = parseInt(opt.id);
+    await store.fetchBoxDetail(id);
+    if (store.currentBox) {
+      // Shallow copy to break reference
+      form.value = { ...store.currentBox };
+    }
   } else {
     uni.setNavigationBarTitle({ title: '新建盒子' });
   }
 });
 
+const onStatusChange = (e: any) => {
+  form.value.status = e.detail.value ? 1 : 0;
+};
+
+const onTypeChange = (e: any) => {
+  form.value.boxType = parseInt(e.detail.value);
+};
+
 const submit = async () => {
-  if (!form.value.boxName || !form.value.boxCode) return uni.showToast({ title: '请填写完整', icon: 'none' });
-  
+  if (!form.value.boxName?.trim() || !form.value.boxCode?.trim()) {
+    return uni.showToast({ title: '盒子名称和编码不能为空', icon: 'none' });
+  }
+
   submitting.value = true;
   try {
-    await saveBox(form.value);
-    uni.showToast({ title: '保存成功', icon: 'success' });
-    setTimeout(() => uni.navigateBack(), 800);
+    const result = await store.saveBox(form.value);
+    if (result.success) {
+      uni.showToast({ title: '保存成功', icon: 'success' });
+      setTimeout(() => uni.navigateBack(), 800);
+    } else {
+      uni.showToast({ title: result.message || '保存失败', icon: 'none' });
+    }
   } finally {
     submitting.value = false;
   }
@@ -104,9 +102,9 @@ const remove = async () => {
     content: '删除后无法恢复，确定吗？',
     confirmColor: '#FF9A9E',
     success: async (res) => {
-      if (res.confirm) {
-        await deleteBox(form.value.id);
-        uni.navigateBack();
+      if (res.confirm && form.value.id) {
+        const result = await store.deleteBox(form.value.id);
+        if (result.success) uni.navigateBack();
       }
     }
   });
@@ -114,105 +112,61 @@ const remove = async () => {
 </script>
 
 <style lang="scss" scoped>
-/* 统一暖色变量 */
 $bg-color: #FFF9F0;
 $primary-gradient: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%);
 
-.page-container {
+.form-page {
   min-height: 100vh;
   background-color: $bg-color;
   padding: 40rpx;
   position: relative;
-  overflow: hidden;
 }
+.pc-placeholder { display: none; height: 80px; @media screen and (min-width: 768px) { display: block; } }
 
-.pc-placeholder {
-  display: none; height: 80px;
-  @media screen and (min-width: 768px) { display: block; }
-}
-
-.bg-shape {
-  position: absolute;
-  width: 400rpx; height: 400rpx;
-  background: radial-gradient(circle, rgba(251, 194, 235, 0.2) 0%, rgba(255,255,255,0) 70%);
-  border-radius: 50%;
-  top: -50rpx; right: -80rpx;
-  z-index: 0; pointer-events: none;
-}
-
-.content-wrapper { position: relative; z-index: 10; }
-
-.header {
-  margin-bottom: 50rpx;
-  .title { font-size: 56rpx; font-weight: 800; color: #333; display: block; margin-bottom: 10rpx; }
-  .subtitle { font-size: 26rpx; color: #999; }
-}
-
-.form-card {
+.form-body {
   background: #fff;
   border-radius: 40rpx;
   padding: 40rpx;
   box-shadow: 0 10rpx 40rpx rgba(161, 140, 209, 0.1);
+  margin-top: 20rpx;
 }
 
-.input-group {
+.form-group {
   margin-bottom: 40rpx;
   &:last-child { margin-bottom: 0; }
+  .label { font-size: 28rpx; color: #666; margin-bottom: 16rpx; font-weight: bold; display: block; padding-left: 10rpx;}
   
-  .label { font-size: 28rpx; color: #666; margin-bottom: 16rpx; font-weight: bold; padding-left: 10rpx;}
-  
-  /* 奶油风输入框：浅灰色胶囊背景 */
-  .input-shell {
+  .input {
     background: #F8F8F8;
     border-radius: 24rpx;
     padding: 20rpx 30rpx;
-    display: flex; align-items: center;
+    height: 80rpx;
+    font-size: 30rpx; color: #333;
     border: 2rpx solid transparent;
     transition: all 0.3s;
-    
-    .icon { font-size: 36rpx; margin-right: 20rpx; }
-    .inp { flex: 1; font-size: 30rpx; color: #333; height: 40rpx; }
-    .placeholder { color: #ccc; }
-    
-    &:focus-within { background: #fff; border-color: #FF9A9E; box-shadow: 0 4rpx 10rpx rgba(255, 154, 158, 0.2); }
+    &:focus { background: #fff; border-color: #FF9A9E; }
   }
   
-  .switch-row {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 0 10rpx; font-size: 30rpx; font-weight: bold; color: #555;
-  }
+  .switch-label { margin-left: 20rpx; color: #555; font-size: 28rpx; }
+  
+  .radio-grp { display: flex; gap: 40rpx; }
+  .radio-label { display: flex; align-items: center; font-size: 28rpx; color: #555; }
 }
 
-.action-area {
+.action-bar {
   margin-top: 60rpx;
-  
-  .btn-save {
+  .submit-btn {
     background: $primary-gradient;
-    color: #fff;
-    border-radius: 50rpx;
+    color: #fff; border-radius: 50rpx;
     font-size: 34rpx; font-weight: bold;
     box-shadow: 0 10rpx 20rpx rgba(255, 154, 158, 0.3);
     margin-bottom: 30rpx;
-    border: none;
-    height: 100rpx; line-height: 100rpx;
     &::after { border: none; }
   }
-  
-  .btn-del {
-    background: #fff;
-    color: #ff6b81;
-    border: 2rpx solid #ffebee;
-    border-radius: 50rpx;
-    font-size: 30rpx; font-weight: bold;
-    height: 90rpx; line-height: 90rpx;
-    &::after { border: none; }
+  .delete-btn {
+    text-align: center; color: #ff6b81; font-size: 28rpx; margin-bottom: 20rpx;
+    opacity: 0.8;
   }
-  
-  .btn-hover { transform: scale(0.98); opacity: 0.9; }
 }
-
-.fade-in-down { animation: fadeInDown 0.6s ease-out; }
-.fade-in-up { animation: fadeInUp 0.6s ease-out; }
-@keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 </style>
+}

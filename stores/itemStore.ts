@@ -5,229 +5,208 @@ import type { ItemDTO, QueryItemDTO } from '@/common/types';
 
 export const useItemStore = defineStore('item', {
   state: () => ({
-    // 物品列表
     itemList: [] as ItemDTO[],
-    
-    // 当前选中的物品详情
     currentItem: null as ItemDTO | null,
     
-    // 分页信息
     pagination: {
-      currentPage: 1,
-      pageSize: 10,
+      page: 1,
+      size: 10,
       total: 0
     },
     
-    // 查询参数
     queryParams: {
+      userId: undefined as number | undefined,
       boxId: undefined as number | undefined,
       itemCode: '',
+      name: '', 
       itemTag: '',
       isValid: undefined as number | undefined
     } as QueryItemDTO,
     
-    // 加载状态
     loading: false,
-    detailLoading: false,
-    
-    // 选中物品ID（用于详情页）
-    selectedItemId: null as number | null,
-    
-    // 当前盒子ID（用于筛选）
-    currentBoxId: null as number | null
+    detailLoading: false
   }),
 
   getters: {
-    // 有效物品（在盒内）
-    validItems: (state) => state.itemList.filter(item => item.isValid === 1),
-    
-    // 已取出物品
-    removedItems: (state) => state.itemList.filter(item => item.isValid === 0),
-    
-    // 根据盒子ID获取物品
-    getItemsByBoxId: (state) => (boxId: number) => {
-      return state.itemList.filter(item => item.boxId === boxId);
-    },
-    
-    // 根据ID获取物品
-    getItemById: (state) => (id: number) => {
-      return state.itemList.find(item => item.id === id) || null;
-    },
-    
-    // 搜索物品（根据名称或标签）
-    searchItems: (state) => (keyword: string) => {
-      if (!keyword.trim()) return state.itemList;
-      
-      const lowerKeyword = keyword.toLowerCase();
+    // 纯前端搜索 (Getter): 当列表已加载时快速筛选
+    searchLocalItems: (state) => (keyword: string) => {
+      if (!keyword) return state.itemList;
+      const lower = keyword.toLowerCase();
       return state.itemList.filter(item => 
-        (item.autoRecognizeName?.toLowerCase().includes(lowerKeyword) ||
-         item.manualEditName?.toLowerCase().includes(lowerKeyword) ||
-         item.itemTag?.toLowerCase().includes(lowerKeyword) ||
-         item.itemCode?.toLowerCase().includes(lowerKeyword))
+        (item.autoRecognizeName?.toLowerCase().includes(lower) ||
+         item.manualEditName?.toLowerCase().includes(lower) ||
+         item.itemTag?.toLowerCase().includes(lower) ||
+         item.itemCode?.toLowerCase().includes(lower))
       );
     },
     
-    // 按标签分组
-    itemsByTag: (state) => {
-      const grouped: Record<string, ItemDTO[]> = {};
-      state.itemList.forEach(item => {
-        const tag = item.itemTag || '未分类';
-        if (!grouped[tag]) {
-          grouped[tag] = [];
-        }
-        grouped[tag].push(item);
-      });
-      return grouped;
+    // 根据 BoxId 筛选 (用于盒子详情页)
+    getItemsByBoxId: (state) => (boxId: number) => {
+        return state.itemList.filter(i => i.boxId === boxId && i.isValid === 1);
     }
   },
 
   actions: {
-    // 获取物品列表
-    async fetchItemList(params?: QueryItemDTO) {
+    // 1. 获取物品分页
+    async fetchItemPage(params: QueryItemDTO = {}) {
       this.loading = true;
+      this.updateQueryParams(params);
+
       try {
-        const response = await API.getItemList(params || this.queryParams);
-        this.itemList = response.data || [];
+        const res = await API.getItemPage({ 
+            ...this.queryParams, 
+            page: this.pagination.page,
+            size: this.pagination.size 
+        });
         
-        // 如果有分页信息
-        if (response.data && response.data.pagination) {
+        if (res.code === 200 && res.data) {
+          this.itemList = res.data.data;
           this.pagination = {
-            currentPage: response.data.currentPage || 1,
-            pageSize: response.data.pageSize || 10,
-            total: response.data.total || 0
+            page: res.data.page,
+            size: res.data.size,
+            total: res.data.total
           };
         }
-        
-        return this.itemList;
       } catch (error) {
-        console.error('获取物品列表失败:', error);
-        throw error;
+        console.error('Fetch items error:', error);
       } finally {
         this.loading = false;
       }
     },
+    
+    // 2. 获取所有物品 (用于无需分页的场景，如搜索或统计)
+    async fetchAllItems(params: QueryItemDTO = {}) {
+        this.loading = true;
+        this.updateQueryParams(params);
+        try {
+            // 调用无分页接口 list
+            const res = await API.getItemList(this.queryParams);
+            if (res.code === 200) {
+                this.itemList = res.data;
+                this.pagination.total = res.data.length;
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            this.loading = false;
+        }
+    },
 
-    // 获取物品详情
+    // 3. 获取详情 [核心要求：优先本地]
     async fetchItemDetail(id: number) {
       this.detailLoading = true;
-      this.selectedItemId = id;
       
+      // A. 优先从 Local List 获取，实现零延迟展示
+      const localItem = this.itemList.find(i => i.id === id);
+      if (localItem) {
+        this.currentItem = { ...localItem };
+      }
+
+      // B. 后台静默刷新数据，保证数据时效性
       try {
-        const response = await API.getItemDetail(id);
-        this.currentItem = response.data;
-        return response.data;
+        const res = await API.getItemDetail(id);
+        if (res.code === 200) {
+          this.currentItem = res.data;
+          // 同步更新列表中的旧数据
+          const idx = this.itemList.findIndex(i => i.id === id);
+          if (idx !== -1) this.itemList[idx] = res.data;
+        }
       } catch (error) {
-        console.error(`获取物品详情失败 (ID: ${id}):`, error);
-        throw error;
+        console.warn('Fetch detail failed, using local data if available');
       } finally {
         this.detailLoading = false;
       }
     },
 
-    // 创建或更新物品
+    // 4. 保存
     async saveItem(itemData: ItemDTO) {
       this.loading = true;
       try {
-        await API.saveItem(itemData);
-        
-        // 更新本地数据
-        if (itemData.id) {
-          // 更新操作
-          const index = this.itemList.findIndex(item => item.id === itemData.id);
-          if (index !== -1) {
-            this.itemList[index] = { ...this.itemList[index], ...itemData };
-          }
-          
-          // 如果当前查看的就是这个物品，也更新
-          if (this.currentItem?.id === itemData.id) {
-            this.currentItem = { ...this.currentItem, ...itemData };
-          }
-        } else {
-          // 创建操作 - 重新获取列表
-          await this.fetchItemList();
+        const isEdit = !!itemData.id;
+        const apiCall = isEdit ? API.updateItem : API.addItem;
+        const res = await apiCall(itemData);
+
+        if (res.code === 200) {
+          // 简单起见，重新拉取当前页
+          await this.fetchItemPage(); 
+          return { success: true };
         }
-        
-        return { success: true };
+        return { success: false, message: res.msg };
       } catch (error) {
-        console.error('保存物品失败:', error);
-        return { success: false, message: '保存失败' };
+        return { success: false, message: '保存异常' };
       } finally {
         this.loading = false;
       }
     },
 
-    // 删除物品
+    // 5. 删除
     async deleteItem(id: number) {
-      this.loading = true;
       try {
-        await API.deleteItem(id);
-        
-        // 从列表中移除
-        this.itemList = this.itemList.filter(item => item.id !== id);
-        
-        // 如果删除的是当前查看的物品，清空currentItem
-        if (this.currentItem?.id === id) {
-          this.currentItem = null;
+        const res = await API.deleteItem(id);
+        if (res.code === 200) {
+          this.itemList = this.itemList.filter(i => i.id !== id);
+          if (this.currentItem?.id === id) this.currentItem = null;
+          this.pagination.total = Math.max(0, this.pagination.total - 1);
+          return { success: true };
         }
-        
-        return { success: true };
-      } catch (error) {
-        console.error(`删除物品失败 (ID: ${id}):`, error);
+        return { success: false, message: res.msg };
+      } catch (e) {
         return { success: false, message: '删除失败' };
-      } finally {
-        this.loading = false;
       }
     },
+    
+    // 6. 移动物品
+    async moveItem(itemId: number, targetBoxId: number) {
+        try {
+            const res = await API.moveItem(itemId, targetBoxId);
+            if (res.code === 200) {
+                // 本地乐观更新
+                this._updateLocalItem(itemId, { boxId: targetBoxId });
+                return { success: true };
+            }
+            return { success: false, message: res.msg };
+        } catch (e) {
+            return { success: false, message: '移动失败' };
+        }
+    },
 
-    // 更新查询参数
+    // 7. 更新状态 (取出/放入)
+    async updateItemStatus(itemId: number, isValid: number) {
+        try {
+            const res = await API.updateItemStatus(itemId, isValid);
+            if (res.code === 200) {
+                this._updateLocalItem(itemId, { isValid });
+                return { success: true };
+            }
+            return { success: false, message: res.msg };
+        } catch (e) {
+            return { success: false, message: '更新状态失败' };
+        }
+    },
+
     updateQueryParams(params: Partial<QueryItemDTO>) {
       this.queryParams = { ...this.queryParams, ...params };
-      if (params.boxId !== undefined) {
-        this.currentBoxId = params.boxId;
-      }
     },
-
-    // 重置查询参数
+    
     resetQueryParams() {
       this.queryParams = {
         boxId: undefined,
         itemCode: '',
+        name: '',
         itemTag: '',
         isValid: undefined
       };
-      this.currentBoxId = null;
     },
 
-    // 清空当前物品
-    clearCurrentItem() {
-      this.currentItem = null;
-      this.selectedItemId = null;
-    },
-
-    // 设置当前盒子（用于筛选）
-    setCurrentBoxId(boxId: number | null) {
-      this.currentBoxId = boxId;
-      this.queryParams.boxId = boxId;
-    },
-
-    // 标记物品为已取出
-    async markItemAsRemoved(itemId: number) {
-      const item = this.itemList.find(item => item.id === itemId);
-      if (item) {
-        item.isValid = 0;
-        // 可以调用API更新状态
-        // await API.updateItemStatus(itemId, 0);
-      }
-    },
-
-    // 标记物品为在盒内
-    async markItemAsValid(itemId: number) {
-      const item = this.itemList.find(item => item.id === itemId);
-      if (item) {
-        item.isValid = 1;
-        // 可以调用API更新状态
-        // await API.updateItemStatus(itemId, 1);
-      }
+    // 内部辅助：更新本地数据
+    _updateLocalItem(id: number, patch: Partial<ItemDTO>) {
+        if (this.currentItem?.id === id) {
+            this.currentItem = { ...this.currentItem, ...patch };
+        }
+        const idx = this.itemList.findIndex(i => i.id === id);
+        if (idx !== -1) {
+            this.itemList[idx] = { ...this.itemList[idx], ...patch };
+        }
     }
   }
 });
