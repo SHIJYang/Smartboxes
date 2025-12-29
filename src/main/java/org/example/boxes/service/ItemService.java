@@ -2,51 +2,50 @@ package org.example.boxes.service;
 
 import java.util.List;
 import org.example.boxes.dto.ItemDTO;
+import org.example.boxes.dto.PageQueryDTO;
 import org.example.boxes.dto.QueryItemDTO;
+import org.example.boxes.result.PageResult;
 import org.example.boxes.result.RestResult;
 
 /**
- * 商品服务接口
+ * 物品服务接口
  *
  * @author 14577
  */
 public interface ItemService {
 
-    /**
-     * 添加新商品
-     *
-     * @param itemDTO 商品数据传输对象
-     * @return RestResult 结果封装
-     */
     RestResult<Void> addItem(ItemDTO itemDTO);
-
-    /**
-     * 删除指定商品
-     *
-     * @param id 商品主键ID
-     * @return RestResult 结果封装
-     */
     RestResult<Void> deleteItem(Long id);
+    RestResult<Void> updateItem(ItemDTO itemDTO);
+    RestResult<ItemDTO> getItemDetail(Long id);
 
     /**
-     * 更新商品信息
-     *
-     * @param itemDTO 更新的商品数据
-     * @return RestResult 结果封装
+     * 移动物品到另一个盒子
      */
-    RestResult<Void> updateItem(ItemDTO itemDTO);
+    RestResult<Void> moveItem(Long itemId, Long targetBoxId);
+
     /**
-     * 查询商品详细信息
-     *
-     * @param id 商品主键ID
-     * @return RestResult 结果封装
+     * 更新物品状态
      */
-    RestResult<ItemDTO> getItemDetail(Long id);
+    RestResult<Void> updateItemStatus(Long id, Integer isValid);
+
     /**
-     * 查询商品列表
-     *
-     * @param queryItemDTO 查询参数
-     * @return RestResult 结果封装
+     * 综合查询物品列表 (支持 User, Box, Tag, Code 组合)
      */
     RestResult<List<ItemDTO>> listItems(QueryItemDTO queryItemDTO);
+
+    /**
+     * 分页查询物品列表 (支持 User, Box, Tag, Code 组合)
+     */
+    RestResult<PageResult<ItemDTO>> listItemsByPage(QueryItemDTO queryItemDTO, PageQueryDTO pageQueryDTO);
+
+    /**
+     * 快捷方法：根据盒子ID查找所有物品
+     */
+    RestResult<List<ItemDTO>> listItemsByBox(Long boxId);
+
+    /**
+     * 快捷方法：根据用户ID查找所有物品
+     */
+    RestResult<List<ItemDTO>> listItemsByUser(Long userId);
 }

@@ -52,8 +52,7 @@ public class BoxDTO {
     private Integer boxType;
 
     /**
-     * 盒子状态（0-离线 1-在线 2-低电 3-故障）
->>>>>>> 274ee59967deb523f16d5cc722ba6731b64355b7
+     * 盒子状态（0-离线 1-在线 2-低电量 3-故障）
      */
     @NotNull(message = "盒子状态不能为空")
     @Min(0)
@@ -73,6 +72,11 @@ public class BoxDTO {
     @Min(value = 0, message = "电量值超出范围")
     @Max(value = 100, message = "电量值超出范围")
     private Integer battery;
+
+    /**
+     * 网络延迟 (ms)，仅主盒有效
+     */
+    private Integer networkDelay;
 
     private java.time.LocalDateTime lastHeartbeatTime;
 

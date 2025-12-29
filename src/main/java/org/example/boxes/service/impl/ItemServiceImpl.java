@@ -8,17 +8,22 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.boxes.dto.ItemDTO;
+import org.example.boxes.dto.PageQueryDTO;
 import org.example.boxes.dto.QueryItemDTO;
 import org.example.boxes.entity.ItemDO;
 import org.example.boxes.repository.ItemRepository;
+import org.example.boxes.result.PageResult;
 import org.example.boxes.result.RestResult;
 import org.example.boxes.service.ItemService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 /**
- * 商品服务实现类
+ * 物品服务实现类
  *
  * @author 14577
  */
@@ -30,71 +35,62 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
 
     /**
-     * 添加新商品
-     *
-     * @param itemDTO 商品数据传输对象
-     * @return RestResult 结果封装
+     * 添加新物品
      */
     @Override
     public RestResult<Void> addItem(ItemDTO itemDTO) {
-        // 验证商品编码是否唯一
+        // 验证物品编码是否唯一
         Optional<ItemDO> existingItem = itemRepository.findByItemCode(itemDTO.getItemCode());
         if (existingItem.isPresent()) {
-            log.warn("新增商品失败：商品编码 {} 已存在", itemDTO.getItemCode());
-            return RestResult.error("商品编码已存在");
+            log.warn("新增物品失败：物品编码 {} 已存在", itemDTO.getItemCode());
+            return RestResult.error("物品编码已存在");
         }
 
-        // 插入新商品信息
+        // 插入新物品信息
         ItemDO itemDO = convertToEntity(itemDTO);
         itemDO.setCreateTime(LocalDateTime.now());
         itemDO.setUpdateTime(LocalDateTime.now());
 
         try {
             itemRepository.save(itemDO);
-            log.info("新增商品成功，ID: {}", itemDO.getId());
+            log.info("新增物品成功，ID: {}", itemDO.getId());
             return RestResult.success(null);
         } catch (Exception e) {
-            log.error("新增商品异常：{}", e.getMessage(), e);
+            log.error("新增物品异常：{}", e.getMessage(), e);
             return RestResult.error("系统错误");
         }
     }
 
     /**
-     * 删除指定商品
-     *
-     * @param id 商品主键ID
-     * @return RestResult 结果封装
+     * 删除指定物品
      */
     @Override
     public RestResult<Void> deleteItem(Long id) {
         Optional<ItemDO> optionalItem = itemRepository.findById(id);
         if (!optionalItem.isPresent()) {
-            log.warn("删除商品失败：找不到ID为 {} 的商品信息", id);
-            return RestResult.error("商品信息不存在");
+            log.warn("删除物品失败：找不到ID为 {} 的物品信息", id);
+            return RestResult.error("物品信息不存在");
         }
 
         try {
             itemRepository.deleteById(id);
-            log.info("删除商品成功，ID: {}", id);
+            log.info("删除物品成功，ID: {}", id);
             return RestResult.success(null);
         } catch (Exception e) {
-            log.error("删除商品异常：{}", e.getMessage(), e);
+            log.error("删除物品异常：{}", e.getMessage(), e);
             return RestResult.error("系统错误");
         }
     }
 
     /**
-     * 更新商品信息
-     *
-     * @param itemDTO 更新的商品数据
-     * @return RestResult 结果封装
+     * 更新物品信息
      */
     @Override
     public RestResult<Void> updateItem(ItemDTO itemDTO) {
         Optional<ItemDO> optionalItem = itemRepository.findById(itemDTO.getId());
         if (!optionalItem.isPresent()) {
-            log.warn("修改商品失败：找不到ID为 {} 的商品信息", itemDTO.getId());
-            return RestResult.error("商品信息不存在");
+            log.warn("修改物品失败：找不到ID为 {} 的物品信息", itemDTO.getId());
+            return RestResult.error("物品信息不存在");
         }
 
         ItemDO itemDO = optionalItem.get();
@@ -130,88 +126,214 @@ public class ItemServiceImpl implements ItemService {
 
         try {
             itemRepository.save(itemDO);
-            log.info("修改商品成功，ID: {}", itemDO.getId());
+            log.info("修改物品成功，ID: {}", itemDO.getId());
             return RestResult.success(null);
         } catch (Exception e) {
-            log.error("修改商品异常：{}", e.getMessage(), e);
+            log.error("修改物品异常：{}", e.getMessage(), e);
             return RestResult.error("系统错误");
         }
     }
 
     /**
-     * 查询商品列表
-     *
-     * @param queryItemDTO 查询参数
-     * @return RestResult 结果封装
+     * 移动物品到新盒子
      */
     @Override
-    public RestResult<List<ItemDTO>> listItems(QueryItemDTO queryItemDTO) {
-        Specification<ItemDO> spec = (root, criteriaQuery, criteriaBuilder) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (queryItemDTO.getBoxId() != null) {
-                predicates.add(criteriaBuilder.equal(root.get("boxId"), queryItemDTO.getBoxId()));
-            }
-            if (queryItemDTO.getItemCode() != null && !queryItemDTO.getItemCode().isEmpty()) {
-                predicates.add(criteriaBuilder.like(root.get("itemCode"), "%" + queryItemDTO.getItemCode() + "%"));
-            }
-            if (queryItemDTO.getItemTag() != null && !queryItemDTO.getItemTag().isEmpty()) {
-                predicates.add(criteriaBuilder.like(root.get("itemTag"), "%" + queryItemDTO.getItemTag() + "%"));
-            }
-            if (queryItemDTO.getIsValid() != null) {
-                predicates.add(criteriaBuilder.equal(root.get("isValid"), queryItemDTO.getIsValid()));
-            }
-            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-        };
-
+    public RestResult<Void> moveItem(Long itemId, Long targetBoxId) {
+        Optional<ItemDO> itemOpt = itemRepository.findById(itemId);
+        if (!itemOpt.isPresent()) {
+            return RestResult.error("物品不存在");
+        }
         try {
-            List<ItemDO> items = itemRepository.findAll(spec, Sort.by(Sort.Direction.DESC, "createTime"));
-            List<ItemDTO> dtos = items.stream().map(this::convertToDto).toList();
-            log.info("查询商品列表成功，共 {} 条记录", dtos.size());
-            return RestResult.success(dtos);
+            ItemDO item = itemOpt.get();
+            item.setBoxId(targetBoxId);
+            item.setUpdateTime(LocalDateTime.now());
+            // 可在此处插入日志逻辑到 t_item_operate_log
+            
+            itemRepository.save(item);
+            log.info("物品 {} 已移动到盒子 {}", itemId, targetBoxId);
+            return RestResult.success(null);
         } catch (Exception e) {
-            log.error("查询商品列表异常：{}", e.getMessage(), e);
+            log.error("移动物品异常：{}", e.getMessage(), e);
             return RestResult.error("系统错误");
         }
     }
 
     /**
-     * 查询商品详细信息
-     *
-     * @param id 商品主键ID
-     * @return RestResult 结果封装
+     * 更新物品状态
+     */
+    @Override
+    public RestResult<Void> updateItemStatus(Long id, Integer isValid) {
+        Optional<ItemDO> itemOpt = itemRepository.findById(id);
+        if (!itemOpt.isPresent()) {
+            return RestResult.error("物品不存在");
+        }
+        try {
+            ItemDO item = itemOpt.get();
+            item.setIsValid(isValid);
+            item.setUpdateTime(LocalDateTime.now());
+            itemRepository.save(item);
+            log.info("物品 {} 状态更新为 {}", id, isValid);
+            return RestResult.success(null);
+        } catch (Exception e) {
+            log.error("更新物品状态异常：{}", e.getMessage(), e);
+            return RestResult.error("系统错误");
+        }
+    }
+
+    /**
+     * 查询物品详细信息
      */
     @Override
     public RestResult<ItemDTO> getItemDetail(Long id) {
         Optional<ItemDO> optionalItem = itemRepository.findById(id);
         if (!optionalItem.isPresent()) {
-            log.warn("查询商品详细信息失败：找不到ID为 {} 的商品信息", id);
-            return RestResult.error("商品信息不存在");
+            log.warn("查询物品详细信息失败：找不到ID为 {} 的物品信息", id);
+            return RestResult.error("物品信息不存在");
         }
 
         try {
             ItemDO itemDO = optionalItem.get();
-
-            // 如果需要关联查询，可以在这里处理
-            // 例如：如果需要查询关联的盒子信息
             if (itemDO.getBox() != null) {
-                log.debug("商品ID: {} 关联盒子: {}", id, itemDO.getBox().getId());
+                log.debug("物品ID: {} 关联盒子: {}", id, itemDO.getBox().getId());
             }
-
-            // 转换DTO时，可以添加额外的逻辑
             ItemDTO itemDTO = convertToDto(itemDO);
-            log.info("查询商品详细信息成功，ID: {}", id);
+            log.info("查询物品详细信息成功，ID: {}", id);
             return RestResult.success(itemDTO);
         } catch (Exception e) {
-            log.error("查询商品详细信息异常：{}", e.getMessage(), e);
+            log.error("查询物品详细信息异常：{}", e.getMessage(), e);
             return RestResult.error("系统错误");
         }
     }
 
     /**
+     * 综合查询物品列表 (不带分页)
+     */
+    @Override
+    public RestResult<List<ItemDTO>> listItems(QueryItemDTO queryItemDTO) {
+        Specification<ItemDO> spec = buildSpecification(queryItemDTO);
+
+        try {
+            List<ItemDO> items = itemRepository.findAll(spec, Sort.by(Sort.Direction.DESC, "createTime"));
+            List<ItemDTO> dtos = items.stream().map(this::convertToDto).toList();
+            log.info("查询物品列表成功，共 {} 条记录", dtos.size());
+            return RestResult.success(dtos);
+        } catch (Exception e) {
+            log.error("查询物品列表异常：{}", e.getMessage(), e);
+            return RestResult.error("系统错误");
+        }
+    }
+
+    /**
+     * 分页查询物品列表
+     */
+    @Override
+    public RestResult<PageResult<ItemDTO>> listItemsByPage(QueryItemDTO queryItemDTO, PageQueryDTO pageQueryDTO) {
+        Specification<ItemDO> spec = buildSpecification(queryItemDTO);
+
+        try {
+            // 处理分页参数，页码从0开始
+            int page = Math.max(0, pageQueryDTO.getPage() - 1);
+            int size = pageQueryDTO.getSize() != null ? pageQueryDTO.getSize() : 10;
+            String sortField = StringUtils.hasText(pageQueryDTO.getSortField()) ? pageQueryDTO.getSortField() : "createTime";
+            String sortOrder = StringUtils.hasText(pageQueryDTO.getSortOrder()) ? pageQueryDTO.getSortOrder() : "DESC";
+
+            Sort sort = Sort.by(Sort.Direction.fromString(sortOrder), sortField);
+            
+            Page<ItemDO> pageData = itemRepository.findAll(spec, PageRequest.of(page, size, sort));
+            
+            List<ItemDTO> dtos = pageData.getContent().stream().map(this::convertToDto).toList();
+            
+            PageResult<ItemDTO> pageResult = new PageResult<>(
+                page + 1, // 返回给前端的页码习惯从1开始
+                size,
+                pageData.getTotalElements(),
+                dtos
+            );
+            
+            return RestResult.success(pageResult);
+        } catch (Exception e) {
+            log.error("分页查询物品列表异常：{}", e.getMessage(), e);
+            return RestResult.error("系统错误");
+        }
+    }
+
+    /**
+     * 根据盒子找物品
+     */
+    @Override
+    public RestResult<List<ItemDTO>> listItemsByBox(Long boxId) {
+        try {
+            List<ItemDO> items = itemRepository.findByBoxId(boxId);
+            List<ItemDTO> dtos = items.stream().map(this::convertToDto).toList();
+            return RestResult.success(dtos);
+        } catch (Exception e) {
+            log.error("根据盒子查询物品异常：{}", e.getMessage(), e);
+            return RestResult.error("系统错误");
+        }
+    }
+
+    /**
+     * 根据用户找物品
+     */
+    @Override
+    public RestResult<List<ItemDTO>> listItemsByUser(Long userId) {
+        try {
+            // 需要在 Repository 中定义 findByBox_UserId
+            List<ItemDO> items = itemRepository.findByBox_UserId(userId);
+            List<ItemDTO> dtos = items.stream().map(this::convertToDto).toList();
+            return RestResult.success(dtos);
+        } catch (Exception e) {
+            log.error("根据用户查询物品异常：{}", e.getMessage(), e);
+            return RestResult.error("系统错误");
+        }
+    }
+
+    /**
+     * 构建动态查询条件 (支持 User, Box, Tag, Name 组合)
+     */
+    private Specification<ItemDO> buildSpecification(QueryItemDTO query) {
+        return (root, criteriaQuery, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            // 1. 根据盒子ID查询
+            if (query.getBoxId() != null) {
+                predicates.add(cb.equal(root.get("boxId"), query.getBoxId()));
+            }
+
+            // 2. 根据用户ID查询 (关联查询：Item -> Box -> User)
+            if (query.getUserId() != null) {
+                // JPA 会自动处理 join，假设 ItemDO 中有 box 关联关系，BoxDO 中有 userId 字段
+                predicates.add(cb.equal(root.get("box").get("userId"), query.getUserId()));
+            }
+
+            // 3. 根据物品编码模糊查询
+            if (StringUtils.hasText(query.getItemCode())) {
+                predicates.add(cb.like(root.get("itemCode"), "%" + query.getItemCode() + "%"));
+            }
+
+            // 4. 根据标签模糊查询
+            if (StringUtils.hasText(query.getItemTag())) {
+                predicates.add(cb.like(root.get("itemTag"), "%" + query.getItemTag() + "%"));
+            }
+
+            // 5. 根据名称查询 (同时匹配自动识别名称和手动编辑名称)
+            if (StringUtils.hasText(query.getName())) {
+                Predicate autoName = cb.like(root.get("autoRecognizeName"), "%" + query.getName() + "%");
+                Predicate manualName = cb.like(root.get("manualEditName"), "%" + query.getName() + "%");
+                predicates.add(cb.or(autoName, manualName));
+            }
+
+            // 6. 根据状态查询
+            if (query.getIsValid() != null) {
+                predicates.add(cb.equal(root.get("isValid"), query.getIsValid()));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+    /**
      * 将DTO转换为DO
-     *
-     * @param dto DTO对象
-     * @return DO对象
      */
     private ItemDO convertToEntity(ItemDTO dto) {
         ItemDO entity = new ItemDO();
@@ -230,9 +352,6 @@ public class ItemServiceImpl implements ItemService {
 
     /**
      * 将DO转换为DTO
-     *
-     * @param entity DO对象
-     * @return DTO对象
      */
     private ItemDTO convertToDto(ItemDO entity) {
         ItemDTO dto = new ItemDTO();

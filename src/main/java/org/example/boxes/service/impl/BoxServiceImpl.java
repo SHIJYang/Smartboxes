@@ -35,25 +35,17 @@ public class BoxServiceImpl implements BoxService {
 
     /**
      * 新增盒子
-     *
-     * @param boxDTO 盒子数据传输对象
-     * @return RestResult 结果封装
      */
     @Override
     public RestResult<Void> addBox(BoxDTO boxDTO) {
-        // 校验传入的盒子编码是否已存在
         Optional<BoxDO> existingBox = boxRepository.findByBoxCode(boxDTO.getBoxCode());
         if (existingBox.isPresent()) {
             log.warn("新增盒子失败：盒子编码 {} 已存在", boxDTO.getBoxCode());
             return RestResult.error("盒子编码已存在");
         }
 
-        // 将新盒子信息保存到数据库
         BoxDO boxDO = convertToEntity(boxDTO);
-
-        // 确保 ID 为 null，表示新增操作
         boxDO.setId(null);
-
         boxDO.setCreateTime(LocalDateTime.now());
         boxDO.setUpdateTime(LocalDateTime.now());
 
@@ -69,9 +61,6 @@ public class BoxServiceImpl implements BoxService {
 
     /**
      * 删除盒子
-     *
-     * @param id 盒子主键ID
-     * @return RestResult 结果封装
      */
     @Override
     public RestResult<Void> deleteBox(Long id) {
@@ -93,9 +82,6 @@ public class BoxServiceImpl implements BoxService {
 
     /**
      * 修改盒子信息
-     *
-     * @param boxDTO 更新的盒子数据
-     * @return RestResult 结果封装
      */
     @Override
     public RestResult<Void> updateBox(BoxDTO boxDTO) {
@@ -106,31 +92,20 @@ public class BoxServiceImpl implements BoxService {
         }
 
         BoxDO boxDO = optionalBox.get();
-        // 只更新传入了值的字段
-        if (boxDTO.getBoxCode() != null) {
-            boxDO.setBoxCode(boxDTO.getBoxCode());
-        }
-        if (boxDTO.getUserId() != null) {
-            boxDO.setUserId(boxDTO.getUserId());
-        }
-        if (boxDTO.getBoxName() != null) {
-            boxDO.setBoxName(boxDTO.getBoxName());
-        }
-        if (boxDTO.getBoxType() != null) {
-            boxDO.setBoxType(boxDTO.getBoxType());
-        }
-        if (boxDTO.getStatus() != null) {
-            boxDO.setStatus(boxDTO.getStatus());
-        }
-        if (boxDTO.getRssi() != null) {
-            boxDO.setRssi(boxDTO.getRssi());
-        }
-        if (boxDTO.getBattery() != null) {
-            boxDO.setBattery(boxDTO.getBattery());
-        }
-        if (boxDTO.getLastHeartbeatTime() != null) {
-            boxDO.setLastHeartbeatTime(boxDTO.getLastHeartbeatTime());
-        }
+        
+        if (boxDTO.getBoxCode() != null) boxDO.setBoxCode(boxDTO.getBoxCode());
+        if (boxDTO.getUserId() != null) boxDO.setUserId(boxDTO.getUserId());
+        if (boxDTO.getBoxName() != null) boxDO.setBoxName(boxDTO.getBoxName());
+        if (boxDTO.getBoxType() != null) boxDO.setBoxType(boxDTO.getBoxType());
+        if (boxDTO.getStatus() != null) boxDO.setStatus(boxDTO.getStatus());
+        if (boxDTO.getRssi() != null) boxDO.setRssi(boxDTO.getRssi());
+        if (boxDTO.getBattery() != null) boxDO.setBattery(boxDTO.getBattery());
+        
+        // 修复：添加 networkDelay 更新逻辑
+        if (boxDTO.getNetworkDelay() != null) boxDO.setNetworkDelay(boxDTO.getNetworkDelay());
+        
+        if (boxDTO.getLastHeartbeatTime() != null) boxDO.setLastHeartbeatTime(boxDTO.getLastHeartbeatTime());
+        
         boxDO.setUpdateTime(LocalDateTime.now());
 
         try {
@@ -145,9 +120,6 @@ public class BoxServiceImpl implements BoxService {
 
     /**
      * 查询盒子列表
-     *
-     * @param queryBoxDTO 查询条件参数
-     * @return RestResult 结果封装
      */
     @Override
     public RestResult<List<BoxDTO>> listBoxes(QueryBoxDTO queryBoxDTO) {
@@ -166,32 +138,21 @@ public class BoxServiceImpl implements BoxService {
 
     /**
      * 分页查询盒子列表
-     *
-     * @param queryBoxDTO 查询条件参数
-     * @param pageQueryDTO 分页条件参数
-     * @return RestResult 结果封装
      */
     @Override
     public RestResult<PageResult<BoxDTO>> listBoxesByPage(QueryBoxDTO queryBoxDTO, PageQueryDTO pageQueryDTO) {
         Specification<BoxDO> spec = buildSpecification(queryBoxDTO);
 
         try {
-            // 设置默认值
-            int page = pageQueryDTO.getPage() != null ? pageQueryDTO.getPage() - 1 : 0;
+            int page = pageQueryDTO.getPage() != null ? Math.max(0, pageQueryDTO.getPage() - 1) : 0;
             int size = pageQueryDTO.getSize() != null ? pageQueryDTO.getSize() : 10;
             String sortOrder = pageQueryDTO.getSortOrder() != null ? pageQueryDTO.getSortOrder() : "DESC";
             String sortField = pageQueryDTO.getSortField() != null ? pageQueryDTO.getSortField() : "createTime";
 
-            // 构造排序对象
             Sort sort = Sort.by(Sort.Direction.fromString(sortOrder), sortField);
-
-            // 执行分页查询
             Page<BoxDO> boxPage = boxRepository.findAll(spec, PageRequest.of(page, size, sort));
-
-            // 转换为DTO列表
             List<BoxDTO> dtos = boxPage.getContent().stream().map(this::convertToDto).toList();
 
-            // 封装分页结果
             PageResult<BoxDTO> pageResult = new PageResult<>(
                     page + 1,
                     size,
@@ -222,7 +183,6 @@ public class BoxServiceImpl implements BoxService {
             if (queryBoxDTO.getBoxName() != null && !queryBoxDTO.getBoxName().isEmpty()) {
                 predicates.add(criteriaBuilder.like(root.get("boxName"), "%" + queryBoxDTO.getBoxName() + "%"));
             }
-            // 修改这里：对于boxType，使用等值查询
             if (queryBoxDTO.getBoxType() != null) {
                 predicates.add(criteriaBuilder.equal(root.get("boxType"), queryBoxDTO.getBoxType()));
             }
@@ -246,6 +206,8 @@ public class BoxServiceImpl implements BoxService {
         boxDTO.setStatus(boxDO.getStatus());
         boxDTO.setRssi(boxDO.getRssi());
         boxDTO.setBattery(boxDO.getBattery());
+        // 修复：添加 networkDelay 转换
+        boxDTO.setNetworkDelay(boxDO.getNetworkDelay());
         boxDTO.setLastHeartbeatTime(boxDO.getLastHeartbeatTime());
         boxDTO.setCreateTime(boxDO.getCreateTime());
         boxDTO.setUpdateTime(boxDO.getUpdateTime());
@@ -265,6 +227,8 @@ public class BoxServiceImpl implements BoxService {
         boxDO.setStatus(boxDTO.getStatus());
         boxDO.setRssi(boxDTO.getRssi());
         boxDO.setBattery(boxDTO.getBattery());
+        // 修复：添加 networkDelay 转换
+        boxDO.setNetworkDelay(boxDTO.getNetworkDelay());
         boxDO.setLastHeartbeatTime(boxDTO.getLastHeartbeatTime());
         boxDO.setCreateTime(boxDTO.getCreateTime());
         boxDO.setUpdateTime(boxDTO.getUpdateTime());

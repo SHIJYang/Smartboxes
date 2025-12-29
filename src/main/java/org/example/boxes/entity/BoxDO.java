@@ -34,7 +34,7 @@ public class BoxDO {
     private Integer boxType;
 
     /**
-     * 状态
+     * 状态 0-离线，1-在线，2-低电量，3-故障
      */
     @Column(name = "status", nullable = false)
     private Integer status;
@@ -44,6 +44,12 @@ public class BoxDO {
 
     @Column(name = "battery")
     private Integer battery;
+
+    /**
+     * 网络延迟，单位ms，仅主盒记录
+     */
+    @Column(name = "network_delay")
+    private Integer networkDelay;
 
     /**
      * 最后心跳时间

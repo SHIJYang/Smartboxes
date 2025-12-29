@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 /**
- * 商品数据传输对象
+ * 物品数据传输对象
  *
  * @author 14577
  */
@@ -22,10 +22,10 @@ public class ItemDTO {
     private Long id;
 
     /**
-     * 商品编码
+     * 物品编码
      */
-    @NotBlank(message = "商品编码不能为空")
-    @Size(max = 255, message = "商品编码长度不能超过255个字符")
+    @NotBlank(message = "物品编码不能为空")
+    @Size(max = 255, message = "物品编码长度不能超过255个字符")
     private String itemCode;
 
     /**
@@ -45,14 +45,14 @@ public class ItemDTO {
     private String manualEditName;
 
     /**
-     * 商品标签
+     * 物品标签
      */
     private String itemTag;
 
     /**
-     * 商品描述 - 对应数据库的 item_desc 字段
+     * 物品描述 - 对应数据库的 item_desc 字段
      */
-    @Size(max = 500, message = "商品描述长度不能超过500个字符")
+    @Size(max = 500, message = "物品描述长度不能超过500个字符")
     private String itemDesc;
 
     /**
