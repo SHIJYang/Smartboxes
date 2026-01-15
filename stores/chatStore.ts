@@ -51,7 +51,7 @@ export const useChatStore = defineStore('chat', {
                 id: Date.now() + 1,
                 role: 'assistant',
                 content: res.data.reply,
-                action: res.data.action,
+                action: res.data.action, // 可能包含 'OPEN_BOX_xxx' 动作
                 timestamp: new Date().toISOString()
             };
             this.messages.push(aiMsg);
@@ -82,10 +82,9 @@ export const useChatStore = defineStore('chat', {
     },
 
     handleAiAction(action: string) {
-        console.log('Executing AI Action:', action);
-        // 示例：解析 "OPEN_BOX_101" 并跳转
-        // 实际跳转逻辑建议在 Component 中监听消息变化来执行，或者引入 Router
-        // 这里仅做状态记录或简单的 EventBus 触发
+        console.log('AI Triggered Action:', action);
+        // 这里可以配合 EventBus 或 UniApp 的全局事件来触发路由跳转
+        // 例如：uni.$emit('AI_ACTION', action);
     },
 
     clearMessages() {

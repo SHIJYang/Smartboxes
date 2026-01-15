@@ -2,21 +2,25 @@
 import { defineStore } from 'pinia';
 import * as API from '@/api';
 import type { BoxDTO, QueryBoxDTO } from '@/common/types';
+// [新增] 引入 userStore 以获取当前登录用户ID
+import { useUserStore } from './userStore';
 
 export const useBoxStore = defineStore('box', {
   state: () => ({
     boxList: [] as BoxDTO[],
     currentBox: null as BoxDTO | null,
+    
     pagination: {
       page: 1,
       size: 10,
       total: 0
     },
+    
     // 查询条件持久化
     queryParams: {
       userId: undefined as number | undefined,
-      boxCode: '',
-      boxName: '',
+      boxCode: undefined as string | undefined, 
+      boxName: undefined as string | undefined,
       status: undefined as number | undefined
     } as QueryBoxDTO,
     
@@ -28,6 +32,7 @@ export const useBoxStore = defineStore('box', {
     onlineBoxes: (state) => state.boxList.filter(box => box.status === 1),
     offlineBoxes: (state) => state.boxList.filter(box => box.status === 0),
     mainBoxes: (state) => state.boxList.filter(box => box.boxType === 1),
+    currentBoxIds: (state) => state.boxList.map(b => b.id).filter((id): id is number => !!id),
   },
 
   actions: {
@@ -60,8 +65,28 @@ export const useBoxStore = defineStore('box', {
       }
     },
 
+    // [修改] 根据当前登录用户获取盒子
+    async fetchUserBoxes() {
+      const userStore = useUserStore();
+      const userId = userStore.userId;
+
+      if (!userId) {
+        console.warn('fetchUserBoxes: 用户未登录');
+        return [];
+      }
+
+      // 重置其他查询条件，锁定 userId
+      this.queryParams = {
+        userId: userId,
+        boxCode: undefined,
+        boxName: undefined,
+        status: undefined
+      };
+      
+      return await this.fetchBoxList({ userId });
+    },
+
     // 2. 获取详情 (智能回退策略)
-    // 因 OpenAPI 缺少 /api/boxes/{id}，优先查本地，本地没有则尝试查列表
     async fetchBoxDetail(id: number) {
       this.detailLoading = true;
       
@@ -73,12 +98,11 @@ export const useBoxStore = defineStore('box', {
         return;
       }
 
-      // B. 尝试调用 Mock/兼容接口 (如果后端支持)
+      // B. 尝试调用 Mock/兼容接口
       try {
         const res = await API.getBoxDetailMock(id);
         if (res.code === 200) {
           this.currentBox = res.data;
-          // 同步到列表
           this._upsertList(res.data);
           return;
         }
@@ -86,10 +110,9 @@ export const useBoxStore = defineStore('box', {
         console.warn('API getBoxDetailMock failed, trying fallback...');
       }
 
-      // C. 回退策略：重新拉取列表 (可能需要扩大搜索范围)
-      // 注意：这里假设用户盒子数量不多，或者ID能在当前查询条件下找到
+      // C. 回退策略
       try {
-        await this.fetchBoxList({ size: 100 }); // 尝试拉取更多
+        await this.fetchBoxList({ size: 50 }); 
         const found = this.boxList.find(b => b.id === id);
         if (found) {
             this.currentBox = { ...found };
@@ -107,6 +130,12 @@ export const useBoxStore = defineStore('box', {
       this.loading = true;
       try {
         let res;
+        // 如果没有userId，尝试自动填充
+        if (!boxData.userId) {
+            const userStore = useUserStore();
+            if (userStore.userId) boxData.userId = userStore.userId;
+        }
+
         if (boxData.id) {
           res = await API.updateBox(boxData);
         } else {
@@ -114,7 +143,7 @@ export const useBoxStore = defineStore('box', {
         }
 
         if (res.code === 200) {
-          await this.fetchBoxList(); // 刷新列表
+          await this.fetchBoxList(); 
           return { success: true };
         }
         return { success: false, message: res.msg };
@@ -141,7 +170,6 @@ export const useBoxStore = defineStore('box', {
       }
     },
     
-    // 内部辅助：更新或插入列表
     _upsertList(box: BoxDTO) {
         const idx = this.boxList.findIndex(b => b.id === box.id);
         if (idx !== -1) {

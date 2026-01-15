@@ -38,17 +38,17 @@ fullContent:
 <script setup lang="ts">
 import { ref } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
-import { useBoxStore } from '@/stores/boxStore';
+import { useBoxStore,useUserStore } from '@/stores';
 import type { BoxDTO } from '@/common/types';
 import PCHeader from '@/components/PCHeader.vue';
 
-const store = useBoxStore();
-
+const boxstore = useBoxStore();
+const userstore = useUserStore();
 const form = ref<BoxDTO>({
   id: undefined,
   boxName: '',
   boxCode: '',
-  userId: 1001,
+  userId: userstore.userId,
   status: 0,
   boxType: 1
 });
@@ -59,10 +59,10 @@ onLoad(async (opt: Record<string, any>) => {
   if (opt.id) {
     uni.setNavigationBarTitle({ title: '编辑盒子' });
     const id = parseInt(opt.id);
-    await store.fetchBoxDetail(id);
-    if (store.currentBox) {
+    await boxstore.fetchBoxDetail(id);
+    if (boxstore.currentBox) {
       // Shallow copy to break reference
-      form.value = { ...store.currentBox };
+      form.value = { ...boxstore.currentBox };
     }
   } else {
     uni.setNavigationBarTitle({ title: '新建盒子' });
@@ -84,7 +84,7 @@ const submit = async () => {
 
   submitting.value = true;
   try {
-    const result = await store.saveBox(form.value);
+    const result = await boxstore.saveBox(form.value);
     if (result.success) {
       uni.showToast({ title: '保存成功', icon: 'success' });
       setTimeout(() => uni.navigateBack(), 800);
@@ -103,7 +103,7 @@ const remove = async () => {
     confirmColor: '#FF9A9E',
     success: async (res) => {
       if (res.confirm && form.value.id) {
-        const result = await store.deleteBox(form.value.id);
+        const result = await boxstore.deleteBox(form.value.id);
         if (result.success) uni.navigateBack();
       }
     }

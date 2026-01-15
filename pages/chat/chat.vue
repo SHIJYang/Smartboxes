@@ -1,7 +1,3 @@
-{
-type: uploaded file
-fileName: chat.vue
-fullContent:
 <template>
   <view class="chat-container">
     <PCHeader current="chat" />
@@ -23,8 +19,14 @@ fullContent:
       :scroll-top="scrollTop" 
       :scroll-with-animation="true"
       :show-scrollbar="false"
+      @scrolltoupper="loadMoreHistory"
     >
       <view class="msg-padding">
+        <view v-if="list.length === 0" class="empty-state">
+          <text class="empty-emoji">👋</text>
+          <text class="empty-text">你好呀！我是收纳酱。\n你可以问我物品的位置，或者让我帮你记录新东西。</text>
+        </view>
+
         <view v-for="(m, i) in list" :key="i" :class="['row', m.role === 'assistant' ? 'ai' : 'user']">
           
           <view class="avatar-wrapper">
@@ -39,8 +41,8 @@ fullContent:
           <view class="bubble-wrapper">
             <text class="name-tag">{{ m.role === 'assistant' ? '收纳酱' : '我' }}</text>
             <view class="bubble">
-              {{ m.text }}
-            </view>
+              <text>{{ m.text }}</text>
+              </view>
           </view>
         </view>
       </view>
@@ -57,6 +59,24 @@ fullContent:
     </view>
 
     <view v-if="userStore.isLoggedIn" class="input-area">
+      
+      <scroll-view 
+        v-if="quickQuestions.length > 0" 
+        scroll-x 
+        class="quick-actions" 
+        :show-scrollbar="false"
+      >
+        <view 
+          class="action-chip" 
+          v-for="(q, index) in quickQuestions" 
+          :key="index"
+          @click="handleQuickAsk(q.fullText)"
+        >
+          <text class="chip-icon">🔍</text>
+          <text class="chip-text">{{ q.label }}</text>
+        </view>
+      </scroll-view>
+
       <view class="input-shell">
         <input 
           class="chat-input"
@@ -69,7 +89,6 @@ fullContent:
         />
         <button class="send-btn" @click="send" :loading="sending" :disabled="sending || !txt.trim()">
           <text v-if="!sending">发送</text>
-          <text v-else>发送中...</text>
         </button>
       </view>
     </view>
@@ -78,10 +97,13 @@ fullContent:
 
 <script setup lang="ts">
 import { ref, nextTick, onMounted, computed, watch } from 'vue';
-import { useUserStore, useChatStore } from '@/stores';
+import { useUserStore, useChatStore, useItemStore } from '@/stores';
+// 假设 PCHeader 组件路径正确，如果不需要可删除
+import PCHeader from '@/components/PCHeader.vue';
 
 const userStore = useUserStore();
 const chatStore = useChatStore();
+const itemStore = useItemStore();
 
 // Map Store messages to UI format
 const list = computed(() => {
@@ -91,23 +113,44 @@ const list = computed(() => {
   }));
 });
 
+// 计算推荐问题 (取最新的 5 个物品)
+const quickQuestions = computed(() => {
+  // 如果 itemStore 还没数据，返回空
+  if (!itemStore.itemList || itemStore.itemList.length === 0) return [];
+  
+  // 过滤掉无效物品，取前5个
+  return itemStore.itemList
+    .filter(item => item.isValid === 1)
+    .slice(0, 5)
+    .map(item => {
+      const name = item.manualEditName || item.autoRecognizeName || '未知物品';
+      return {
+        label: `找 ${name}`,
+        fullText: `我的 ${name} 在哪里？`
+      };
+    });
+});
+
 const txt = ref('');
 const sending = ref(false);
 const scrollTop = ref(0);
 
 // Initial greeting check
-const checkInitialMessages = () => {
-  if (chatStore.isEmpty && userStore.isLoggedIn) {
-     // Store allows direct mutation or we can ignore until first message
-     // Usually we might want to push a local fake message, but let's keep it clean
+const checkInitialMessages = async () => {
+  if (userStore.isLoggedIn) {
+     // 如果物品列表为空，尝试加载一下，以便显示推荐气泡
+     if (itemStore.itemList.length === 0) {
+       await itemStore.fetchItemPage({ size: 10 });
+     }
   }
 };
 
+// 发送消息逻辑
 const send = async () => {
   if (!txt.value.trim() || sending.value || !userStore.isLoggedIn) return;
   
   const message = txt.value;
-  txt.value = '';
+  txt.value = ''; // 清空输入框
   sending.value = true;
   
   try {
@@ -122,10 +165,22 @@ const send = async () => {
   }
 };
 
+// 快捷提问处理
+const handleQuickAsk = (question: string) => {
+  txt.value = question;
+  send();
+};
+
 const scrollToBottom = () => {
   nextTick(() => {
-    scrollTop.value = 9999999; 
+    // 设置一个很大的值确保滚到底部
+    scrollTop.value = 9999999 + Math.random(); 
   });
+};
+
+const loadMoreHistory = () => {
+  // TODO: 如果 ChatStore 支持分页加载历史记录，在这里实现
+  // console.log('Load more history...');
 };
 
 const goToLogin = () => {
@@ -142,7 +197,8 @@ onMounted(() => {
   if (userStore.isLoggedIn) {
     checkInitialMessages();
   }
-  scrollToBottom();
+  // 稍微延迟一下滚动，确保渲染完成
+  setTimeout(scrollToBottom, 200);
 });
 </script>
 
@@ -187,6 +243,14 @@ onMounted(() => {
   @media screen and (min-width: 768px) { max-width: 900px; margin: 0 auto; }
 }
 
+/* 空状态 */
+.empty-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding-top: 100rpx; opacity: 0.6;
+}
+.empty-emoji { font-size: 80rpx; margin-bottom: 20rpx; }
+.empty-text { font-size: 28rpx; color: #999; text-align: center; line-height: 1.6; }
+
 .row { display: flex; margin-bottom: 50rpx; align-items: flex-start; }
 .row.user { flex-direction: row-reverse; }
 
@@ -220,7 +284,8 @@ onMounted(() => {
 .row.ai .bubble { background: #fff; color: #555; border-top-left-radius: 8rpx; }
 .row.user .bubble { background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%); color: #2c5875; border-top-right-radius: 8rpx; font-weight: 500; }
 
-.bottom-spacer { height: 180rpx; }
+/* 底部留白，为了容纳输入框和推荐栏 */
+.bottom-spacer { height: 260rpx; }
 
 /* 登录提示 */
 .login-prompt {
@@ -243,20 +308,41 @@ onMounted(() => {
   margin-top: 20rpx;
 }
 
-/* 输入区 */
+/* 输入区 (包含推荐栏) */
 .input-area {
-  position: fixed; bottom: 126rpx; left: 0; right: 0; z-index: 20;
-  background: rgba(255,249,240, 0.95);
-  padding: 20rpx 30rpx calc(20rpx + constant(safe-area-inset-bottom)) 30rpx;
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 20;
+  background: rgba(255,249,240, 0.98);
+  padding: 10rpx 30rpx calc(20rpx + constant(safe-area-inset-bottom)) 30rpx;
   padding-bottom: calc(20rpx + env(safe-area-inset-bottom)); 
   backdrop-filter: blur(10rpx);
+  border-top: 1px solid rgba(255,255,255,0.5);
 
   @media screen and (min-width: 768px) {
     background: transparent; backdrop-filter: none; padding: 0;
-    left: 50%; transform: translateX(-50%); bottom: 50px;
-    width: 90%; max-width: 800px;
+    left: 50%; transform: translateX(-50%); bottom: 30px;
+    width: 90%; max-width: 800px; border-top: none;
   }
 }
+
+/* 推荐快捷栏 */
+.quick-actions {
+  white-space: nowrap; width: 100%;
+  margin-bottom: 20rpx; height: 64rpx;
+}
+
+.action-chip {
+  display: inline-flex; align-items: center;
+  background: #fff; padding: 10rpx 24rpx; border-radius: 32rpx;
+  margin-right: 16rpx; 
+  box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.02);
+  transition: transform 0.1s;
+  
+  &:active { transform: scale(0.95); background: #f9f9f9; }
+}
+
+.chip-icon { font-size: 24rpx; margin-right: 8rpx; }
+.chip-text { font-size: 26rpx; color: #666; }
 
 .input-shell {
   background: #fff; padding: 12rpx 12rpx 12rpx 40rpx;
@@ -280,9 +366,9 @@ onMounted(() => {
   color: #fff; font-size: 28rpx; padding: 0 40rpx; height: 72rpx; line-height: 72rpx;
   border: none; font-weight: bold; margin-left: 20rpx;
   box-shadow: 0 4rpx 10rpx rgba(255, 154, 158, 0.4); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
   
   &[disabled] { opacity: 0.6; filter: grayscale(0.5); cursor: not-allowed; }
   &:active:not([disabled]) { transform: scale(0.95); }
 }
 </style>
-}

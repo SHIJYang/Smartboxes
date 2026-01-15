@@ -124,7 +124,7 @@ onShow(async () => {
           // Fetch all boxes to get count
           boxStore.fetchBoxList({ userId: userStore.userId }),
           // Fetch items page (1) to get total count
-          itemStore.fetchItemPage({ page: 1, size: 1 }) 
+          itemStore.fetchUserItems() 
       ]);
   } else {
       // Optional: Redirect to login or show guest state

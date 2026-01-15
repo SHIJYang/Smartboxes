@@ -8,7 +8,10 @@ import type {
   EmotionDTO 
 } from '@/common/types';
 
-// 模拟盒子列表 (List模式)
+// ==========================================
+// 盒子 Mock 数据
+// ==========================================
+
 export const mockBoxList: RestResult<BoxDTO[]> = {
   code: 200,
   msg: "success",
@@ -21,19 +24,20 @@ export const mockBoxList: RestResult<BoxDTO[]> = {
       status: 1, 
       userId: 1001, 
       battery: 80,
-      rssi: -55
+      rssi: -55,
+      createTime: "2023-01-01 10:00:00",
+      updateTime: "2023-12-10 14:30:00"
     }
   ]
 };
 
-// 模拟盒子分页数据
 export const mockBoxPage: RestResult<PageResult<BoxDTO>> = {
   code: 200,
   msg: "success",
   data: {
     page: 1,
     size: 10,
-    total: 4,
+    total: 2,
     totalPages: 1,
     data: [
       { 
@@ -64,7 +68,6 @@ export const mockBoxPage: RestResult<PageResult<BoxDTO>> = {
   }
 };
 
-// 模拟单个盒子详情
 export const mockBoxDetail: RestResult<BoxDTO> = {
   code: 200,
   msg: "success",
@@ -81,7 +84,10 @@ export const mockBoxDetail: RestResult<BoxDTO> = {
   }
 };
 
-// 模拟物品列表 (List) - 已移除 price, itemName 字段
+// ==========================================
+// 物品 Mock 数据
+// ==========================================
+
 export const mockItemList: RestResult<ItemDTO[]> = {
   code: 200,
   msg: "success",
@@ -109,14 +115,13 @@ export const mockItemList: RestResult<ItemDTO[]> = {
   ]
 };
 
-// 模拟物品分页
 export const mockItemPage: RestResult<PageResult<ItemDTO>> = {
   code: 200,
   msg: "success",
   data: {
     page: 1,
     size: 10,
-    total: 2,
+    total: 1,
     totalPages: 1,
     data: [
         { 
@@ -133,7 +138,6 @@ export const mockItemPage: RestResult<PageResult<ItemDTO>> = {
   }
 };
 
-// 模拟单个物品详情
 export const mockItemDetail: RestResult<ItemDTO> = {
   code: 200,
   msg: "success",
@@ -144,25 +148,28 @@ export const mockItemDetail: RestResult<ItemDTO> = {
     autoRecognizeName: "Nintendo Switch",
     manualEditName: "Switch游戏机", 
     itemTag: "数码", 
-    itemDesc: "红蓝手柄", 
+    itemDesc: "红蓝手柄 限定版", 
     isValid: 1, 
     putInTime: "2023-01-15 10:00:00"
   }
 };
 
-// 模拟用户
+// ==========================================
+// 用户 Mock 数据
+// ==========================================
+
 export const mockUser: RestResult<UserDTO> = {
   code: 200,
   msg: "success",
   data: { 
     id: 1001, 
-    userAccount: "admin001",
     username: "Admin", 
-    phone: "13800000000",
-    token: "abcdef-123456-token"
+    email: "admin@example.com",
+    createdAt: "2023-01-01 10:00:00",
+    updatedAt: "2023-01-02 10:00:00"
   }
 };
-// 模拟登录返回 (RestResult_Map)
+
 export const mockLoginResult: RestResult<any> = {
   code: 200,
   msg: "success",
@@ -170,24 +177,27 @@ export const mockLoginResult: RestResult<any> = {
       token: "abcdef-123456-token",
       user: {
         id: 1001, 
-        userAccount: "admin001",
         username: "Admin",
-        email: "admin@magicbox.com", // 新增
-        createdAt: "2023-01-01 12:00:00", // 新增
-        updatedAt: "2023-01-02 12:00:00"  // 新增
+        email: "admin@magicbox.com",
+        createdAt: "2023-01-01 12:00:00",
+        updatedAt: "2023-01-02 12:00:00"
       }
   }
 };
 
-
-// 模拟用户列表
 export const mockUserList: RestResult<UserDTO[]> = {
   code: 200,
   msg: "success",
-  data: [{ id: 1001, userAccount: "admin", username: "Admin", phone: "138001" }]
+  data: [
+    { 
+      id: 1001, 
+      username: "Admin", 
+      email: "admin@example.com",
+      createdAt: "2023-01-01 10:00:00"
+    }
+  ]
 };
 
-// 模拟用户分页
 export const mockUserPage: RestResult<PageResult<UserDTO>> = {
   code: 200,
   msg: "success",
@@ -196,11 +206,21 @@ export const mockUserPage: RestResult<PageResult<UserDTO>> = {
     size: 10,
     total: 1,
     totalPages: 1,
-    data: [{ id: 1001, userAccount: "admin", username: "Admin", phone: "138001" }]
+    data: [
+      { 
+        id: 1001, 
+        username: "Admin", 
+        email: "admin@example.com",
+        createdAt: "2023-01-01 10:00:00"
+      }
+    ]
   }
 };
 
-// 模拟情感标签分页
+// ==========================================
+// 情感标签与通用 Mock
+// ==========================================
+
 export const mockEmotionPage: RestResult<PageResult<EmotionDTO>> = {
   code: 200,
   msg: "success",
@@ -215,7 +235,15 @@ export const mockEmotionPage: RestResult<PageResult<EmotionDTO>> = {
   }
 };
 
-// 模拟聊天响应
+export const mockEmotionList: RestResult<EmotionDTO[]> = {
+  code: 200,
+  msg: "success",
+  data: [
+      { id: 1, itemId: 101, emotionTag: 1, emotionRemark: "这是生日礼物" },
+      { id: 2, itemId: 101, emotionTag: 2, emotionRemark: "有点旧了" }
+  ]
+};
+
 export const mockChat: RestResult<AiChatResponse> = {
   code: 200,
   msg: "success",
@@ -225,7 +253,6 @@ export const mockChat: RestResult<AiChatResponse> = {
   }
 };
 
-// 模拟通用成功响应
 export const mockSuccess: RestResult<any> = { 
   code: 200, 
   msg: "操作成功", 

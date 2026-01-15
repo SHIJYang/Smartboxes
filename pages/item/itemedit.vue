@@ -82,7 +82,7 @@ const expireDate = ref('');
 
 // 初始化盒子选项
 const initBoxes = async () => {
-  await boxStore.fetchBoxList({ userId: 1001 });
+  await boxStore.fetchBoxList();
   const boxes = boxStore.boxList;
   boxOptions.value = boxes.map(b => `${b.boxName} (${b.boxCode})`);
   
@@ -149,10 +149,7 @@ const submit = async () => {
 
   submitting.value = true;
   try {
-    const result = await itemStore.addItem(form.value); // Use addItem/saveItem wrapper if available
-    // OR if store has separate update/add, check id
-    // const result = form.value.id ? await itemStore.updateItem(form.value) : await itemStore.addItem(form.value);
-    
+    const result = await itemStore.saveItem(form.value);
     if (result.success) {
       uni.showToast({ title: '保存成功', icon: 'success' });
       setTimeout(() => uni.navigateBack(), 800);

@@ -1,7 +1,7 @@
 // stores/userStore.ts
 import { defineStore } from 'pinia';
 import * as API from '@/api';
-import type { UserDTO, UserDO, LoginRequest, QueryUserDTO } from '@/common/types';
+import type { UserDTO, UserDO, LoginRequest } from '@/common/types';
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -24,7 +24,9 @@ export const useUserStore = defineStore('user', {
 
   getters: {
     userId: (state) => state.currentUser?.id,
+    // 优先显示昵称，没有则显示账号
     username: (state) => state.currentUser?.username || state.currentUser?.userAccount,
+    // 简单的管理员判断逻辑，实际项目中可能需要根据 Role 字段判断
     isAdmin: (state) => state.currentUser?.userAccount === 'admin' || state.currentUser?.username === 'Admin'
   },
 
@@ -34,23 +36,23 @@ export const useUserStore = defineStore('user', {
       this.loading = true;
       try {
         const res = await API.login(loginData);
-        // OpenAPI 定义返回为 RestResult_Map，通常包含 token 和 user 对象
+        // 根据 Mock 数据结构: data: { token: "...", user: { ... } }
         if (res.code === 200 && res.data) {
-          // 类型断言：假设 Map 中包含 token (string) 和 user (UserDTO)
-          const data = res.data as any; 
-          const token = data.token;
-          const user = data.user as UserDTO;
+          const { token, user } = res.data;
 
           if (token && user) {
             this.token = token;
             this.currentUser = user;
             this.isLoggedIn = true;
+            
+            // 持久化存储
             uni.setStorageSync('token', token);
-            uni.setStorageSync('userInfo', user); // 可选：持久化用户信息
+            uni.setStorageSync('userInfo', user); 
+            
             return { success: true, user };
           }
         }
-        return { success: false, message: res.msg || '登录返回数据异常' };
+        return { success: false, message: res.msg || '登录返回数据结构异常' };
       } catch (error) {
         console.error('Login error:', error);
         return { success: false, message: '网络请求失败' };
@@ -93,10 +95,13 @@ export const useUserStore = defineStore('user', {
         try {
             const res = await API.getUserDetail(id);
             if (res.code === 200) {
+                // 合并更新 currentUser，防止覆盖掉本地特有的临时字段
                 this.currentUser = { ...this.currentUser, ...res.data };
                 uni.setStorageSync('userInfo', this.currentUser);
             }
-        } catch (e) { console.error(e); }
+        } catch (e) { 
+            console.error('Fetch user info error', e); 
+        }
     },
 
     // 5. 退出登录
@@ -106,7 +111,6 @@ export const useUserStore = defineStore('user', {
       this.token = '';
       uni.removeStorageSync('token');
       uni.removeStorageSync('userInfo');
-      // 清理其他Store的数据通常在组件中处理，或者引入其他Store在这里reset
     }
   }
 });

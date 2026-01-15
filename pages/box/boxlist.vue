@@ -41,7 +41,7 @@ import PCHeader from '@/components/PCHeader.vue';
 const store = useBoxStore();
 
 onShow(async () => {
-  await store.fetchBoxList({ userId: 1001, page: 1, size: 999 });
+  await store.fetchUserBoxes();
 });
 
 const goDetail = (id: number) => uni.navigateTo({ url: `/pages/box/boxdetail?id=${id}` });
