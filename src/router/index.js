@@ -7,6 +7,7 @@ import ItemList from '../views/item/ItemList.vue'
 import EmotionList from '../views/emotion/EmotionList.vue'
 import AiChat from '../views/chat/AiChat.vue'
 import ErrorRecovery from '../views/error/ErrorRecovery.vue'
+import ResourceList from '../views/resource/ResourceList.vue'
 
 const routes = [
   {
@@ -48,6 +49,11 @@ const routes = [
         path: 'error-recovery',
         name: 'ErrorRecovery',
         component: ErrorRecovery
+      },
+      {
+        path: 'resources',
+        name: 'ResourceList',
+        component: ResourceList
       }
     ]
   }

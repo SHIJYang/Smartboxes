@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // 创建axios实例
 const service = axios.create({
-  baseURL: '/api', // 使用相对路径，配合Mock.js拦截请求
+  baseURL: 'http://localhost:8080', 
   timeout: 10000
 })
 
@@ -27,9 +27,9 @@ service.interceptors.response.use(
   response => {
     const res = response.data
     // 检查返回码
-    if (res.code !== 200) {
-      console.log('请求失败:', res.msg)
-      return Promise.reject(new Error(res.msg || '请求失败'))
+    if (res.code !== 0) {
+      console.log('请求失败:', res.msg || res.message)
+      return Promise.reject(new Error(res.msg || res.message || '请求失败'))
     } else {
       return res
     }

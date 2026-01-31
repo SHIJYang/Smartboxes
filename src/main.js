@@ -7,8 +7,6 @@ import { createPinia } from 'pinia'
 import router from './router'
 import './axios'
 
-// 引入mock服务（无论什么环境都引入，确保完全离线运行）
-import('../mock/index.js')
 
 const app = createApp(App)
 const pinia = createPinia()

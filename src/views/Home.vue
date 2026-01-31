@@ -44,7 +44,7 @@
               <span>情感标签管理</span>
             </template>
             <el-menu-item index="4-1">
-              <router-link to="/emotion-tags">标签列表</router-link>
+              <router-link to="/emotions">标签列表</router-link>
             </el-menu-item>
           </el-sub-menu>
           <el-sub-menu index="5">
@@ -53,7 +53,7 @@
               <span>AI聊天</span>
             </template>
             <el-menu-item index="5-1">
-              <router-link to="/ai-chat">聊天界面</router-link>
+              <router-link to="/chat">聊天界面</router-link>
             </el-menu-item>
           </el-sub-menu>
           <el-sub-menu index="6">
@@ -63,6 +63,15 @@
             </template>
             <el-menu-item index="6-1">
               <router-link to="/error-recovery">修复列表</router-link>
+            </el-menu-item>
+          </el-sub-menu>
+          <el-sub-menu index="7">
+            <template #title>
+              <el-icon><DataAnalysis /></el-icon>
+              <span>模型资源管理</span>
+            </template>
+            <el-menu-item index="7-1">
+              <router-link to="/resources">资源列表</router-link>
             </el-menu-item>
           </el-sub-menu>
         </el-menu>
@@ -111,7 +120,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'
 import {
-  User, Box, Goods, CollectionTag, ChatDotRound, Warning,
+  User, Box, Goods, CollectionTag, ChatDotRound, Warning, DataAnalysis,
   Menu, ArrowDown, SwitchButton
 } from '@element-plus/icons-vue'
 
@@ -125,9 +134,10 @@ const activeMenu = computed(() => {
   if (path.includes('/users')) return '1-1'
   if (path.includes('/boxes')) return '2-1'
   if (path.includes('/items')) return '3-1'
-  if (path.includes('/emotion-tags')) return '4-1'
-  if (path.includes('/ai-chat')) return '5-1'
+  if (path.includes('/emotions')) return '4-1'
+  if (path.includes('/chat')) return '5-1'
   if (path.includes('/error-recovery')) return '6-1'
+  if (path.includes('/resources')) return '7-1'
   return '1-1'
 })
 

@@ -13,52 +13,69 @@
 		},
 		"version": "v1.0.0"
 	},
-	"servers": [{
-		"url": "http://localhost:8080",
-		"description": "Generated server url"
-	}],
-	"tags": [{
-		"name": "盒子管理",
-		"description": "盒子相关API"
-	}, {
-		"name": "商品管理",
-		"description": "商品相关API"
-	}, {
-		"name": "用户管理",
-		"description": "用户相关API"
-	}, {
-		"name": "AI聊天",
-		"description": "AI聊天相关接口"
-	}, {
-		"name": "错误修复管理",
-		"description": "错误日志和降级管理API"
-	}, {
-		"name": "情感标签管理",
-		"description": "情感标签相关API"
-	}],
+	"servers": [
+		{
+			"url": "http://localhost:8080",
+			"description": "Generated server url"
+		}
+	],
+	"tags": [
+		{
+			"name": "模型资源管理",
+			"description": "3D模型元数据API"
+		},
+		{
+			"name": "盒子管理",
+			"description": "盒子相关API"
+		},
+		{
+			"name": "用户管理",
+			"description": "用户相关API"
+		},
+		{
+			"name": "AI聊天",
+			"description": "AI聊天相关接口"
+		},
+		{
+			"name": "物品管理",
+			"description": "提供按用户、按盒子及综合搜索物品的功能"
+		},
+		{
+			"name": "错误修复管理",
+			"description": "错误日志和降级管理API"
+		},
+		{
+			"name": "情感标签管理",
+			"description": "情感标签相关API"
+		}
+	],
 	"paths": {
 		"/api/users/{id}": {
 			"get": {
-				"tags": ["用户管理"],
+				"tags": [
+					"用户管理"
+				],
 				"summary": "根据ID获取用户",
 				"description": "根据用户ID获取用户详细信息",
 				"operationId": "getUserById",
-				"parameters": [{
-					"name": "id",
-					"in": "path",
-					"required": true,
-					"schema": {
-						"type": "integer",
-						"format": "int64"
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
 					}
-				}],
+				],
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"*/*": {
 								"schema": {
-									"$ref": "#/components/schemas/UserDTO"
+									"$ref": "#/components/schemas/RestResultUserDTO"
 								}
 							}
 						}
@@ -66,19 +83,23 @@
 				}
 			},
 			"put": {
-				"tags": ["用户管理"],
+				"tags": [
+					"用户管理"
+				],
 				"summary": "更新用户",
 				"description": "更新用户基本信息",
 				"operationId": "updateUser",
-				"parameters": [{
-					"name": "id",
-					"in": "path",
-					"required": true,
-					"schema": {
-						"type": "integer",
-						"format": "int64"
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
 					}
-				}],
+				],
 				"requestBody": {
 					"content": {
 						"application/json": {
@@ -95,7 +116,7 @@
 						"content": {
 							"*/*": {
 								"schema": {
-									"$ref": "#/components/schemas/UserDTO"
+									"$ref": "#/components/schemas/RestResultUserDTO"
 								}
 							}
 						}
@@ -103,31 +124,44 @@
 				}
 			},
 			"delete": {
-				"tags": ["用户管理"],
+				"tags": [
+					"用户管理"
+				],
 				"summary": "删除用户",
 				"description": "删除指定的用户账户",
 				"operationId": "deleteUser",
-				"parameters": [{
-					"name": "id",
-					"in": "path",
-					"required": true,
-					"schema": {
-						"type": "integer",
-						"format": "int64"
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
 					}
-				}],
+				],
 				"responses": {
 					"200": {
-						"description": "OK"
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/RestResultVoid"
+								}
+							}
+						}
 					}
 				}
 			}
 		},
 		"/api/items/update": {
 			"put": {
-				"tags": ["商品管理"],
-				"summary": "更新商品信息",
-				"description": "更新商品的基本信息",
+				"tags": [
+					"物品管理"
+				],
+				"summary": "更新物品信息",
+				"description": "更新物品的基本信息",
 				"operationId": "updateItem",
 				"requestBody": {
 					"content": {
@@ -153,11 +187,96 @@
 				}
 			}
 		},
+		"/api/items/status/{id}/{isValid}": {
+			"put": {
+				"tags": [
+					"物品管理"
+				],
+				"summary": "更新物品状态",
+				"description": "设置物品为有效(1)或无效(0)",
+				"operationId": "updateItemStatus",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					},
+					{
+						"name": "isValid",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/RestResultVoid"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/items/move/{itemId}/to/{boxId}": {
+			"put": {
+				"tags": [
+					"物品管理"
+				],
+				"summary": "移动物品",
+				"description": "将物品移动到指定的盒子中",
+				"operationId": "moveItem",
+				"parameters": [
+					{
+						"name": "itemId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					},
+					{
+						"name": "boxId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/RestResultVoid"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/api/emotions/update": {
 			"put": {
-				"tags": ["情感标签管理"],
+				"tags": [
+					"情感标签管理"
+				],
 				"summary": "更新情感标签",
-				"description": "更新情感标签信息",
 				"operationId": "updateEmotion",
 				"requestBody": {
 					"content": {
@@ -185,9 +304,43 @@
 		},
 		"/api/boxes/update": {
 			"put": {
-				"tags": ["盒子管理"],
-				"summary": "修改盒子",
+				"tags": [
+					"盒子管理"
+				],
+				"summary": "修改盒子信息",
 				"operationId": "updateBox",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BoxDTO"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/RestResultVoid"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/boxes/report/status": {
+			"put": {
+				"tags": [
+					"盒子管理"
+				],
+				"summary": "上报盒子状态",
+				"description": "更新盒子的在线状态、电量和信号强度",
+				"operationId": "reportBoxStatus",
 				"requestBody": {
 					"content": {
 						"application/json": {
@@ -214,7 +367,9 @@
 		},
 		"/api/users": {
 			"get": {
-				"tags": ["用户管理"],
+				"tags": [
+					"用户管理"
+				],
 				"summary": "获取所有用户",
 				"description": "获取系统中所有用户列表",
 				"operationId": "getAllUsers",
@@ -224,10 +379,7 @@
 						"content": {
 							"*/*": {
 								"schema": {
-									"type": "array",
-									"items": {
-										"$ref": "#/components/schemas/UserDTO"
-									}
+									"$ref": "#/components/schemas/RestResultListUserDTO"
 								}
 							}
 						}
@@ -235,7 +387,9 @@
 				}
 			},
 			"post": {
-				"tags": ["用户管理"],
+				"tags": [
+					"用户管理"
+				],
 				"summary": "创建用户",
 				"description": "创建新的用户账户",
 				"operationId": "createUser",
@@ -255,7 +409,7 @@
 						"content": {
 							"*/*": {
 								"schema": {
-									"$ref": "#/components/schemas/UserDTO"
+									"$ref": "#/components/schemas/RestResultUserDTO"
 								}
 							}
 						}
@@ -265,7 +419,9 @@
 		},
 		"/api/users/login": {
 			"post": {
-				"tags": ["用户管理"],
+				"tags": [
+					"用户管理"
+				],
 				"summary": "用户登录",
 				"description": "通过账号密码登录，返回Token",
 				"operationId": "login",
@@ -285,10 +441,38 @@
 						"content": {
 							"*/*": {
 								"schema": {
-									"type": "object",
-									"additionalProperties": {
-										"type": "object"
-									}
+									"$ref": "#/components/schemas/RestResultMapStringObject"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/resources/add": {
+			"post": {
+				"tags": [
+					"模型资源管理"
+				],
+				"summary": "注册新模型资源",
+				"operationId": "add",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ModelResourceDTO"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/RestResultVoid"
 								}
 							}
 						}
@@ -298,9 +482,11 @@
 		},
 		"/api/items/add": {
 			"post": {
-				"tags": ["商品管理"],
-				"summary": "添加新商品",
-				"description": "创建新的商品记录",
+				"tags": [
+					"物品管理"
+				],
+				"summary": "添加新物品",
+				"description": "创建新的物品记录",
 				"operationId": "addItem",
 				"requestBody": {
 					"content": {
@@ -328,7 +514,9 @@
 		},
 		"/api/error-recovery/trigger-fallback": {
 			"post": {
-				"tags": ["错误修复管理"],
+				"tags": [
+					"错误修复管理"
+				],
 				"summary": "触发优雅降级策略",
 				"description": "在服务异常时触发降级策略",
 				"operationId": "triggerGracefulFallback",
@@ -358,7 +546,9 @@
 		},
 		"/api/error-recovery/record-error": {
 			"post": {
-				"tags": ["错误修复管理"],
+				"tags": [
+					"错误修复管理"
+				],
 				"summary": "记录运行时错误",
 				"description": "记录系统运行时错误日志",
 				"operationId": "recordRuntimeError",
@@ -388,9 +578,10 @@
 		},
 		"/api/emotions/add": {
 			"post": {
-				"tags": ["情感标签管理"],
+				"tags": [
+					"情感标签管理"
+				],
 				"summary": "添加情感标签",
-				"description": "为物品添加情感标签",
 				"operationId": "addEmotion",
 				"requestBody": {
 					"content": {
@@ -418,7 +609,9 @@
 		},
 		"/api/chat": {
 			"post": {
-				"tags": ["AI聊天"],
+				"tags": [
+					"AI聊天"
+				],
 				"summary": "AI聊天",
 				"description": "处理用户的AI聊天请求",
 				"operationId": "chat",
@@ -448,7 +641,9 @@
 		},
 		"/api/boxes/add": {
 			"post": {
-				"tags": ["盒子管理"],
+				"tags": [
+					"盒子管理"
+				],
 				"summary": "新增盒子",
 				"operationId": "addBox",
 				"requestBody": {
@@ -477,28 +672,121 @@
 		},
 		"/api/users/page": {
 			"get": {
-				"tags": ["用户管理"],
+				"tags": [
+					"用户管理"
+				],
 				"summary": "分页查询用户",
-				"description": "分页查询用户信息",
+				"description": "分页查询用户信息，支持关键字搜索",
 				"operationId": "getUsersByPage",
-				"parameters": [{
-					"name": "query",
-					"in": "query",
-					"required": true,
-					"schema": {
-						"$ref": "#/components/schemas/UserQuery"
+				"parameters": [
+					{
+						"name": "query",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/UserQuery"
+						}
 					}
-				}],
+				],
 				"responses": {
 					"200": {
 						"description": "OK",
 						"content": {
 							"*/*": {
 								"schema": {
-									"type": "array",
-									"items": {
-										"$ref": "#/components/schemas/UserDTO"
-									}
+									"$ref": "#/components/schemas/RestResultPageResultUserDTO"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/resources/{key}": {
+			"get": {
+				"tags": [
+					"模型资源管理"
+				],
+				"summary": "获取特定模型配置",
+				"operationId": "getByKey",
+				"parameters": [
+					{
+						"name": "key",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/RestResultModelResourceDTO"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/resources/list": {
+			"get": {
+				"tags": [
+					"模型资源管理"
+				],
+				"summary": "获取所有资源列表",
+				"operationId": "list",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/RestResultListModelResourceDTO"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/items/page": {
+			"get": {
+				"tags": [
+					"物品管理"
+				],
+				"summary": "综合分页查询",
+				"description": "支持按用户、盒子、名称、标签等组合筛选物品",
+				"operationId": "listItemsByPage",
+				"parameters": [
+					{
+						"name": "queryItemDTO",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/QueryItemDTO"
+						}
+					},
+					{
+						"name": "pageQueryDTO",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/PageQueryDTO"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/RestResultPageResultItemDTO"
 								}
 							}
 						}
@@ -508,18 +796,22 @@
 		},
 		"/api/items/list": {
 			"get": {
-				"tags": ["商品管理"],
-				"summary": "查询商品列表",
-				"description": "根据条件查询商品列表",
-				"operationId": "listItem",
-				"parameters": [{
-					"name": "queryItemDTO",
-					"in": "query",
-					"required": true,
-					"schema": {
-						"$ref": "#/components/schemas/QueryItemDTO"
+				"tags": [
+					"物品管理"
+				],
+				"summary": "查询物品列表",
+				"description": "根据条件查询物品列表",
+				"operationId": "listItems",
+				"parameters": [
+					{
+						"name": "queryItemDTO",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/QueryItemDTO"
+						}
 					}
-				}],
+				],
 				"responses": {
 					"200": {
 						"description": "OK",
@@ -534,20 +826,161 @@
 				}
 			}
 		},
+		"/api/items/detail/{id}": {
+			"get": {
+				"tags": [
+					"物品管理"
+				],
+				"summary": "查询物品详细信息",
+				"description": "查询指定物品的详细信息，包含关联数据",
+				"operationId": "getItemDetail",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/RestResultItemDTO"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/items/by-user/{userId}": {
+			"get": {
+				"tags": [
+					"物品管理"
+				],
+				"summary": "根据用户找物品",
+				"description": "获取指定用户的所有物品（跨所有盒子）",
+				"operationId": "listItemsByUser",
+				"parameters": [
+					{
+						"name": "userId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/RestResultListItemDTO"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/items/by-box/{boxId}": {
+			"get": {
+				"tags": [
+					"物品管理"
+				],
+				"summary": "根据盒子找物品",
+				"description": "获取指定盒子内的所有物品",
+				"operationId": "listItemsByBox",
+				"parameters": [
+					{
+						"name": "boxId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/RestResultListItemDTO"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/emotions/page": {
+			"get": {
+				"tags": [
+					"情感标签管理"
+				],
+				"summary": "分页查询情感标签",
+				"operationId": "listEmotionsByPage",
+				"parameters": [
+					{
+						"name": "queryEmotionDTO",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/QueryEmotionDTO"
+						}
+					},
+					{
+						"name": "pageQueryDTO",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/PageQueryDTO"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/RestResultPageResultEmotionDTO"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/api/emotions/list": {
 			"get": {
-				"tags": ["情感标签管理"],
-				"summary": "查询情感标签列表",
-				"description": "根据条件查询情感标签列表",
+				"tags": [
+					"情感标签管理"
+				],
+				"summary": "查询情感标签列表(无分页)",
 				"operationId": "listEmotions",
-				"parameters": [{
-					"name": "queryEmotionDTO",
-					"in": "query",
-					"required": true,
-					"schema": {
-						"$ref": "#/components/schemas/QueryEmotionDTO"
+				"parameters": [
+					{
+						"name": "queryEmotionDTO",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/QueryEmotionDTO"
+						}
 					}
-				}],
+				],
 				"responses": {
 					"200": {
 						"description": "OK",
@@ -562,19 +995,63 @@
 				}
 			}
 		},
+		"/api/boxes/page": {
+			"get": {
+				"tags": [
+					"盒子管理"
+				],
+				"summary": "分页查询盒子",
+				"description": "支持筛选条件的分页查询",
+				"operationId": "listBoxesByPage",
+				"parameters": [
+					{
+						"name": "queryBoxDTO",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/QueryBoxDTO"
+						}
+					},
+					{
+						"name": "pageQueryDTO",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/PageQueryDTO"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/RestResultPageResultBoxDTO"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/api/boxes/list": {
 			"get": {
-				"tags": ["盒子管理"],
-				"summary": "查询盒子列表",
+				"tags": [
+					"盒子管理"
+				],
+				"summary": "查询盒子列表(无分页)",
 				"operationId": "listBoxes",
-				"parameters": [{
-					"name": "queryBoxDTO",
-					"in": "query",
-					"required": true,
-					"schema": {
-						"$ref": "#/components/schemas/QueryBoxDTO"
+				"parameters": [
+					{
+						"name": "queryBoxDTO",
+						"in": "query",
+						"required": true,
+						"schema": {
+							"$ref": "#/components/schemas/QueryBoxDTO"
+						}
 					}
-				}],
+				],
 				"responses": {
 					"200": {
 						"description": "OK",
@@ -591,19 +1068,23 @@
 		},
 		"/api/items/delete/{id}": {
 			"delete": {
-				"tags": ["商品管理"],
-				"summary": "删除商品",
-				"description": "删除指定的商品记录",
+				"tags": [
+					"物品管理"
+				],
+				"summary": "删除物品",
+				"description": "删除指定的物品记录",
 				"operationId": "deleteItem",
-				"parameters": [{
-					"name": "id",
-					"in": "path",
-					"required": true,
-					"schema": {
-						"type": "integer",
-						"format": "int64"
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
 					}
-				}],
+				],
 				"responses": {
 					"200": {
 						"description": "OK",
@@ -620,19 +1101,22 @@
 		},
 		"/api/emotions/delete/{id}": {
 			"delete": {
-				"tags": ["情感标签管理"],
+				"tags": [
+					"情感标签管理"
+				],
 				"summary": "删除情感标签",
-				"description": "删除指定的情感标签",
 				"operationId": "deleteEmotion",
-				"parameters": [{
-					"name": "id",
-					"in": "path",
-					"required": true,
-					"schema": {
-						"type": "integer",
-						"format": "int64"
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
 					}
-				}],
+				],
 				"responses": {
 					"200": {
 						"description": "OK",
@@ -649,18 +1133,22 @@
 		},
 		"/api/boxes/delete/{id}": {
 			"delete": {
-				"tags": ["盒子管理"],
+				"tags": [
+					"盒子管理"
+				],
 				"summary": "删除盒子",
 				"operationId": "deleteBox",
-				"parameters": [{
-					"name": "id",
-					"in": "path",
-					"required": true,
-					"schema": {
-						"type": "integer",
-						"format": "int64"
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int64"
+						}
 					}
-				}],
+				],
 				"responses": {
 					"200": {
 						"description": "OK",
@@ -707,6 +1195,21 @@
 					}
 				}
 			},
+			"RestResultUserDTO": {
+				"type": "object",
+				"properties": {
+					"code": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"msg": {
+						"type": "string"
+					},
+					"data": {
+						"$ref": "#/components/schemas/UserDTO"
+					}
+				}
+			},
 			"UserDTO": {
 				"type": "object",
 				"properties": {
@@ -731,7 +1234,10 @@
 				}
 			},
 			"ItemDTO": {
-				"required": ["boxId", "itemCode", "itemName", "price"],
+				"required": [
+					"boxId",
+					"itemCode"
+				],
 				"type": "object",
 				"properties": {
 					"id": {
@@ -743,25 +1249,9 @@
 						"minLength": 0,
 						"type": "string"
 					},
-					"itemName": {
-						"maxLength": 100,
-						"minLength": 0,
-						"type": "string"
-					},
-					"itemDesc": {
-						"maxLength": 500,
-						"minLength": 0,
-						"type": "string"
-					},
 					"boxId": {
 						"type": "integer",
 						"format": "int64"
-					},
-					"price": {
-						"minimum": 0.01,
-						"exclusiveMinimum": false,
-						"type": "number",
-						"format": "double"
 					},
 					"autoRecognizeName": {
 						"type": "string"
@@ -770,6 +1260,23 @@
 						"type": "string"
 					},
 					"itemTag": {
+						"type": "string"
+					},
+					"itemDesc": {
+						"maxLength": 500,
+						"minLength": 0,
+						"type": "string"
+					},
+					"posX": {
+						"type": "number"
+					},
+					"posY": {
+						"type": "number"
+					},
+					"posZ": {
+						"type": "number"
+					},
+					"rotQuaternion": {
 						"type": "string"
 					},
 					"putInTime": {
@@ -783,14 +1290,6 @@
 					"isValid": {
 						"type": "integer",
 						"format": "int32"
-					},
-					"createTime": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"updateTime": {
-						"type": "string",
-						"format": "date-time"
 					}
 				}
 			},
@@ -810,7 +1309,10 @@
 				}
 			},
 			"EmotionDTO": {
-				"required": ["emotionTag", "itemId"],
+				"required": [
+					"emotionTag",
+					"itemId"
+				],
 				"type": "object",
 				"properties": {
 					"id": {
@@ -833,7 +1335,13 @@
 				}
 			},
 			"BoxDTO": {
-				"required": ["boxCode", "boxName", "boxType", "status", "userId"],
+				"required": [
+					"boxCode",
+					"boxName",
+					"boxType",
+					"status",
+					"userId"
+				],
 				"type": "object",
 				"properties": {
 					"id": {
@@ -866,6 +1374,14 @@
 						"type": "integer",
 						"format": "int32"
 					},
+					"resourceKey": {
+						"maxLength": 100,
+						"minLength": 0,
+						"type": "string"
+					},
+					"dimensionConfig": {
+						"type": "string"
+					},
 					"rssi": {
 						"maximum": 0,
 						"minimum": -100,
@@ -875,6 +1391,10 @@
 					"battery": {
 						"maximum": 100,
 						"minimum": 0,
+						"type": "integer",
+						"format": "int32"
+					},
+					"networkDelay": {
 						"type": "integer",
 						"format": "int32"
 					},
@@ -903,8 +1423,56 @@
 					}
 				}
 			},
+			"RestResultMapStringObject": {
+				"type": "object",
+				"properties": {
+					"code": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"msg": {
+						"type": "string"
+					},
+					"data": {
+						"type": "object",
+						"additionalProperties": {
+							"type": "object"
+						}
+					}
+				}
+			},
+			"ModelResourceDTO": {
+				"required": [
+					"modelName",
+					"resourceKey"
+				],
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"resourceKey": {
+						"maxLength": 100,
+						"minLength": 0,
+						"type": "string"
+					},
+					"modelName": {
+						"type": "string"
+					},
+					"geometryType": {
+						"type": "string"
+					},
+					"paramsJson": {
+						"type": "string"
+					}
+				}
+			},
 			"FallbackRequestDTO": {
-				"required": ["fallbackReason", "serviceId"],
+				"required": [
+					"fallbackReason",
+					"serviceId"
+				],
 				"type": "object",
 				"properties": {
 					"serviceId": {
@@ -931,7 +1499,11 @@
 				}
 			},
 			"ErrorLogDTO": {
-				"required": ["errorCode", "errorMessage", "errorTime"],
+				"required": [
+					"errorCode",
+					"errorMessage",
+					"errorTime"
+				],
 				"type": "object",
 				"properties": {
 					"errorCode": {
@@ -947,7 +1519,10 @@
 				}
 			},
 			"AiChatRequestDTO": {
-				"required": ["message", "userId"],
+				"required": [
+					"message",
+					"userId"
+				],
 				"type": "object",
 				"properties": {
 					"userId": {
@@ -958,6 +1533,24 @@
 						"maxLength": 1000,
 						"minLength": 0,
 						"type": "string"
+					}
+				}
+			},
+			"RestResultListUserDTO": {
+				"type": "object",
+				"properties": {
+					"code": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"msg": {
+						"type": "string"
+					},
+					"data": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/UserDTO"
+						}
 					}
 				}
 			},
@@ -977,14 +1570,96 @@
 					}
 				}
 			},
+			"PageResultUserDTO": {
+				"type": "object",
+				"properties": {
+					"page": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"size": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"total": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"totalPages": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"data": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/UserDTO"
+						}
+					}
+				}
+			},
+			"RestResultPageResultUserDTO": {
+				"type": "object",
+				"properties": {
+					"code": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"msg": {
+						"type": "string"
+					},
+					"data": {
+						"$ref": "#/components/schemas/PageResultUserDTO"
+					}
+				}
+			},
+			"RestResultModelResourceDTO": {
+				"type": "object",
+				"properties": {
+					"code": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"msg": {
+						"type": "string"
+					},
+					"data": {
+						"$ref": "#/components/schemas/ModelResourceDTO"
+					}
+				}
+			},
+			"RestResultListModelResourceDTO": {
+				"type": "object",
+				"properties": {
+					"code": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"msg": {
+						"type": "string"
+					},
+					"data": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/ModelResourceDTO"
+						}
+					}
+				}
+			},
 			"QueryItemDTO": {
 				"type": "object",
 				"properties": {
+					"userId": {
+						"type": "integer",
+						"format": "int64"
+					},
 					"boxId": {
 						"type": "integer",
 						"format": "int64"
 					},
 					"itemCode": {
+						"type": "string"
+					},
+					"name": {
 						"type": "string"
 					},
 					"itemTag": {
@@ -993,6 +1668,67 @@
 					"isValid": {
 						"type": "integer",
 						"format": "int32"
+					}
+				}
+			},
+			"PageQueryDTO": {
+				"type": "object",
+				"properties": {
+					"page": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"size": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"sortField": {
+						"type": "string"
+					},
+					"sortOrder": {
+						"type": "string"
+					}
+				}
+			},
+			"PageResultItemDTO": {
+				"type": "object",
+				"properties": {
+					"page": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"size": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"total": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"totalPages": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"data": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/ItemDTO"
+						}
+					}
+				}
+			},
+			"RestResultPageResultItemDTO": {
+				"type": "object",
+				"properties": {
+					"code": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"msg": {
+						"type": "string"
+					},
+					"data": {
+						"$ref": "#/components/schemas/PageResultItemDTO"
 					}
 				}
 			},
@@ -1014,12 +1750,69 @@
 					}
 				}
 			},
+			"RestResultItemDTO": {
+				"type": "object",
+				"properties": {
+					"code": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"msg": {
+						"type": "string"
+					},
+					"data": {
+						"$ref": "#/components/schemas/ItemDTO"
+					}
+				}
+			},
 			"QueryEmotionDTO": {
 				"type": "object",
 				"properties": {
 					"itemId": {
 						"type": "integer",
 						"format": "int64"
+					}
+				}
+			},
+			"PageResultEmotionDTO": {
+				"type": "object",
+				"properties": {
+					"page": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"size": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"total": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"totalPages": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"data": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/EmotionDTO"
+						}
+					}
+				}
+			},
+			"RestResultPageResultEmotionDTO": {
+				"type": "object",
+				"properties": {
+					"code": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"msg": {
+						"type": "string"
+					},
+					"data": {
+						"$ref": "#/components/schemas/PageResultEmotionDTO"
 					}
 				}
 			},
@@ -1061,6 +1854,48 @@
 					"status": {
 						"type": "integer",
 						"format": "int32"
+					}
+				}
+			},
+			"PageResultBoxDTO": {
+				"type": "object",
+				"properties": {
+					"page": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"size": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"total": {
+						"type": "integer",
+						"format": "int64"
+					},
+					"totalPages": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"data": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/BoxDTO"
+						}
+					}
+				}
+			},
+			"RestResultPageResultBoxDTO": {
+				"type": "object",
+				"properties": {
+					"code": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"msg": {
+						"type": "string"
+					},
+					"data": {
+						"$ref": "#/components/schemas/PageResultBoxDTO"
 					}
 				}
 			},
